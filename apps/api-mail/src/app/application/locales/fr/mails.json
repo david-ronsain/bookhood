@@ -1,0 +1,9 @@
+{
+	"user": {
+		"registered": {
+			"subject": "Bienvenue !",
+			"text1": "Bienvenue, {firstName} !",
+			"text2": "Nous espérons que vous allez adorer le site !"
+		}
+	}
+}

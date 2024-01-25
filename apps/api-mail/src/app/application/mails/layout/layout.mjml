@@ -1,0 +1,61 @@
+<mjml>
+	<mj-head>
+		<mj-title>{{ title }}</mj-title>
+		<mj-font
+			name="Raleway"
+			href="https://fonts.googleapis.com/css?family=Raleway" />
+		<mj-style> </mj-style>
+	</mj-head>
+
+	<mj-body>
+		<mj-wrapper background-color="#e8e8e8">
+			<mj-section background-color="#e8e8e8">
+				<mj-column width="100%">
+					<mj-image
+						src="https://3.bp.blogspot.com/-ggzi2A2IX2I/W8C3DGXPjDI/AAAAAAAACVY/7vjPuLEpUPU3lSchl-tyjGIpo_lgZ81ZwCLcBGAs/s200/Livre1.png" />
+				</mj-column>
+			</mj-section>
+			<mj-section>
+				<mj-column width="100%">
+					<mj-text font-family="Raleway">
+						<h1>{{ trads.websiteName }}</h1>
+						<h2>{{ trads.websitePhrase }}</h2>
+					</mj-text>
+				</mj-column>
+			</mj-section>
+
+			<mj-section>
+				<mj-column width="100%"> {{ content }} </mj-column>
+			</mj-section>
+
+			<mj-section background-color="#e8e8e8">
+				<mj-column>
+					<mj-text
+						font-family="Raleway"
+						align="center">
+						<h6>{{ trads.copyright }}</h6>
+					</mj-text>
+				</mj-column>
+			</mj-section>
+
+			<mj-section>
+				<mj-column>
+					<mj-social
+						font-size="15px"
+						icon-size="30px"
+						mode="horizontal">
+						<mj-social-element
+							name="facebook"
+							href="https://mjml.io/" />
+						<mj-social-element
+							name="twitter"
+							href="https://mjml.io/" />
+						<mj-social-element
+							name="youtube"
+							href="https://mjml.io/" />
+					</mj-social>
+				</mj-column>
+			</mj-section>
+		</mj-wrapper>
+	</mj-body>
+</mjml>
