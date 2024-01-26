@@ -72,7 +72,7 @@ export class HealthController {
 				this.http.pingCheck(
 					envConfig().gateway.gateway.serviceName,
 					`${envConfig().settings.protocol}://${
-						envConfig().settings.host
+						envConfig().settings.externalHost
 					}:${envConfig().settings.port}/${
 						envConfig().settings.docPrefix
 					}`

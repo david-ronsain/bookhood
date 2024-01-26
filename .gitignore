@@ -3,6 +3,7 @@
 /**/logs/*
 .pnpm-store/*
 .env
+.env.test
 
 # compiled output
 dist

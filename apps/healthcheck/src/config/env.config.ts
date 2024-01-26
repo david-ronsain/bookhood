@@ -4,6 +4,7 @@ export default (): INestEnvConfig => ({
 	settings: {
 		apiPrefix: process.env.APP_API_GATEWAY_PREFIX || '',
 		host: process.env.APP_API_GATEWAY_HOST || '',
+		externalHost: process.env.APP_API_GATEWAY_EXTERNAL_HOST || '',
 		port: parseInt(process.env.APP_API_GATEWAY_PORT || ''),
 		docPrefix: process.env.APP_API_GATEWAY_DOC || '',
 		protocol: (process.env.APP_API_GATEWAY_PROTOCOL || '') as

@@ -1,6 +1,7 @@
 export interface INestEnvConfigSettings {
 	protocol?: 'http' | 'https'
 	host?: string
+	externalHost?: string
 	port?: number
 	apiPrefix?: string
 	docPrefix?: string
