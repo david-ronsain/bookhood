@@ -14,6 +14,11 @@ import envConfig from '../../config/env.config'
 			useFactory: () => ({
 				uri: `${envConfig().mongo.protocol}://${
 					envConfig().mongo.user
+						? envConfig().mongo.user +
+						  ':' +
+						  envConfig().mongo.password +
+						  '@'
+						: ''
 				}${
 					envConfig().mongo.host
 				}:${envConfig().mongo.port.toString()}/${

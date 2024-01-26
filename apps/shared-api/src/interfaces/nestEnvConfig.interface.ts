@@ -32,6 +32,7 @@ interface INestEnvConfigMongo {
 	host: string
 	database: string
 	user: string
+	password: string
 }
 
 interface INestEnvConfigRedis {

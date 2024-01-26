@@ -8,7 +8,7 @@ async function bootstrap() {
 
 	app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
 
-	const port = process.env.PORT || 3001
+	const port = process.env.APP_HEALTHCHECK_PORT || 3001
 	await app.listen(port)
 }
 

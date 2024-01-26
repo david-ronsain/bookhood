@@ -40,7 +40,6 @@ import {
 		}),
 		I18nModule.forRoot({
 			fallbackLanguage: envConfig().i18n.fallbackLocale,
-			viewEngine: 'hbs',
 			resolvers: [
 				{
 					use: QueryResolver,

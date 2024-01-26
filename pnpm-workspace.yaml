@@ -1,0 +1,9 @@
+packages:
+    - apps/front
+    - apps/ui
+    - apps/shared
+    - apps/shared-api
+    - apps/api-gateway
+    - apps/api-user
+    - apps/api-mail
+    - apps/healthcheck

@@ -7,6 +7,7 @@ export default (): INestEnvConfig => ({
 		port: parseInt(process.env.MONGO_PORT || ''),
 		protocol: process.env.MONGO_PROTOCOL || '',
 		user: process.env.MONGO_USER || '',
+		password: process.env.MONGO_PASSWORD || '',
 	},
 	gateway: {
 		user: {
