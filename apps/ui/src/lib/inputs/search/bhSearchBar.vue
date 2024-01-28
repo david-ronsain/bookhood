@@ -17,6 +17,9 @@
 
 	const props = withDefaults(defineProps<BhSearchBarProps>(), {
 		isLoading: false,
+		noResultLabel: 'No result',
+		authorLabel: 'By author',
+		bookLabel: 'By title'
 	})
 
 	const loading = ref(false)
@@ -28,12 +31,12 @@
 	const searchTypes = ref<ISearchTypeItem[]>([
 		{
 			value: 'inauthor',
-			title: 'Par auteur',
+			title: props.authorLabel,
 			icon: mdiAccountTie,
 		},
 		{
 			value: 'intitle',
-			title: 'Par titre',
+			title: props.bookLabel,
 			icon: mdiBookOpenBlankVariantOutline,
 		},
 	])
@@ -43,41 +46,36 @@
 		loading.value = p.isLoading || false
 	})
 
-	watch(searchValue, (newText: string, oldText: string) => {
-		if (newText.toLowerCase() !== oldText.toLowerCase()) {
-			page.value = 0
-			items.value = []
-			startSearch(newText)
-		}
-	})
-
 	function resetSearch() {
 		searchValue.value = ''
+		page.value = 0
 		items.value = []
 		loading.value = false
 		keepLoading.value = true
 	}
 
 const startSearch = ((text: string) => {
-		if (typeof text === 'string' && text.length) {
+		if (typeof text === 'string' && text.length > 0) {
 			keepLoading.value = true
 			searchValue.value = text.toString()
 			loading.value = true
 			debouncedSearch(text)
+		} else if (typeof text === 'string') {
+			resetSearch()
 		}
 		
 	})
 
 	const debouncedSearch = debounce((text: string) => {
-			if (typeof text === 'string' && text.length) {
-				events('searching', {
-					type: searchType.value,
-					text: searchValue.value.trim() || '',
-					page: page.value,
-				})
-				page.value++
-			}
-		}, 750)
+		if (typeof text === 'string' && text.length) {
+			events('searching', {
+				type: searchType.value,
+				text: searchValue.value.trim() || '',
+				page: page.value,
+			})
+			page.value++
+		}
+	}, 750)
 
 	function setItems(list: any[]) {
 		items.value.push(...list)
@@ -117,7 +115,7 @@ const startSearch = ((text: string) => {
 		:items="items"
 		:label="label"
 		:loading="loading"
-		no-data-text="No results"
+		:no-data-text="props.noResultLabel"
 		no-filter
 		persistent-clear
 		persistent-placeholder

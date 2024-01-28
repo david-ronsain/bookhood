@@ -13,6 +13,9 @@ export interface BhSearchBarProps {
 	isLoading?: boolean
 	label?: string | undefined
 	placeholder?: string | undefined
+	authorLabel?: string | undefined
+	bookLabel?: string | undefined
+	noResultLabel?: string | undefined
 }
 
 export interface ISearchTypeItem {

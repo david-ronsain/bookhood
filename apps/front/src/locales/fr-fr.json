@@ -4,6 +4,14 @@
 		"menu": {
 			"signin": "Se connecter",
 			"profile": "Mon profil"
+		},
+		"header": {
+			"searchbar": {
+				"label": "Chercher un livre ou un auteur",
+				"authorLabel": "Par auteur",
+				"bookLabel": "Par titre",
+				"noResultLabel": "Aucun résultat"
+			}
 		}
 	},
 	"home": {

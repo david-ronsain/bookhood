@@ -88,6 +88,10 @@
 		<template v-slot:title>
 			<bh-search-bar
 				ref="searchBar"
+				:placeholder="$t('common.header.searchbar.label')"
+				:authorLabel="$t('common.header.searchbar.authorLabel')"
+				:bookLabel="$t('common.header.searchbar.bookLabel')"
+				:noResultLabel="$t('common.header.searchbar.noResultLabel')"
 				@searching="search" />
 		</template>
 
