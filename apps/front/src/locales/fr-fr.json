@@ -1,5 +1,6 @@
 {
 	"common": {
+		"websiteName": "La Folivre",
 		"menu": {
 			"signin": "Se connecter",
 			"profile": "Mon profil"

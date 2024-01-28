@@ -1,0 +1,787 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 57,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "RBYbvgAACAAJ",
+      "etag": "B0eCwVsqdlc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/RBYbvgAACAAJ",
+      "volumeInfo": {
+        "title": "From Percy Jackson: Camp Half-Blood Confidential (An Official Rick Riordan Companion Book)",
+        "subtitle": "Your Real Guide to the Demigod Training Camp",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Disney-Hyperion",
+        "publishedDate": "2017-05-02",
+        "description": "In response to an awful camp orientation video created by the god Apollo, Percy Jackson and other residents of Camp Half-Blood answer such questions as \"What is this place?\" and \"Do I get to keep the T-shirt?\" Newbies can check out the section on the Divine Cabins, read up on Magical Landmarks, and consult the chapter of Training Arenas. But Camp Half-Blood Confidential explores much more than just the buildings and grounds. It includes info that can only be learned from those who live there. For instance, campers do not always co-exist in peace and harmony. The camp is not run with superior efficiency. Prophecies do not flow forth with great regularity. Sprinkled throughout are stories from heroes who have called Camp Half-Blood home or just passed through on their way to places unknown. Chiron himself introduces the book with a brief history of training based on his millennia of experience. And, of course, there are divine words of wisdom from the god Apollo himself, because . . . well, because the demigod authors would prefer not to be struck down, thank you very much.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "148478555X"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781484785553"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=RBYbvgAACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=RBYbvgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=RBYbvgAACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=RBYbvgAACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/From_Percy_Jackson_Camp_Half_Blood_Confi.html?hl=&id=RBYbvgAACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=RBYbvgAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Chiron himself introduces the book with a brief history of training based on his millennia of experience."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "OlRNNAAACAAJ",
+      "etag": "g9YDoBksfGA",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/OlRNNAAACAAJ",
+      "volumeInfo": {
+        "title": "Demigods and Monsters",
+        "subtitle": "Your Favorite Authors on Rick Riordan's Percy Jackson and the Olympians Series",
+        "authors": [
+          "Rick Riordan",
+          "Leah Wilson"
+        ],
+        "publisher": "Borders",
+        "publishedDate": "2008-01-01",
+        "description": "Spend a little more time in Percy Jackson's world-- a place where the gods bike among us, monsters man snack bars and each of us has the potential to become a hero.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0979233143"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780979233142"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 190,
+        "printType": "BOOK",
+        "categories": [
+          "Children's stories, American"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=OlRNNAAACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=OlRNNAAACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Demigods_and_Monsters.html?hl=&id=OlRNNAAACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=OlRNNAAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Spend a little more time in Percy Jackson&#39;s world-- a place where the gods bike among us, monsters man snack bars and each of us has the potential to become a hero."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "QKSvxgEACAAJ",
+      "etag": "VjYvxHApOIQ",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/QKSvxgEACAAJ",
+      "volumeInfo": {
+        "title": "Read Riordan",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Disney-Hyperion",
+        "publishedDate": "2019-09-24",
+        "description": "The adventure begins here - the first novels from the five groundbreaking series by Rick Riordan! Starting with THE LIGHTNING THIEF, the book that launched millions of readers into the amazing world of Greek mythology, to THE HIDDEN ORACLE, the story that gives a new look to Roman myths -- not to mention the god, Apollo -- with visits to Egypt and Valhalla in between. This beautifully packaged boxed set will thrill fans who want to relive the adventure and magic again, and will open the door to new readers of Riordan's epic storytelling.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1368058116"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781368058117"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "averageRating": 5,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=QKSvxgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=QKSvxgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=QKSvxgEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=3&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=QKSvxgEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Read_Riordan.html?hl=&id=QKSvxgEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=QKSvxgEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "The adventure begins here - the first novels from the five groundbreaking series by Rick Riordan!"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "c5c_yQEACAAJ",
+      "etag": "MqtaesKjx6Q",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/c5c_yQEACAAJ",
+      "volumeInfo": {
+        "title": "The Trials of Apollo Camp Jupiter Classified (An Official Rick Riordan Companion Book)",
+        "subtitle": "A Probatio's Journal",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Disney-Hyperion",
+        "publishedDate": "2020-05-05",
+        "description": "It's the February after Gaea's defeat, and mysterious incidents are wreaking havoc throughout Camp Jupiter. If the Romans don't figure out who--or what--is behind the episodes soon, the Twelfth Legion could implode. Suspicion falls on Claudia, the Fourth Cohort's newest probatio. After all, the mischief started shortly after she stumbled into camp. Plus, she's a daughter of Mercury, the god of thieves and tricksters. To find out whether she's guilty or innocent, readers can delve into the pages of Claudia's personal journal. Through her eyewitness accounts, they will visit the crime scenes--a row of seats in the Coliseum, an underground aqueduct tunnel, the strange staircase at the back of the principia--and see the bizarre events unfold. They'll be right alongside Claudia when she discovers a secret so ancient that not even the lares know about it . . . a secret that holds the key to Camp Jupiter's safety.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "136802405X"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781368024051"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=c5c_yQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=c5c_yQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=c5c_yQEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=4&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=c5c_yQEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Trials_of_Apollo_Camp_Jupiter_Classi.html?hl=&id=c5c_yQEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=c5c_yQEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "It&#39;s the February after Gaea&#39;s defeat, and mysterious incidents are wreaking havoc throughout Camp Jupiter."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "cAQnEAAAQBAJ",
+      "etag": "7ARLgmzBGjc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/cAQnEAAAQBAJ",
+      "volumeInfo": {
+        "title": "Neros torn",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Bonnier Carlsen",
+        "publishedDate": "2021-05-26",
+        "description": "Rafflande spänning i femte och avslutande delen i Rick Riordans populära serie om den grekiska guden Apollon, som dessvärre förvandlats till den finniga tonåringen Lester Papadopoulos. Lesters halvgudvänner på Camp Jupiter har just hjälpt honom överleva attacker från blodtörstiga ghuler, de har tillsammans tagit sig an en ond romersk kung och hans zombiearmé, samt de livsfarliga kejsarna Caligula och Commodus. Men ingen rast och ingen ro. Nu måste Lester och Meg följa harpyan Ellas profetia och bege sig till Neros torn i New York för att där besegra den sista kejsaren. Kommer han sedan äntligen få återvända till Olympen i sin fulländade, gudomliga gestalt? Rick Riordan är en av världens mest populära författare. Hans serie om Percy Jackson har översatts till mer än 35 språk, och legat till grund för två storfilmer från Hollywood. I serien om Apollon fortsätter han att utforska den grekiska och romerska mytologin i en rad böcker som ständigt ligger högt upp på New York Times bestsellerlista.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9789179757663"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "9179757669"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 419,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.9.9.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=cAQnEAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=cAQnEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "sv",
+        "previewLink": "http://books.google.fr/books?id=cAQnEAAAQBAJ&printsec=frontcover&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=5&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=cAQnEAAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=cAQnEAAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 4.28,
+          "currencyCode": "EUR"
+        },
+        "retailPrice": {
+          "amount": 4.07,
+          "currencyCode": "EUR"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=cAQnEAAAQBAJ&rdid=book-cAQnEAAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 4280000,
+              "currencyCode": "EUR"
+            },
+            "retailPrice": {
+              "amountInMicros": 4070000,
+              "currencyCode": "EUR"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=cAQnEAAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Kommer han sedan äntligen få återvända till Olympen i sin fulländade, gudomliga gestalt? Rick Riordan är en av världens mest populära författare."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "_zMdzgEACAAJ",
+      "etag": "EkCHH1Ku+Ys",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/_zMdzgEACAAJ",
+      "volumeInfo": {
+        "title": "The Cursed Carnival and Other Calamities",
+        "subtitle": "New Stories about Mythic Heroes",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Rick Riordan",
+        "publishedDate": "2021",
+        "description": "A collection of ten stories by authors from the Rick Riordan Presents imprint that remix myths for modern readers.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1368070833"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781368070836"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 496,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=_zMdzgEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=_zMdzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=_zMdzgEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=6&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=_zMdzgEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Cursed_Carnival_and_Other_Calamities.html?hl=&id=_zMdzgEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=_zMdzgEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A collection of ten stories by authors that remix myths for modern readers"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "p8VXEoxGbAMC",
+      "etag": "8gMflG+oKt8",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/p8VXEoxGbAMC",
+      "volumeInfo": {
+        "title": "Other Worlds (feat. stories by Rick Riordan, Shaun Tan, Tom Angleberger, Ray Bradbury and more)",
+        "authors": [
+          "Rick Riordan",
+          "Tan",
+          "Ray Bradbury",
+          "Tom Angleberger",
+          "Neal Shusterman",
+          "Rebecca Stead"
+        ],
+        "publisher": "HarperCollins UK",
+        "publishedDate": "2013-08-29",
+        "description": "Ten incredible trips into the unknown await you...",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780007535033"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0007535031"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 352,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.4.4.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=p8VXEoxGbAMC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=p8VXEoxGbAMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=p8VXEoxGbAMC&printsec=frontcover&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=7&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=p8VXEoxGbAMC&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=p8VXEoxGbAMC"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 5.49,
+          "currencyCode": "EUR"
+        },
+        "retailPrice": {
+          "amount": 5.49,
+          "currencyCode": "EUR"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=p8VXEoxGbAMC&rdid=book-p8VXEoxGbAMC&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 5490000,
+              "currencyCode": "EUR"
+            },
+            "retailPrice": {
+              "amountInMicros": 5490000,
+              "currencyCode": "EUR"
+            },
+            "giftable": true
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.fr/books/download/Other_Worlds_feat_stories_by_Rick_Riorda-sample-epub.acsm?id=p8VXEoxGbAMC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=p8VXEoxGbAMC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Ten incredible trips into the unknown await you..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "atmaDwAAQBAJ",
+      "etag": "XVXxXytEndo",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/atmaDwAAQBAJ",
+      "volumeInfo": {
+        "title": "Rick Riordan Series Sampler",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Disney Electronic Content",
+        "publishedDate": "2019-05-31",
+        "description": "Available for the first time, a free sampler of the riveting opening chapters from all five of Rick Riordan's New York Times mega-best-selling series: Percy Jackson and the Olympians: THE LIGHTNING THIEF, The Heroes of Olympus: THE LOST HERO, The Kane Chronicles: THE RED PYRAMID, Magnus Chase and the Gods of Asgard: THE SWORD OF SUMMER, and The Trials of Apollo: THE HIDDEN ORACLE. Start reading now and get hooked on these thrilling quest stories inspired by Greek, Roman, Egyptian, and Norse mythologies, told as only Rick Riordan, dubbed \"storyteller of the gods,\" can tell them.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781368058001"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1368058000"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 95,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.1.1.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=atmaDwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=atmaDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=atmaDwAAQBAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=8&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=atmaDwAAQBAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Rick_Riordan_Series_Sampler.html?hl=&id=atmaDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=atmaDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Start reading now and get hooked on these thrilling quest stories inspired by Greek, Roman, Egyptian, and Norse mythologies, told as only Rick Riordan, dubbed &quot;storyteller of the gods,&quot; can tell them."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5yKzswEACAAJ",
+      "etag": "CwOt94sC3Eo",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5yKzswEACAAJ",
+      "volumeInfo": {
+        "title": "From the Kane Chronicles Brooklyn House Magician's Manual (An Official Rick Riordan Companion Book)",
+        "subtitle": "Your Guide to Egyptian Gods & Creatures, Glyphs & Spells, and More",
+        "authors": [
+          "Rick Riordan"
+        ],
+        "publisher": "Disney-Hyperion",
+        "publishedDate": "2018-05-01",
+        "description": "Greetings, initiate! Carter Kane, here. Congratulations on reaching Brooklyn House in one piece. This accomplishment signals that you're descended from Ancient Egyptian royalty, and you have magic powers. But what good is power without knowing how to use it? That's where this training manual comes in. Packed with quizzes, stories, and insights about Ancient Egyptian deities, creatures (the friendly and the deadly), the mysterious Duat, and more, this primer will prime those with the blood of the pharaohs to take their first steps down the path of the gods. You'll hear from me, other magicians (including my sister, Sadie), and even a few of the gods themselves. But beware of tricks and surprises: anything can happen in the world of Egyptian magic.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1484785533"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781484785539"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Fiction"
+        ],
+        "averageRating": 5,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=5yKzswEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=5yKzswEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=5yKzswEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=9&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=5yKzswEACAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/From_the_Kane_Chronicles_Brooklyn_House.html?hl=&id=5yKzswEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5yKzswEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "This accomplishment signals that you&#39;re descended from Ancient Egyptian royalty, and you have magic powers. But what good is power without knowing how to use it? That&#39;s where this training manual comes in."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "SaEQAQAAIAAJ",
+      "etag": "DE+OCVA9Ptc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/SaEQAQAAIAAJ",
+      "volumeInfo": {
+        "title": "Sean O'Riordan, a Theologian of Development",
+        "subtitle": "Selected Essays",
+        "authors": [
+          "Sean O'Riordan"
+        ],
+        "publisher": "Columba Press (IE)",
+        "publishedDate": "1998",
+        "description": "Sean O'Riordan (1916-1998) was among the most gifted theologians of his generation. His particular theological style was the development of a scientifically based discourse with a pastoral purpose. It is this pastoral thrust that distinguishes him as a theologian: the desire to see how theology is at the service of all that is concrete, dynamic and historical in the life of the Church. This unique book gathers together, for the first time, some of Sean O'Riordan's more significant essays over a thirty-year period.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105021485797"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 416,
+        "printType": "BOOK",
+        "categories": [
+          "Christian ethics"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.3.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=SaEQAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=SaEQAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fr/books?id=SaEQAQAAIAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&cd=10&source=gbs_api",
+        "infoLink": "http://books.google.fr/books?id=SaEQAQAAIAAJ&dq=intitle:riordan%2Binauthor:riordan&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Sean_O_Riordan_a_Theologian_of_Developme.html?hl=&id=SaEQAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "FR",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FR",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=SaEQAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "This unique book gathers together, for the first time, some of Sean O&#39;Riordan&#39;s more significant essays over a thirty-year period."
+      }
+    }
+  ]
+}

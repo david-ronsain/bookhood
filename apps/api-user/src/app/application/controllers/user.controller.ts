@@ -25,12 +25,11 @@ export class UserController {
 	async createUser(
 		user: ICreateUserDTO
 	): Promise<MicroserviceResponseFormatter<UserModel>> {
-		this.rabbitMailClient.send('mail-user-registered', user).subscribe()
-
 		try {
 			const createdUser: UserModel = await this.createUserUseCase.handler(
 				user
 			)
+			this.rabbitMailClient.send('mail-user-registered', user).subscribe()
 			return new MicroserviceResponseFormatter<UserModel>(
 				true,
 				HttpStatus.CREATED,

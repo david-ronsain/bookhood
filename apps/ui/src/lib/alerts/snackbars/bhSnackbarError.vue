@@ -1,22 +1,31 @@
 <script setup lang="ts">
 	import { ref } from 'vue'
 	import { mdiCloseCircleOutline } from '@mdi/js'
+	import { watch } from 'vue';
 
 	export interface BhSnackbarErrorProps {
-		text: string
+		text?: string
+		opened?: boolean
 	}
 
-	defineProps<BhSnackbarErrorProps>()
-	const opened = ref<boolean>(false)
+	const props = withDefaults(defineProps<BhSnackbarErrorProps>(), {
+		text: 'Ok',
+		opened: false
+	})
+	const isOpened = ref(props.opened)
 
 	function open() {
-		opened.value = true
+		isOpened.value = true
 	}
 
 	function close() {
-		opened.value = false
+		isOpened.value = false
 		emit('close')
 	}
+
+	watch(props, (p: BhSnackbarErrorProps) => {
+		isOpened.value = p.opened || false
+	})
 
 	defineExpose({
 		open,
@@ -32,7 +41,7 @@
 		timeout="-1"
 		rounded
 		multi-line
-		v-model="opened"
+		v-model="isOpened"
 		color="error">
 		<template v-slot:text>
 			{{ text }}

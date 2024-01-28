@@ -24,6 +24,7 @@ node_modules
 
 # IDE - VSCode
 .vscode/*
+.VSCodeCounter/*
 
 # misc
 /.sass-cache

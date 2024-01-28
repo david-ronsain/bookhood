@@ -16,3 +16,7 @@ const Template = (args: BhSnackbarErrorProps) => ({
 })
 
 export const Classic = Template.bind({})
+Classic.args = {
+	opened: true,
+	text: 'This is an error',
+}

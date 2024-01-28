@@ -28,5 +28,15 @@ export default createRouter({
 			name: 'account',
 			component: Account,
 		},
+		{
+			path: '/book/:id',
+			name: 'book',
+			component: Home,
+		},
+		{
+			path: '/search',
+			name: 'search',
+			component: Home,
+		},
 	],
 })

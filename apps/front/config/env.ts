@@ -7,6 +7,7 @@ interface II18nConfig {
 interface IEnvConfig {
 	i18n: II18nConfig
 	api: IApiConfig
+	googleApi: IGoogleApi
 }
 
 enum I18nLocales {
@@ -17,6 +18,11 @@ interface IApiConfig {
 	url: {
 		user: string
 	}
+}
+
+interface IGoogleApi {
+	url: string
+	key: string
 }
 
 export const EnvConfig: IEnvConfig = {
@@ -40,5 +46,9 @@ export const EnvConfig: IEnvConfig = {
 				import.meta.env.VITE_APP_FRONT_API_GATEWAY_PREFIX
 			}${import.meta.env.VITE_APP_FRONT_API_USER_PREFIX}`,
 		},
+	},
+	googleApi: {
+		url: import.meta.env.VITE_APP_FRONT_GOOGLE_BOOKS_URL || '',
+		key: import.meta.env.VITE_APP_FRONT_GOOGLE_API_KEY || '',
 	},
 }

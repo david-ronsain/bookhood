@@ -45,7 +45,7 @@ services:
     api-gateway:
         build:
             context: .
-            dockerfile: /apps/api-gateway/Dockerfile
+            dockerfile: ./apps/api-gateway/Dockerfile
             target: prod
         restart: unless-stopped
         ports:
