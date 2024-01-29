@@ -27,6 +27,12 @@ const UserSchema = new Schema(
 			enum: Role,
 			default: [Role.USER],
 		},
+		token: {
+			type: String,
+		},
+		tokenExpiration: {
+			type: Date,
+		},
 	},
 	{
 		timestamps: true,

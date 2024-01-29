@@ -8,6 +8,7 @@ export interface INestEnvConfigSettings {
 	env?: string
 	mailFrom?: string
 	mailTo?: string
+	sessionDuration?: number
 }
 
 interface INestEnvConfigGatewayUserService {
@@ -71,6 +72,12 @@ interface INestEnvConfigI18n {
 	fallbackLocale: string
 }
 
+interface INestEnvConfigFront {
+	protocol: string
+	port: number
+	host: string
+}
+
 export interface INestEnvConfig {
 	settings?: INestEnvConfigSettings
 	gateway?: INestEnvConfigGateway
@@ -79,4 +86,5 @@ export interface INestEnvConfig {
 	rabbitmq?: INestEnvConfigRabbitMQ
 	aws?: INestEnvConfigAWS
 	i18n?: INestEnvConfigI18n
+	front?: INestEnvConfigFront
 }

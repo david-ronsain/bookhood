@@ -11,6 +11,8 @@ import {
 	Transport,
 } from '@nestjs/microservices'
 import envConfig from '../../config/env.config'
+import { AuthController } from './controllers/auth.controller'
+import { JwtModule } from '@nestjs/jwt'
 
 @Module({
 	imports: [
@@ -21,8 +23,14 @@ import envConfig from '../../config/env.config'
 				schema: UserSchema,
 			},
 		]),
+		JwtModule.register({
+			secret: 'secret',
+			signOptions: {
+				expiresIn: '1h',
+			},
+		}),
 	],
-	controllers: [UserController],
+	controllers: [UserController, AuthController],
 	providers: [
 		...USER_USECASES,
 		{

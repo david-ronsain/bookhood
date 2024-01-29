@@ -41,5 +41,19 @@
 				"terms_required": "Vous devez accepter les conditions d'utilisation"
 			}
 		}
+	},
+	"signin": {
+		"sendLink": {
+			"explanation": "Pour vous connecter, vous n'avez pas besoin de mot de passe. Tout ce que vous avez à faire, c'est nous rappeler votre email et nous vous enverrons un lien de connexion.",
+			"email": {
+				"label": "Email",
+				"placeholder": "jean{'@'}dupont.com",
+				"email_required": "Vous devez saisir votre email",
+				"email_regex": "Vous adresse email est incorrecte"
+			},
+			"send": "Envoyer",
+			"error": "Nous n'avons pas de compte lié à cette adresse",
+			"success": "Le mail vous a été envoyé"
+		}
 	}
 }

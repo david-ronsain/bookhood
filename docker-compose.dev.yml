@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
     mongo:
@@ -20,6 +20,8 @@ services:
     redis:
         image: redis:7
         restart: unless-stopped
+        ports:
+            - '${REDIS_PORT}:${REDIS_PORT}'
         expose:
             - ${REDIS_PORT}
         networks:
@@ -30,6 +32,7 @@ services:
         image: rabbitmq:3
         restart: unless-stopped
         ports:
+            - '${RMQ_PORT}:${RMQ_PORT}'
             - '15672:15672'
         expose:
             - ${RMQ_PORT}
@@ -42,92 +45,91 @@ services:
             main:
                 ipv4_address: 192.168.1.103
 
-    api-gateway:
-        build:
-            context: .
-            dockerfile: /apps/api-gateway/Dockerfile
-            target: dev
-        restart: unless-stopped
-        ports:
-            - '${APP_API_GATEWAY_PORT}:${APP_API_GATEWAY_PORT}'
-        expose:
-            - ${APP_API_GATEWAY_PORT}
-            - ${REDIS_PORT}
-        networks:
-            main:
-                ipv4_address: 192.168.1.104
+    # api-gateway:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/api-gateway/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     ports:
+    #         - '${APP_API_GATEWAY_PORT}:${APP_API_GATEWAY_PORT}'
+    #     expose:
+    #         - ${APP_API_GATEWAY_PORT}
+    #         - ${REDIS_PORT}
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.104
 
-    api-user:
-        build:
-            context: .
-            dockerfile: /apps/api-user/Dockerfile
-            target: dev
-        restart: unless-stopped
-        expose:
-            - ${RMQ_PORT}
-            - ${MONGO_PORT}
-        depends_on:
-            - mongo
-            - redis
-            - rabbitmq
-        networks:
-            main:
-                ipv4_address: 192.168.1.105
+    # api-user:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/api-user/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     expose:
+    #         - ${RMQ_PORT}
+    #         - ${MONGO_PORT}
+    #     depends_on:
+    #         - mongo
+    #         - redis
+    #         - rabbitmq
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.105
 
-    api-mail:
-        build:
-            context: .
-            dockerfile: /apps/api-mail/Dockerfile
-            target: dev
-        restart: unless-stopped
-        expose:
-            - ${RMQ_PORT}
-        depends_on:
-            - api-user
-        networks:
-            main:
-                ipv4_address: 192.168.1.106
+    # api-mail:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/api-mail/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     expose:
+    #         - ${RMQ_PORT}
+    #     depends_on:
+    #         - api-user
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.106
 
-    healthcheck:
-        build:
-            context: .
-            dockerfile: /apps/healthcheck/Dockerfile
-            target: dev
-        restart: unless-stopped
-        ports:
-            - '${APP_HEALTHCHECK_PORT}:${APP_HEALTHCHECK_PORT}'
-        expose:
-            - ${RMQ_PORT}
-            - ${MONGO_PORT}
-            - ${APP_API_GATEWAY_PORT}
-            - ${REDIS_PORT}
-            - ${APP_HEALTHCHECK_PORT}
-        environment:
-            - APP_API_GATEWAY_HOST=api-gateway
-        depends_on:
-            - front
-        networks:
-            main:
-                ipv4_address: 192.168.1.107
+    # healthcheck:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/healthcheck/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     ports:
+    #         - '${APP_HEALTHCHECK_PORT}:${APP_HEALTHCHECK_PORT}'
+    #     expose:
+    #         - ${RMQ_PORT}
+    #         - ${MONGO_PORT}
+    #         - ${APP_API_GATEWAY_PORT}
+    #         - ${REDIS_PORT}
+    #         - ${APP_HEALTHCHECK_PORT}
+    #     environment:
+    #         - APP_API_GATEWAY_HOST=api-gateway
+    #     depends_on:
+    #         - front
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.107
 
-    front:
-        build:
-            context: .
-            dockerfile: /apps/front/Dockerfile
-            target: dev
-        restart: unless-stopped
-        ports:
-            - '${APP_FRONT_SERVER_PORT}:${APP_FRONT_SERVER_PORT}'
-        depends_on:
-            - api-gateway
-        networks:
-            main:
-                ipv4_address: 192.168.1.108
+    # front:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/front/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     ports:
+    #         - '${APP_FRONT_SERVER_PORT}:${APP_FRONT_SERVER_PORT}'
+    #     depends_on:
+    #         - api-gateway
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.108
 
 volumes:
     mongodata:
     modules:
-
 
 networks:
     main:

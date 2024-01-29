@@ -10,7 +10,7 @@ import router from './router/router'
 import { createI18n } from 'vue-i18n'
 import { createPinia } from 'pinia'
 
-const pinia = createPinia()
+export const pinia = createPinia()
 const i18n = createI18n({
 	locale: EnvConfig.i18n.defaultLocale,
 	availableLocales: EnvConfig.i18n.availableLocales,
@@ -22,8 +22,10 @@ const i18n = createI18n({
 
 const app = createApp(App)
 
+app.config.globalProperties.authenticated = false
+
 app.use(i18n)
 app.use(vuetify)
-app.use(router)
 app.use(pinia)
+app.use(router)
 app.mount('#root')

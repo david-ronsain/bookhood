@@ -26,4 +26,7 @@ export default (): INestEnvConfig => ({
 			mail: process.env.RMQ_MAIL_QUEUE || '',
 		},
 	},
+	settings: {
+		sessionDuration: parseInt(process.env.SESSION_DURATION || ''),
+	},
 })

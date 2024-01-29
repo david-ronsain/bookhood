@@ -9,7 +9,9 @@
 	import { type CreateUserDTO } from '@bookhood/shared'
 	import { useI18n } from 'vue-i18n'
 	import { useUserStore } from '../../store'
+	import { useRouter } from 'vue-router'
 
+	const router = useRouter()
 	const userStore = useUserStore()
 	const { t } = useI18n()
 	const formValid = ref<boolean>(false)
@@ -43,11 +45,16 @@
 	async function signup() {
 		loading.value = true
 		disabled.value = true
-		userStore.signup(data.value).catch((err) => {
-			error.value = err.message
-			loading.value = false
-			snackError.value?.open()
-		})
+		userStore
+			.signup(data.value)
+			.then(() => {
+				router.push({ name: 'home' })
+			})
+			.catch((err) => {
+				error.value = err.message
+				loading.value = false
+				snackError.value?.open()
+			})
 	}
 </script>
 
@@ -118,7 +125,7 @@
 		<bh-snackbar-error
 			:attach="form"
 			ref="snackError"
-			text="gzeg"
+			:text="error"
 			@close="disabled = false" />
 	</v-form>
 </template>

@@ -13,4 +13,8 @@ export interface UserEntity extends Document, IUser {
 	readonly email: string
 
 	readonly role?: Role[]
+
+	readonly token?: string
+
+	readonly tokenExpiration: Date
 }

@@ -17,6 +17,7 @@ import {
 import { WinstonModule } from 'nest-winston'
 import * as winston from 'winston'
 import { winstonConfig } from '@bookhood/shared'
+import { AuthController } from './application/controllers/auth.controller'
 
 @Module({
 	imports: [
@@ -40,7 +41,7 @@ import { winstonConfig } from '@bookhood/shared'
 			winstonConfig(winston, envConfig().gateway.gateway.serviceName)
 		),
 	],
-	controllers: [UserController],
+	controllers: [UserController, AuthController],
 	providers: [
 		ConfigService,
 		{

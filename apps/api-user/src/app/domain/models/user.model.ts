@@ -10,6 +10,8 @@ export default class UserModel {
 				Array.isArray(user.role) && user.role.length
 					? user.role
 					: [Role.USER]
+			this.token = user.token
+			this.tokenExpiration = user.tokenExpiration
 		}
 	}
 
@@ -20,4 +22,8 @@ export default class UserModel {
 	readonly email: string
 
 	readonly role: Role[]
+
+	token: string
+
+	tokenExpiration: Date
 }

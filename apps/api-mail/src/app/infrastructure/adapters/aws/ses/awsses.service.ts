@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectAwsService } from 'nest-aws-sdk'
 import { AWSError, SES } from 'aws-sdk'
-import { ICreateUserDTO } from '@bookhood/shared'
+import { ICreateUserDTO, IUser } from '@bookhood/shared'
 import { IMailer } from '../../../../domain/ports/mailer.interface'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
@@ -46,6 +46,40 @@ export class SESManagerService implements IMailer {
 			envConfig().settings.mailFrom,
 			[this.mailTo(user.email)],
 			this.i18n.t('mails.user.registered.subject'),
+			content
+		)
+	}
+
+	async authSendLink(user: IUser): Promise<void> {
+		const template = 'auth/send-link.mjml'
+		const link = `${envConfig().front.protocol}://${
+			envConfig().front.host
+		}:${envConfig().front.port}/signin/${user.token}`
+
+		const content = await this.parseTemplate(
+			template,
+			this.i18n.t('mails.auth.signin.subject'),
+			{
+				text: {
+					text1: this.i18n.t('mails.auth.signin.text1', {
+						args: { firstName: user.firstName },
+					}),
+					text2: this.i18n.t('mails.auth.signin.text2', {
+						args: { link },
+					}),
+				},
+			}
+		)
+
+		if (!content.length) {
+			this.logger.error(`template not found - ${template}`)
+			throw new Error('template not found')
+		}
+
+		this.sendEmail(
+			envConfig().settings.mailFrom,
+			[this.mailTo(user.email)],
+			this.i18n.t('mails.auth.signin.subject'),
 			content
 		)
 	}

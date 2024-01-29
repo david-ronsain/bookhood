@@ -32,4 +32,9 @@ export default (): INestEnvConfig => ({
 		defaultLocale: process.env.I18N_FALLBACK_LOCALE || '',
 		fallbackLocale: process.env.I18N_DEFAULT_LOCALE || '',
 	},
+	front: {
+		host: process.env.APP_FRONT_HOST || '',
+		port: parseInt(process.env.APP_FRONT_PORT || ''),
+		protocol: process.env.APP_FRONT_PROTOCOL || '',
+	},
 })

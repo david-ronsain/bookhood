@@ -1,7 +1,9 @@
-import { ICreateUserDTO } from '@bookhood/shared'
+import { ICreateUserDTO, IUser } from '@bookhood/shared'
 
 export interface IMailer {
 	userRegistered(user: ICreateUserDTO): void
+
+	authSendLink(user: IUser): void
 
 	sendEmail(
 		from: string,

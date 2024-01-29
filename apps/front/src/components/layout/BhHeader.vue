@@ -8,24 +8,37 @@
 	import { mapBooks } from '../../mappers/bookMapper'
 	import { type IBookAutocompleteItem } from '../../interfaces/book.interface'
 	import { EnvConfig } from '../../../config/env'
+	import { useRoute } from 'vue-router'
+	import { watch } from 'vue'
 
+	const route = useRoute()
 	const { t } = useI18n({})
 	const { mdAndDown, lgAndUp } = useDisplay()
 	const drawerOpened = ref(false)
 	const searchBar = ref(null)
 	const maxResults = ref<number>(0)
-	const menuItems = ref([
-		{
-			prependIcon: mdiLogin,
-			title: t('common.menu.signin'),
-			link: { name: 'signin' },
-		},
-		{
-			prependIcon: mdiAccountCircle,
-			title: t('common.menu.profile'),
-			link: { name: 'account' },
-		},
-	])
+	const menuItems = ref([])
+
+	watch(
+		() => route.meta,
+		() => {
+			menuItems.value = []
+
+			if (route.meta.authenticated) {
+				menuItems.value.push({
+					prependIcon: mdiAccountCircle,
+					title: t('common.menu.profile'),
+					link: { name: 'account' },
+				})
+			} else {
+				menuItems.value.push({
+					prependIcon: mdiLogin,
+					title: t('common.menu.signin'),
+					link: { name: 'signin' },
+				})
+			}
+		}
+	)
 
 	async function search(search: ISearchingEventProps) {
 		const startAt = search.page * 10

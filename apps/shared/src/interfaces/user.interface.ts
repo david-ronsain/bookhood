@@ -8,6 +8,10 @@ export interface IUser {
 	email: string
 
 	role?: Role[]
+
+	token?: string
+
+	tokenExpiration?: Date
 }
 
 export interface ICreateUserDTO {

@@ -8,6 +8,15 @@ interface IEnvConfig {
 	i18n: II18nConfig
 	api: IApiConfig
 	googleApi: IGoogleApi
+	settings: ISettingsConfig
+}
+
+interface ISettingsConfig {
+	session: ISessionConfig
+}
+
+interface ISessionConfig {
+	duration: number
 }
 
 enum I18nLocales {
@@ -15,8 +24,10 @@ enum I18nLocales {
 }
 
 interface IApiConfig {
+	base: string
 	url: {
 		user: string
+		auth: string
 	}
 }
 
@@ -39,16 +50,25 @@ export const EnvConfig: IEnvConfig = {
 			I18nLocales.FR,
 	},
 	api: {
+		base: `${import.meta.env.VITE_APP_FRONT_API_GATEWAY_PROTOCOL}://${
+			import.meta.env.VITE_APP_FRONT_API_GATEWAY_HOST
+		}:${import.meta.env.VITE_APP_FRONT_API_GATEWAY_PORT}/${
+			import.meta.env.VITE_APP_FRONT_API_GATEWAY_PREFIX
+		}`,
 		url: {
-			user: `${import.meta.env.VITE_APP_FRONT_API_GATEWAY_PROTOCOL}://${
-				import.meta.env.VITE_APP_FRONT_API_GATEWAY_HOST
-			}:${import.meta.env.VITE_APP_FRONT_API_GATEWAY_PORT}/${
-				import.meta.env.VITE_APP_FRONT_API_GATEWAY_PREFIX
-			}${import.meta.env.VITE_APP_FRONT_API_USER_PREFIX}`,
+			user: `${import.meta.env.VITE_APP_FRONT_API_USER_PREFIX}`,
+			auth: `${import.meta.env.VITE_APP_FRONT_API_AUTH_PREFIX}`,
 		},
 	},
 	googleApi: {
 		url: import.meta.env.VITE_APP_FRONT_GOOGLE_BOOKS_URL || '',
 		key: import.meta.env.VITE_APP_FRONT_GOOGLE_API_KEY || '',
+	},
+	settings: {
+		session: {
+			duration: parseInt(
+				import.meta.env.VITE_APP_FRONT_SESSION_DURATION || ''
+			),
+		},
 	},
 }

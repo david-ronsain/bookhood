@@ -1,5 +1,6 @@
 export { default as BhSearchBar } from './lib/inputs/search/bhSearchBar.vue'
 export { default as BhSnackbarError } from './lib/alerts/snackbars/bhSnackbarError.vue'
+export { default as BhSnackbarSuccess } from './lib/alerts/snackbars/bhSnackbarSuccess.vue'
 export { default as BhCheckBox } from './lib/inputs/checkbox/bhCheckBox.vue'
 export { default as BhTextField } from './lib/inputs/textField/bhTextField.vue'
 export { default as BhPrimaryButton } from './lib/buttons/primaryButton/bhPrimaryButton.vue'

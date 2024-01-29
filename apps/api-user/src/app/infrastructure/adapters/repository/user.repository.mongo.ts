@@ -26,4 +26,19 @@ export default class UserRepositoryMongo implements UserRepository {
 
 		return UserMapper.fromEntitytoModel(createdUser)
 	}
+
+	async getUserByEmail(email: string): Promise<UserModel | null> {
+		const user = await this.userModel.findOne({ email })
+
+		return user ? UserMapper.fromEntitytoModel(user) : null
+	}
+
+	async update(user: UserModel): Promise<UserModel> {
+		const updated = await this.userModel.findOneAndUpdate(
+			{ email: user.email },
+			user
+		)
+
+		return user ? UserMapper.fromEntitytoModel(updated) : null
+	}
 }

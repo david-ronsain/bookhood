@@ -19,7 +19,7 @@
 		isLoading: false,
 		noResultLabel: 'No result',
 		authorLabel: 'By author',
-		bookLabel: 'By title'
+		bookLabel: 'By title',
 	})
 
 	const loading = ref(false)
@@ -54,7 +54,7 @@
 		keepLoading.value = true
 	}
 
-const startSearch = ((text: string) => {
+	const startSearch = (text: string) => {
 		if (typeof text === 'string' && text.length > 0) {
 			keepLoading.value = true
 			searchValue.value = text.toString()
@@ -63,8 +63,7 @@ const startSearch = ((text: string) => {
 		} else if (typeof text === 'string') {
 			resetSearch()
 		}
-		
-	})
+	}
 
 	const debouncedSearch = debounce((text: string) => {
 		if (typeof text === 'string' && text.length) {
@@ -178,14 +177,19 @@ const startSearch = ((text: string) => {
 				</template>
 			</v-select>
 		</template>
-		<template v-slot:['append-inner']>
-			<router-link 
+		<template v-slot:append-inner>
+			<router-link
 				@click="resetSearch"
-				:to="{name: 'search', query: {
-				terms: encodeURI(searchValue),
-				type: searchType
-			}}">
-				<v-icon size="24" :icon="mdiMagnify" />
+				:to="{
+					name: 'search',
+					query: {
+						terms: encodeURI(searchValue),
+						type: searchType,
+					},
+				}">
+				<v-icon
+					size="24"
+					:icon="mdiMagnify" />
 			</router-link>
 		</template>
 	</v-autocomplete>
