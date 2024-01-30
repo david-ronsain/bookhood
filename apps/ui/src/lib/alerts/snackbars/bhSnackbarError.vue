@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref } from 'vue'
 	import { mdiCloseCircleOutline } from '@mdi/js'
-	import { watch } from 'vue';
+	import { watch } from 'vue'
 
 	export interface BhSnackbarErrorProps {
 		text?: string
@@ -9,8 +9,8 @@
 	}
 
 	const props = withDefaults(defineProps<BhSnackbarErrorProps>(), {
-		text: 'Ok',
-		opened: false
+		text: '',
+		opened: false,
 	})
 	const isOpened = ref(props.opened)
 

@@ -15,8 +15,8 @@ export default class VerifyAuthTokenUseCase {
 			)
 		}
 
-		const userToken = user.token.split('|')[1]
-		if (userToken !== token) {
+		const userToken = user.token.split('|')[1] ?? null
+		if (!userToken || userToken !== token) {
 			user.token = null
 			user.tokenExpiration = null
 			this.userRepository.update(user)

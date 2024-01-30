@@ -21,9 +21,9 @@ export default class UserModel {
 
 	readonly email: string
 
-	readonly role: Role[]
+	readonly role?: Role[]
 
-	token: string
+	token?: string
 
-	tokenExpiration: Date
+	tokenExpiration?: Date
 }

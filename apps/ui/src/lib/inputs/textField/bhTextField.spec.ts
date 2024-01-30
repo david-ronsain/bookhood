@@ -3,7 +3,7 @@ import BhTextField from './bhTextField.vue'
 
 describe('BhTextField', () => {
 	it('renders properly', () => {
-		const wrapper = mount(BhTextField, { props: { label: 'field' } })
-		expect(wrapper.text()).toContain('Welcome to BhTextField')
+		const wrapper = mount(BhTextField, { props: { label: 'My textfield' } })
+		expect(wrapper.html()).toContain('My textfield')
 	})
 })

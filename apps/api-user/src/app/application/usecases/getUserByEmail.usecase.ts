@@ -1,18 +1,21 @@
 import { Inject, NotFoundException } from '@nestjs/common'
+import UserModel from '../../domain/models/user.model'
 import { UserRepository } from '../../domain/ports/user.repository'
 
-export default class UserEmailExistsUseCase {
+export default class GetUserByEmailUseCase {
 	constructor(
 		@Inject('UserRepository')
 		private readonly userRepository: UserRepository
 	) {}
 
-	async handler(email: string): Promise<boolean> {
-		const exists = await this.userRepository.emailExists(email)
-		if (!exists) {
-			throw new NotFoundException('An account exists with this email')
+	async handler(email: string): Promise<UserModel> {
+		const user = await this.userRepository.getUserByEmail(email)
+		if (!user) {
+			throw new NotFoundException(
+				"We don't have any account linked to this email"
+			)
 		}
 
-		return exists
+		return user
 	}
 }

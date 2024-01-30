@@ -1,63 +1,79 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @nx/enforce-module-boundaries */
-import { Test } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { MailController } from '../../../../src/app/application/controllers/mail.controller'
+import { IUser } from '@bookhood/shared'
 import UserRegisteredUseCase from '../../../../src/app/application/usecases/user/userRegistered.usecase'
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
+import AuthSendLinkUseCase from '../../../../src/app/application/usecases/user/authSendLink.usecase'
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
+import envConfig from '../../../../src/config/env.config'
 
-const moduleMocker = new ModuleMocker(global)
-describe('Testing MailController', () => {
+describe('MailController', () => {
 	let controller: MailController
-	let usecase: UserRegisteredUseCase
 
-	const mock = {
+	const mockLogger = {
+		info: jest.fn(),
+		error: jest.fn(),
+	}
+
+	const mockUserRegisteredUseCase = {
 		handler: jest.fn(),
-	} as unknown as UserRegisteredUseCase
+	}
+
+	const mockAuthSendLinkUseCase = {
+		handler: jest.fn(),
+	}
 
 	beforeEach(async () => {
-		jest.resetAllMocks()
-
-		const module = await Test.createTestingModule({
+		const module: TestingModule = await Test.createTestingModule({
 			controllers: [MailController],
 			providers: [
 				{
-					provide: 'winston',
-					useValue: () => ({}),
+					provide: WINSTON_MODULE_PROVIDER,
+					useValue: mockLogger,
+				},
+				{
+					provide: UserRegisteredUseCase,
+					useValue: mockUserRegisteredUseCase,
+				},
+				{
+					provide: AuthSendLinkUseCase,
+					useValue: mockAuthSendLinkUseCase,
 				},
 			],
-		})
-			.useMocker((token) => {
-				if (token === UserRegisteredUseCase) {
-					return mock
-				}
-				if (typeof token === 'function') {
-					const mockMetadata = moduleMocker.getMetadata(
-						token
-					) as MockFunctionMetadata<any, any>
-					const Mock = moduleMocker.generateFromMetadata(mockMetadata)
-					return new Mock()
-				}
-			})
-			.compile()
+		}).compile()
+
 		controller = module.get<MailController>(MailController)
-		usecase = module.get<UserRegisteredUseCase>(UserRegisteredUseCase)
 	})
 
-	describe('The healthcheck', () => {
-		it('should return "up"', () => {
-			expect(controller.health()).toBe('up')
-		})
+	it('should be defined', () => {
+		expect(controller).toBeDefined()
 	})
 
-	describe('userRegistered method', () => {
-		it('should call the usecase', () => {
-			const spy = jest.spyOn(usecase, 'handler')
-			controller.userRegistered({
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			})
-			expect(spy).toHaveBeenCalledTimes(1)
-		})
+	it('should handle mail-health', () => {
+		const result = controller.health()
+		expect(result).toEqual('up')
+	})
+
+	it('should handle mail-user-registered', () => {
+		const mockUser: IUser = {
+			firstName: 'first',
+			lastName: 'last',
+			email: 'first.last@name.test',
+		}
+
+		controller.userRegistered(mockUser)
+
+		expect(mockUserRegisteredUseCase.handler).toHaveBeenCalledWith(mockUser)
+	})
+
+	it('should handle mail-auth-send-link', () => {
+		const mockUser: IUser = {
+			firstName: 'first',
+			lastName: 'last',
+			email: 'first.last@name.test',
+		}
+
+		controller.authSendLink(mockUser)
+
+		expect(mockAuthSendLinkUseCase.handler).toHaveBeenCalledWith(mockUser)
 	})
 })

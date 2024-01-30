@@ -3,6 +3,7 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	HttpCode,
 	HttpStatus,
 	Inject,
 	Post,
@@ -16,7 +17,6 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { CreateUserDTO } from '../dto/user.dto'
 import { Role } from '@bookhood/shared'
 import { Roles } from '../guards/role.guard'
 import { UserNotFoundException } from '../exceptions'
@@ -38,7 +38,7 @@ export class AuthController {
 	@ApiResponse({ type: UserNotFoundException, status: HttpStatus.NOT_FOUND })
 	async sendLink(@Body() dto: SendLinkDTO): Promise<boolean> {
 		const sent = await firstValueFrom<
-			MicroserviceResponseFormatter<CreateUserDTO>
+			MicroserviceResponseFormatter<boolean>
 		>(this.gatewayQueue.send('auth-send-link', dto))
 		if (!sent.success) {
 			throw new UserNotFoundException(sent.message)
@@ -47,6 +47,7 @@ export class AuthController {
 	}
 
 	@Post('signin')
+	@HttpCode(HttpStatus.OK)
 	@Roles([Role.GUEST])
 	@ApiOperation({ description: 'Authenticates the user' })
 	@ApiBody({ type: SigninDTO })
@@ -55,7 +56,7 @@ export class AuthController {
 	@ApiResponse({ type: ForbiddenException, status: HttpStatus.FORBIDDEN })
 	async signin(@Body() dto: SigninDTO): Promise<boolean> {
 		const verified = await firstValueFrom<
-			MicroserviceResponseFormatter<CreateUserDTO>
+			MicroserviceResponseFormatter<boolean>
 		>(this.gatewayQueue.send('auth-signin', dto))
 		if (!verified.success) {
 			throw new ForbiddenException(verified.message)

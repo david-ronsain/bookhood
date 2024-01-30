@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectAwsService } from 'nest-aws-sdk'
 import { AWSError, SES } from 'aws-sdk'
-import { ICreateUserDTO, IUser } from '@bookhood/shared'
+import { IUser } from '@bookhood/shared'
 import { IMailer } from '../../../../domain/ports/mailer.interface'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
@@ -21,8 +21,12 @@ export class SESManagerService implements IMailer {
 		private readonly i18n: I18nService
 	) {}
 
-	async userRegistered(user: ICreateUserDTO): Promise<void> {
+	async userRegistered(user: IUser): Promise<void> {
 		const template = 'user/registered.mjml'
+		const link = `${envConfig().front.protocol}://${
+			envConfig().front.host
+		}:${envConfig().front.port}/signin/${user.token}`
+
 		const content = await this.parseTemplate(
 			template,
 			this.i18n.t('mails.user.registered.subject'),
@@ -32,7 +36,10 @@ export class SESManagerService implements IMailer {
 					text1: this.i18n.t('mails.user.registered.text1', {
 						args: { firstName: user.firstName },
 					}),
-					text2: this.i18n.t('mails.user.registered.text2'),
+					text2: this.i18n.t('mails.auth.signin.text2', {
+						args: { link },
+					}),
+					text3: this.i18n.t('mails.user.registered.text2'),
 				},
 			}
 		)
@@ -91,8 +98,8 @@ export class SESManagerService implements IMailer {
 		body: string,
 		cc: string[] = [],
 		bcc: string[] = []
-	): void {
-		this.ses
+	): Promise<unknown> {
+		return this.ses
 			.sendEmail({
 				Destination: {
 					ToAddresses: to,
@@ -122,7 +129,7 @@ export class SESManagerService implements IMailer {
 				}
 			)
 			.catch((err) => {
-				console.log(err)
+				this.logger.error(err)
 			})
 	}
 

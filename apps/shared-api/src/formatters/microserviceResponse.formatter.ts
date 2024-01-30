@@ -1,4 +1,9 @@
-import { ConflictException, HttpStatus } from '@nestjs/common'
+import {
+	ConflictException,
+	ForbiddenException,
+	HttpStatus,
+	NotFoundException,
+} from '@nestjs/common'
 
 export class MicroserviceResponseFormatter<T> {
 	readonly success: boolean
@@ -14,9 +19,7 @@ export class MicroserviceResponseFormatter<T> {
 		data?: T,
 		message?: string
 	) {
-		if (success) {
-			this.success = success
-		}
+		this.success = !!success
 
 		if (code) {
 			this.code = code
@@ -39,7 +42,11 @@ export class MicroserviceResponseFormatter<T> {
 		err: unknown,
 		payload: unknown
 	): MicroserviceResponseFormatter<T> {
-		if (err instanceof ConflictException)
+		if (
+			err instanceof ConflictException ||
+			err instanceof ForbiddenException ||
+			err instanceof NotFoundException
+		)
 			return new MicroserviceResponseFormatter<T>(
 				false,
 				err.getStatus(),

@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import BhCheckBpx from './bhCheckBox.vue'
+import BhCheckBox from './bhCheckBox.vue'
 
 describe('BhCheckBox', () => {
 	it('renders properly', () => {
-		const wrapper = mount(BhCheckBpx, {})
-		expect(wrapper.text()).toContain('Welcome to BhCheckBpx')
+		const wrapper = mount(BhCheckBox, { props: { label: 'My checkbox' } })
+		expect(wrapper.html()).toContain('My checkbox')
 	})
 })

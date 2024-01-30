@@ -1,22 +1,15 @@
 <script setup lang="ts">
-	import {
-		BhTextField,
-		BhPrimaryButton,
-		BhSnackbarError,
-		BhSnackbarSuccess,
-	} from '@bookhood/ui'
+	import { BhTextField, BhPrimaryButton } from '@bookhood/ui'
 	import { ref } from 'vue'
 	import { useI18n } from 'vue-i18n'
-	import { useUserStore } from '../../store'
+	import { useUserStore, useMainStore } from '../../store'
 	import { mdiSendOutline } from '@mdi/js'
 
+	const mainStore = useMainStore()
 	const userStore = useUserStore()
 	const { t } = useI18n()
 	const formValid = ref<boolean>(false)
 	const disabled = ref<boolean>(false)
-	const error = ref<string>('')
-	const snackError = ref(null)
-	const snackSuccess = ref(null)
 	const form = ref(null)
 	const email = ref<string>('')
 	const loading = ref<boolean>(false)
@@ -34,12 +27,12 @@
 			.sendSigninLink(email.value)
 			.then(() => {
 				loading.value = false
-				snackSuccess.value?.open()
+				mainStore.success = 'Le lien vous a été envoyé'
 			})
 			.catch((err) => {
-				error.value = err.message
+				mainStore.error = err.message
 				loading.value = false
-				snackError.value?.open()
+				disabled.value = false
 			})
 	}
 </script>
@@ -70,23 +63,13 @@
 				cols="12">
 				<bh-primary-button
 					ref="submit"
-					:icon="mdiSendOutline"
+					:icon="{ icon: mdiSendOutline, prepend: true }"
 					@click.stop="sendSigninLink"
 					:disabled="!formValid || loading || disabled"
 					:loading="formValid && loading"
 					:text="$t('signin.sendLink.send')" />
 			</v-col>
 		</v-row>
-		<bh-snackbar-error
-			:attach="form"
-			ref="snackError"
-			:text="$t('signin.sendLink.error')"
-			@close="disabled = false" />
-		<bh-snackbar-success
-			:attach="form"
-			ref="snackSuccess"
-			:text="$t('signin.sendLink.success')"
-			@close="disabled = false" />
 	</v-form>
 </template>
 

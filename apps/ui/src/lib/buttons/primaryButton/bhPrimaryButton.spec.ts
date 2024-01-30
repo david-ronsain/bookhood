@@ -3,7 +3,9 @@ import BhPrimaryButton from './bhPrimaryButton.vue'
 
 describe('Button', () => {
 	it('renders properly', () => {
-		const wrapper = mount(BhPrimaryButton, { text: 'Submit' })
-		expect(wrapper.text()).toContain('Submit')
+		const wrapper = mount(BhPrimaryButton, {
+			props: { text: 'Submit button' },
+		})
+		expect(wrapper.html()).toContain('Submit button')
 	})
 })

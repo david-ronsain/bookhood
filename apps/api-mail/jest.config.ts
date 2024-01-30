@@ -21,11 +21,7 @@ export default {
 	collectCoverageFrom: [
 		'**/*.ts',
 		'!**/node_modules/**',
-		'!**/guards/**',
-		'!**/filters/**',
-		'!**/interceptors/**',
 		'!**/jest.config.ts',
 		'!**/main.ts',
-		'!**/awsses*',
 	],
 }

@@ -1,7 +1,7 @@
 import { Controller, Inject } from '@nestjs/common'
 
 import { MessagePattern } from '@nestjs/microservices'
-import { ICreateUserDTO, IUser } from '@bookhood/shared'
+import { IUser } from '@bookhood/shared'
 import UserRegisteredUseCase from '../usecases/user/userRegistered.usecase'
 import { Logger } from 'winston'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
@@ -21,7 +21,7 @@ export class MailController {
 	}
 
 	@MessagePattern('mail-user-registered')
-	userRegistered(user: ICreateUserDTO): void {
+	userRegistered(user: IUser): void {
 		this.userRegisteredUseCase.handler(user)
 	}
 

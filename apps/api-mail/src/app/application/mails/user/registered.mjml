@@ -6,6 +6,12 @@
 
 <mj-section>
 	<mj-column>
-		<mj-text color="#F45E43"> {{ text.text2 }} </mj-text>
+		<mj-text color="#F45E43"> {{{ text.text2 }}} </mj-text>
+	</mj-column>
+</mj-section>
+
+<mj-section>
+	<mj-column>
+		<mj-text color="#F45E43"> {{ text.text3 }} </mj-text>
 	</mj-column>
 </mj-section>

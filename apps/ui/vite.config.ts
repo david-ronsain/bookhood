@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import * as path from 'path'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import vuetify from 'vite-plugin-vuetify'
 
 export default defineConfig({
 	root: __dirname,
@@ -17,6 +18,7 @@ export default defineConfig({
 			tsConfigFilePath: path.join(__dirname, 'tsconfig.lib.json'),
 			skipDiagnostics: true,
 		}),
+		vuetify({ autoImport: true }),
 	],
 
 	// Uncomment this if you are using workers.

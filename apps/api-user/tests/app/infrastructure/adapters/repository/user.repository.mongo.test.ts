@@ -18,6 +18,20 @@ describe('Testing UserRepositoryMongo', () => {
 	const mock = {
 		countDocuments: jest.fn(),
 		create: jest.fn(),
+		findOne: ({ email }) =>
+			new Promise((resolve) =>
+				resolve(
+					email === 'first.last@name.test'
+						? ({ email } as UserModel)
+						: null
+				)
+			),
+		findOneAndUpdate: ({ email }, user: UserModel) =>
+			new Promise((resolve) =>
+				email === 'first.last@name.test'
+					? resolve({ email })
+					: resolve(null)
+			),
 	} as unknown as Model<UserEntity>
 
 	beforeEach(async () => {
@@ -91,6 +105,29 @@ describe('Testing UserRepositoryMongo', () => {
 					>
 			)
 			expect(repo.createUser(user)).resolves.toMatchObject(expectedResult)
+		})
+	})
+
+	describe('getUserByEmail method', () => {
+		it('should return the user', async () =>
+			expect(
+				repo.getUserByEmail('first.last@name.test')
+			).resolves.toMatchObject({ email: expect.anything() }))
+
+		it('should not return an user', async () => {
+			expect(repo.getUserByEmail('')).resolves.toBe(null)
+		})
+	})
+
+	describe('update method', () => {
+		it('should return the updated user', async () => {
+			expect(
+				repo.update({ email: 'first.last@name.test' } as UserModel)
+			).resolves.toMatchObject({ email: expect.anything() })
+		})
+
+		it('should not return an user', async () => {
+			expect(repo.update({ email: '' } as UserModel)).resolves.toBe(null)
 		})
 	})
 })

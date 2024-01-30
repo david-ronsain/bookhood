@@ -7,12 +7,14 @@ import type UserModel from '../../domain/models/user.model'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
+import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 
 @Controller()
 export class UserController {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
 		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy,
+		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly createUserUseCase: CreateUserUseCase
 	) {}
 
@@ -29,7 +31,10 @@ export class UserController {
 			const createdUser: UserModel = await this.createUserUseCase.handler(
 				user
 			)
-			this.rabbitMailClient.send('mail-user-registered', user).subscribe()
+			this.createAuthLinkUseCase.handler(createdUser)
+			this.rabbitMailClient
+				.send('mail-user-registered', createdUser)
+				.subscribe()
 			return new MicroserviceResponseFormatter<UserModel>(
 				true,
 				HttpStatus.CREATED,

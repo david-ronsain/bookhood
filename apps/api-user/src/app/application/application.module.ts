@@ -12,7 +12,6 @@ import {
 } from '@nestjs/microservices'
 import envConfig from '../../config/env.config'
 import { AuthController } from './controllers/auth.controller'
-import { JwtModule } from '@nestjs/jwt'
 
 @Module({
 	imports: [
@@ -23,12 +22,6 @@ import { JwtModule } from '@nestjs/jwt'
 				schema: UserSchema,
 			},
 		]),
-		JwtModule.register({
-			secret: 'secret',
-			signOptions: {
-				expiresIn: '1h',
-			},
-		}),
 	],
 	controllers: [UserController, AuthController],
 	providers: [

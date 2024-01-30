@@ -59,6 +59,9 @@ describe('Testing the env configuration', () => {
 			process.env.MONGO_PROTOCOL || ''
 		)
 		expect(envConfig().mongo.user).toBe(process.env.MONGO_USER || '')
+		expect(envConfig().mongo.password).toBe(
+			process.env.MONGO_PASSWORD || ''
+		)
 
 		expect(envConfig().rabbitmq.host).toBe(process.env.RMQ_HOST || '')
 		expect(envConfig().rabbitmq.port).toBe(

@@ -3,14 +3,10 @@ import Home from '../views/Home.vue'
 import Signup from '../views/Signup.vue'
 import Signin from '../views/Signin.vue'
 import Account from '../views/Account.vue'
-import { useUserStore } from '../store'
-import { createPinia } from 'pinia'
+import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
 import { EnvConfig } from '../../config/env'
-
-const pinia = createPinia()
-const userStore = useUserStore(pinia)
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -48,10 +44,16 @@ const router = createRouter({
 			name: 'signinLink',
 			component: Signin,
 			beforeEnter: async (to, from, next) => {
+				const userStore = useUserStore()
+				const mainStore = useMainStore()
+
 				const verified = await userStore
 					.signin(to.params.token.toString())
 					.then((res: { data: boolean }) => res.data)
-
+					.catch((err) => {
+						mainStore.$patch({ error: err.response.data.message })
+						next({ name: 'signin', replace: true, force: true })
+					})
 				if (verified) {
 					localStorage.setItem(
 						'user',
@@ -59,10 +61,8 @@ const router = createRouter({
 							'|' +
 							(Date.now() + EnvConfig.settings.session.duration)
 					)
-					next()
 				}
-
-				next({ name: 'home' })
+				next({ name: 'home', force: true, replace: true })
 			},
 			meta: {
 				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
@@ -101,7 +101,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 	if (!isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
-		next({ name: 'home' })
+		next({ name: to.meta.requiresAuth ? 'signin' : 'home' })
 	}
 
 	next()

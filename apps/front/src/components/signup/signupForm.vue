@@ -1,23 +1,17 @@
 <script setup lang="ts">
-	import {
-		BhTextField,
-		BhPrimaryButton,
-		BhCheckBox,
-		BhSnackbarError,
-	} from '@bookhood/ui'
+	import { BhTextField, BhPrimaryButton, BhCheckBox } from '@bookhood/ui'
 	import { ref } from 'vue'
 	import { type CreateUserDTO } from '@bookhood/shared'
 	import { useI18n } from 'vue-i18n'
-	import { useUserStore } from '../../store'
+	import { useUserStore, useMainStore } from '../../store'
 	import { useRouter } from 'vue-router'
 
+	const mainStore = useMainStore()
 	const router = useRouter()
 	const userStore = useUserStore()
 	const { t } = useI18n()
 	const formValid = ref<boolean>(false)
 	const disabled = ref<boolean>(false)
-	const error = ref<string>('')
-	const snackError = ref(null)
 	const form = ref(null)
 	const data = ref<CreateUserDTO>({
 		firstName: '',
@@ -51,9 +45,9 @@
 				router.push({ name: 'home' })
 			})
 			.catch((err) => {
-				error.value = err.message
+				mainStore.error = err.message
 				loading.value = false
-				snackError.value?.open()
+				disabled.value = false
 			})
 	}
 </script>
@@ -122,11 +116,6 @@
 					:text="$t('signup.form.signup')" />
 			</v-col>
 		</v-row>
-		<bh-snackbar-error
-			:attach="form"
-			ref="snackError"
-			:text="error"
-			@close="disabled = false" />
 	</v-form>
 </template>
 

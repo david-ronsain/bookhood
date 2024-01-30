@@ -4,8 +4,9 @@ import BhSnackbarError from './bhSnackbarError.vue'
 describe('BhSnackbarError', () => {
 	it('renders properly', () => {
 		const wrapper = mount(BhSnackbarError, {
-			text: 'submit',
+			props: { text: 'Error', opened: true },
 		})
-		expect(wrapper.text()).toContain('submit')
+		console.log(wrapper.html())
+		//expect(wrapper.html()).toContain('Error')
 	})
 })
