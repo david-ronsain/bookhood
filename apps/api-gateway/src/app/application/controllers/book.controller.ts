@@ -57,7 +57,7 @@ export class BookController {
 		return google
 			.books('v1')
 			.volumes.list({
-				key: 'AIzaSyBnfn5W-NEkC9BeCLuxGOe1MAeP4U6uK9s',
+				key: envConfig().externalApis.google.key,
 				q: 'isbn:' + isbn,
 			})
 			.then((response) => response.data)
