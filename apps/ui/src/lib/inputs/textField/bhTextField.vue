@@ -6,6 +6,8 @@
 		icon: string
 		prepend?: boolean
 		append?: boolean
+		appendInner?: boolean
+		prependInner?: boolean
 	}
 	export interface BhTextFieldProps {
 		autofocus?: boolean
@@ -14,12 +16,22 @@
 		label?: string
 		placeholder?: string
 		type?: string
+		variant?:
+			| 'underlined'
+			| 'filled'
+			| 'outlined'
+			| 'plain'
+			| 'solo'
+			| 'solo-inverted'
+			| 'solo-filled'
+			| undefined
 	}
 
 	const props = withDefaults(defineProps<BhTextFieldProps>(), {
 		autofocus: false,
 		clear: false,
 		type: 'text',
+		variant: 'underlined',
 	})
 
 	const prependIcon = computed(() =>
@@ -27,6 +39,15 @@
 	)
 	const appendIcon = computed(() =>
 		props.icon && props.icon.icon && props.icon.append
+			? props.icon.icon
+			: null
+	)
+
+	const prependInnerIcon = computed(() =>
+		props.icon && props.icon.prependInner ? props.icon.icon : null
+	)
+	const appendInnerIcon = computed(() =>
+		props.icon && props.icon.icon && props.icon.appendInner
 			? props.icon.icon
 			: null
 	)
@@ -46,9 +67,11 @@
 
 <template>
 	<v-text-field
-		variant="underlined"
+		:variant="variant"
 		:prepend-icon="prependIcon"
+		:prepend-inner-icon="prependInnerIcon"
 		:append-icon="appendIcon"
+		:append-inner-icon="appendInnerIcon"
 		:autofocus="autofocus"
 		:clearable="clear"
 		:clear-icon="mdiCloseCircleOutline"

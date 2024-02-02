@@ -18,6 +18,7 @@ import { WinstonModule } from 'nest-winston'
 import * as winston from 'winston'
 import { winstonConfig } from '@bookhood/shared'
 import { AuthController } from './application/controllers/auth.controller'
+import { BookController } from './application/controllers/book.controller'
 
 @Module({
 	imports: [
@@ -41,11 +42,11 @@ import { AuthController } from './application/controllers/auth.controller'
 			winstonConfig(winston, envConfig().gateway.gateway.serviceName)
 		),
 	],
-	controllers: [UserController, AuthController],
+	controllers: [UserController, AuthController, BookController],
 	providers: [
 		ConfigService,
 		{
-			provide: 'RabbitGateway',
+			provide: 'RabbitUser',
 			useFactory: () => {
 				return ClientProxyFactory.create({
 					transport: Transport.RMQ,
@@ -59,7 +60,30 @@ import { AuthController } from './application/controllers/auth.controller'
 								envConfig().rabbitmq.vhost || ''
 							}`,
 						],
-						queue: envConfig().rabbitmq.queues.gateway || '',
+						queue: envConfig().rabbitmq.queues.user,
+						queueOptions: {
+							durable: true,
+						},
+					},
+				} as RmqOptions)
+			},
+		},
+		{
+			provide: 'RabbitBook',
+			useFactory: () => {
+				return ClientProxyFactory.create({
+					transport: Transport.RMQ,
+					options: {
+						urls: [
+							`${envConfig().rabbitmq.protocol || ''}://${
+								envConfig().rabbitmq.user || ''
+							}:${envConfig().rabbitmq.password || ''}@${
+								envConfig().rabbitmq.host || ''
+							}:${envConfig().rabbitmq.port || ''}/${
+								envConfig().rabbitmq.vhost || ''
+							}`,
+						],
+						queue: envConfig().rabbitmq.queues.book,
 						queueOptions: {
 							durable: true,
 						},

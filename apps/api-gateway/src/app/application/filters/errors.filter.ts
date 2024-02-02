@@ -5,6 +5,8 @@ import {
 	HttpException,
 	Inject,
 	LoggerService,
+	HttpCode,
+	HttpStatus,
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
@@ -28,10 +30,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				req.params
 			)}} ###{query: ${JSON.stringify(req.query)}}`
 		)
+		let reasons
+		if (status === HttpStatus.BAD_REQUEST) {
+			reasons =
+				typeof exception.getResponse() === 'object'
+					? exception.getResponse()
+					: JSON.parse(exception.getResponse().toString())
+		}
 
 		response.status(status).json({
 			statusCode: status,
 			message: exception.message,
+			reasons:
+				status === HttpStatus.BAD_REQUEST
+					? reasons?.message
+					: undefined,
 		})
 	}
 }

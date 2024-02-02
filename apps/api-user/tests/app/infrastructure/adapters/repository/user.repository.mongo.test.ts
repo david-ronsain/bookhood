@@ -1,133 +1,188 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @nx/enforce-module-boundaries */
-import { Test } from '@nestjs/testing'
-import { UserEntity } from '../../../../../src//app/infrastructure/adapters/repository/entities/user.entity'
-import UserRepositoryMongo from '../../../../../src//app/infrastructure/adapters/repository/user.repository.mongo'
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
-import { Document, Model, ObjectId, Query } from 'mongoose'
-import UserModel from '../../../../../src/app/domain/models/user.model'
+import { Test, TestingModule } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
-import { Role } from '../../../../../../shared/src'
+import { Document, Model, Query } from 'mongoose'
+import { UserEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/user.entity'
+import UserRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/user.repository.mongo'
+import UserModel from '../../../../../src/app/domain/models/user.model'
 import UserMapper from '../../../../../src/app/application/mappers/user.mapper'
 
-const moduleMocker = new ModuleMocker(global)
-describe('Testing UserRepositoryMongo', () => {
-	let model: Model<UserEntity>
-	let repo: UserRepositoryMongo
+const mockUserModel = () => ({
+	countDocuments: jest.fn(),
+	create: jest.fn(),
+	findOne: jest.fn(),
+	findOneAndUpdate: jest.fn(),
+})
 
-	const mock = {
-		countDocuments: jest.fn(),
-		create: jest.fn(),
-		findOne: ({ email }) =>
-			new Promise((resolve) =>
-				resolve(
-					email === 'first.last@name.test'
-						? ({ email } as UserModel)
-						: null
-				)
-			),
-		findOneAndUpdate: ({ email }, user: UserModel) =>
-			new Promise((resolve) =>
-				email === 'first.last@name.test'
-					? resolve({ email })
-					: resolve(null)
-			),
-	} as unknown as Model<UserEntity>
+describe('UserRepositoryMongo', () => {
+	let userRepository: UserRepositoryMongo
+	let userModel: Model<UserEntity>
 
 	beforeEach(async () => {
-		jest.resetAllMocks()
-		const module = await Test.createTestingModule({
+		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				UserModel,
 				UserRepositoryMongo,
 				{
 					provide: getModelToken('User'),
-					useValue: mock,
+					useFactory: mockUserModel,
 				},
 			],
-		})
-			.useMocker((token) => {
-				if (typeof token === 'function') {
-					const mockMetadata = moduleMocker.getMetadata(
-						token
-					) as MockFunctionMetadata<any, any>
-					const Mock = moduleMocker.generateFromMetadata(mockMetadata)
-					return new Mock()
-				}
-			})
-			.compile()
-		model = module.get<Model<UserEntity>>(getModelToken('User'))
-		repo = module.get<UserRepositoryMongo>(UserRepositoryMongo)
+		}).compile()
+
+		userRepository = module.get<UserRepositoryMongo>(UserRepositoryMongo)
+		userModel = module.get<Model<UserEntity>>(getModelToken('User'))
 	})
 
-	describe('EmailExists method', () => {
-		it('shoud return true for an existing email', () => {
-			jest.spyOn(model, 'countDocuments').mockImplementationOnce(
-				() =>
-					Promise.resolve(1) as unknown as Query<
-						number,
-						Document<unknown, object, UserEntity> &
-							UserEntity & { _id: ObjectId }
-					>
-			)
-			expect(repo.emailExists('existing@email.test')).resolves.toBe(true)
+	describe('emailExists', () => {
+		it('should return true if email exists', async () => {
+			const email = 'first.last@name.test'
+			jest.spyOn(userModel, 'countDocuments').mockResolvedValueOnce(1)
+
+			const result = await userRepository.emailExists(email)
+
+			expect(result).toBe(true)
+			expect(userModel.countDocuments).toHaveBeenCalledWith({ email })
 		})
 
-		it('shoud return false for a new email', () => {
-			jest.spyOn(model, 'countDocuments').mockImplementationOnce(
-				() =>
-					Promise.resolve(0) as unknown as Query<
-						number,
-						Document<unknown, object, UserEntity> &
-							UserEntity & { _id: ObjectId }
-					>
-			)
-			expect(repo.emailExists('existing@email.test')).resolves.toBe(false)
+		it('should return false if email does not exist', async () => {
+			const email = 'first.last@name.test'
+			jest.spyOn(userModel, 'countDocuments').mockResolvedValueOnce(0)
+
+			const result = await userRepository.emailExists(email)
+
+			expect(result).toBe(false)
+			expect(userModel.countDocuments).toHaveBeenCalledWith({ email })
 		})
 	})
 
-	describe('CreateUser method', () => {
-		it('should create the user', async () => {
-			const userEntity = {
+	describe('createUser', () => {
+		it('should create a user', async () => {
+			const user: UserModel = {
 				firstName: 'first',
 				lastName: 'last',
-				email: 'new@email.test',
-				role: [Role.USER],
-			} as UserEntity
-			const user = new UserModel(userEntity)
-			const expectedResult = UserMapper.fromEntitytoModel(userEntity)
-
-			jest.spyOn(model, 'create').mockImplementationOnce(
-				() =>
-					Promise.resolve(userEntity) as unknown as Promise<
-						(Document<unknown, object, UserEntity> &
-							UserEntity & { _id: ObjectId })[]
-					>
+				email: 'first.last@name.test',
+			}
+			const createdUserEntity: UserEntity = {
+				...user,
+				_id: '123',
+			} as unknown as UserEntity
+			jest.spyOn(userModel, 'create').mockResolvedValueOnce(
+				createdUserEntity as unknown as (Document<
+					unknown,
+					object,
+					UserEntity
+				> &
+					UserEntity &
+					Required<{ _id: string }>)[]
 			)
-			expect(repo.createUser(user)).resolves.toMatchObject(expectedResult)
+
+			const result = await userRepository.createUser(user)
+
+			expect(result).toEqual(
+				UserMapper.fromEntitytoModel(createdUserEntity)
+			)
+			expect(userModel.create).toHaveBeenCalledWith(user)
 		})
 	})
 
-	describe('getUserByEmail method', () => {
-		it('should return the user', async () =>
-			expect(
-				repo.getUserByEmail('first.last@name.test')
-			).resolves.toMatchObject({ email: expect.anything() }))
+	describe('getUserByEmail', () => {
+		it('should get a user by email', async () => {
+			const email = 'first.last@name.test'
+			const userEntity: UserEntity = {
+				firstName: 'first',
+				lastName: 'last',
+				email,
+				_id: '123',
+			} as unknown as UserEntity
+			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(userEntity)
 
-		it('should not return an user', async () => {
-			expect(repo.getUserByEmail('')).resolves.toBe(null)
+			const result = await userRepository.getUserByEmail(email)
+
+			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(userModel.findOne).toHaveBeenCalledWith({ email })
+		})
+
+		it('should return null if user is not found by email', async () => {
+			const email = 'first.last@name.test'
+			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(null)
+
+			const result = await userRepository.getUserByEmail(email)
+
+			expect(result).toBeNull()
+			expect(userModel.findOne).toHaveBeenCalledWith({ email })
 		})
 	})
 
-	describe('update method', () => {
-		it('should return the updated user', async () => {
-			expect(
-				repo.update({ email: 'first.last@name.test' } as UserModel)
-			).resolves.toMatchObject({ email: expect.anything() })
+	describe('getUserByToken', () => {
+		it('should get a user by token', async () => {
+			const token = 'someToken'
+			const userEntity: UserEntity = {
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@name.test',
+				_id: '123',
+			} as unknown as UserEntity
+			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(userEntity)
+
+			const result = await userRepository.getUserByToken(token)
+
+			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(userModel.findOne).toHaveBeenCalledWith({ token })
 		})
 
-		it('should not return an user', async () => {
-			expect(repo.update({ email: '' } as UserModel)).resolves.toBe(null)
+		it('should return null if user is not found by token', async () => {
+			const token = 'invalidToken'
+			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(null)
+
+			const result = await userRepository.getUserByToken(token)
+
+			expect(result).toBeNull()
+			expect(userModel.findOne).toHaveBeenCalledWith({ token })
+		})
+	})
+
+	describe('update', () => {
+		it('should update a user', async () => {
+			const user: UserModel = {
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@name.test',
+			}
+			jest.spyOn(userModel, 'findOneAndUpdate').mockResolvedValueOnce({
+				...user,
+				_id: '123',
+			})
+
+			const result = await userRepository.update(user)
+
+			expect(result).toEqual(
+				UserMapper.fromEntitytoModel({
+					...user,
+					_id: '123',
+				} as unknown as UserEntity)
+			)
+			expect(userModel.findOneAndUpdate).toHaveBeenCalledWith(
+				{ email: user.email },
+				user
+			)
+		})
+
+		it('should return null if user is not found for update', async () => {
+			const user: UserModel = {
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@name.test',
+			}
+			jest.spyOn(userModel, 'findOneAndUpdate').mockResolvedValueOnce(
+				null
+			)
+
+			const result = await userRepository.update(user)
+
+			expect(result).toBeNull()
+			expect(userModel.findOneAndUpdate).toHaveBeenCalledWith(
+				{ email: user.email },
+				user
+			)
 		})
 	})
 })

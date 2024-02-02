@@ -1,6 +1,8 @@
 import { Role } from '../enums'
 
 export interface IUser {
+	_id?: string
+
 	lastName: string
 
 	firstName: string

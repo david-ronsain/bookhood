@@ -1,5 +1,4 @@
 <script setup lang="ts">
-	import { ref } from 'vue'
 	import BhHeader from '../components/layout/BhHeader.vue'
 	import { BhSnackbarError, BhSnackbarSuccess } from '@bookhood/ui'
 	import { useMainStore } from '../store'
@@ -10,7 +9,22 @@
 <template>
 	<v-app>
 		<BhHeader />
-		<router-view id="main-content" />
+
+		<v-container fluid>
+			<v-row>
+				<v-col
+					class="d-none d-md-block"
+					cols="2"></v-col>
+				<v-col
+					cols="12"
+					md="8">
+					<router-view id="main-content" />
+				</v-col>
+				<v-col
+					class="d-none d-md-block"
+					cols="2"></v-col>
+			</v-row>
+		</v-container>
 
 		<bh-snackbar-error
 			:opened="mainStore.error.length > 0"
@@ -27,16 +41,18 @@
 <style lang="scss" scoped>
 	@import 'vuetify/lib/styles/settings/_variables';
 	#main-content {
-		position: relative;
-		top: 74px;
 		max-width: 1200px;
 		margin: 0 auto;
-		width: 100%;
 	}
 
 	@media #{map-get($display-breakpoints, 'md-and-up')} {
 		#main-content {
 			width: calc(100% - 48px);
 		}
+	}
+
+	.v-application > div > .v-container {
+		position: relative;
+		top: 74px;
 	}
 </style>

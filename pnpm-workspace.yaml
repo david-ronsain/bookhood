@@ -6,4 +6,5 @@ packages:
     - apps/api-gateway
     - apps/api-user
     - apps/api-mail
+    - apps/api-book
     - apps/healthcheck

@@ -1,3 +1,5 @@
+import type { IISBN, IBookImageLinks } from '@bookhood/shared'
+
 export interface IGoogleBook {
 	volumeInfo: IGoogleBookVolumeInfo
 
@@ -5,40 +7,16 @@ export interface IGoogleBook {
 }
 
 export interface IGoogleBookVolumeInfo {
-	industryIdentifiers?: IGoogleBookIndustryIdentifier[]
+	industryIdentifiers?: IISBN[]
 	title: string
 	authors: string[]
 	categories: string[]
-	description: string[]
-	imageLinks: IGoogleBookImageLinks
+	description: string
+	imageLinks: IBookImageLinks
 	language: string
 	subtitle: string
 	publisher: string
 	publishedDate: string
 
 	[key: string]: unknown
-}
-
-export interface IGoogleBookIndustryIdentifier {
-	type: 'ISBN_10' | 'ISBN_13' | string
-	identifier: string
-}
-
-export interface IGoogleBookImageLinks {
-	smallThumbnail: string
-	thumbnail: string
-}
-
-export interface IBookAutocompleteItem {
-	value: string
-	title: string
-	authors: string[]
-	categories: string[]
-	description: string[]
-	image: string | undefined | null
-	isbn: IGoogleBookIndustryIdentifier[]
-	language: string
-	subtitle: string
-	publisher: string
-	publishedDate: string
 }

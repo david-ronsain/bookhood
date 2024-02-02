@@ -1,0 +1,53 @@
+{
+	"name": "api-book",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/api-book/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nx/webpack:webpack",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"target": "node",
+				"compiler": "tsc",
+				"outputPath": "dist/apps/api-book",
+				"main": "apps/api-book/src/main.ts",
+				"tsConfig": "apps/api-book/tsconfig.app.json",
+				"webpackConfig": "apps/api-book/webpack.config.js"
+			},
+			"configurations": {
+				"development": {},
+				"production": {}
+			}
+		},
+		"serve": {
+			"executor": "@nx/js:node",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "api-book:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "api-book:build:development"
+				},
+				"production": {
+					"buildTarget": "api-book:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"]
+		},
+		"test": {
+			"executor": "@nx/jest:jest",
+			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"options": {
+				"jestConfig": "apps/api-book/jest.config.ts",
+				"codeCoverage": true
+			}
+		}
+	},
+	"tags": []
+}

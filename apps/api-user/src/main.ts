@@ -18,7 +18,7 @@ async function bootstrap() {
 					envConfig().rabbitmq.vhost
 				}`,
 			],
-			queue: process.env.RMQ_GATEWAY_QUEUE || '',
+			queue: envConfig().rabbitmq.queues.user || '',
 			queueOptions: {
 				durable: true,
 			},

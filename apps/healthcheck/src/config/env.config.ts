@@ -21,6 +21,9 @@ export default (): INestEnvConfig => ({
 		gateway: {
 			serviceName: process.env.APP_API_GATEWAY_SERVICE_NAME || '',
 		},
+		book: {
+			serviceName: process.env.APP_API_BOOK_SERVICE_NAME || '',
+		},
 		mail: {
 			serviceName: process.env.APP_API_MAIL_SERVICE_NAME || '',
 		},
@@ -50,6 +53,8 @@ export default (): INestEnvConfig => ({
 		queues: {
 			gateway: process.env.RMQ_GATEWAY_QUEUE || '',
 			mail: process.env.RMQ_MAIL_QUEUE || '',
+			user: process.env.RMQ_USER_QUEUE || '',
+			book: process.env.RMQ_BOOK_QUEUE || '',
 		},
 	},
 })

@@ -38,36 +38,45 @@ const router = createRouter({
 				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
 				authenticated: isAuthenticated(),
 			},
-		},
-		{
-			path: '/signin/:token',
-			name: 'signinLink',
-			component: Signin,
-			beforeEnter: async (to, from, next) => {
-				const userStore = useUserStore()
-				const mainStore = useMainStore()
+			children: [
+				{
+					path: ':token',
+					name: 'signinLink',
+					component: Signin,
+					beforeEnter: async (to, from, next) => {
+						const userStore = useUserStore()
+						const mainStore = useMainStore()
 
-				const verified = await userStore
-					.signin(to.params.token.toString())
-					.then((res: { data: boolean }) => res.data)
-					.catch((err) => {
-						mainStore.$patch({ error: err.response.data.message })
-						next({ name: 'signin', replace: true, force: true })
-					})
-				if (verified) {
-					localStorage.setItem(
-						'user',
-						to.params.token +
-							'|' +
-							(Date.now() + EnvConfig.settings.session.duration)
-					)
-				}
-				next({ name: 'home', force: true, replace: true })
-			},
-			meta: {
-				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
-				authenticated: isAuthenticated(),
-			},
+						const verified = await userStore
+							.signin(to.params.token.toString())
+							.then((res: { data: boolean }) => res.data)
+							.catch((err) => {
+								mainStore.$patch({
+									error: err.response.data.message,
+								})
+								next({
+									name: 'signin',
+									replace: true,
+									force: true,
+								})
+							})
+						if (verified) {
+							localStorage.setItem(
+								'user',
+								to.params.token +
+									'|' +
+									(Date.now() +
+										EnvConfig.settings.session.duration)
+							)
+						}
+						next({ name: 'home', force: true, replace: true })
+					},
+					meta: {
+						requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
+						authenticated: isAuthenticated(),
+					},
+				},
+			],
 		},
 		{
 			path: '/account',
@@ -77,6 +86,17 @@ const router = createRouter({
 				requiresAuth: RequiresAuth.AUTHENTICATED,
 				authenticated: isAuthenticated(),
 			},
+			children: [
+				{
+					path: 'your-books',
+					name: 'yourBooks',
+					component: Account,
+					meta: {
+						requiresAuth: RequiresAuth.AUTHENTICATED,
+						authenticated: isAuthenticated(),
+					},
+				},
+			],
 		},
 		{
 			path: '/book/:id',

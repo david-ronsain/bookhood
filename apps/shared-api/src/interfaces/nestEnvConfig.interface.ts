@@ -26,6 +26,7 @@ export interface INestEnvConfigGateway {
 	user?: INestEnvConfigGatewayUserService
 	gateway?: INestEnvConfigGatewayGenericService
 	mail?: INestEnvConfigGatewayGenericService
+	book?: INestEnvConfigGatewayGenericService
 }
 
 interface INestEnvConfigMongo {
@@ -58,6 +59,8 @@ interface INestEnvConfigRabbitMQ {
 interface INestEnvConfigRabbitMQQueues {
 	gateway?: string
 	mail?: string
+	user?: string
+	book?: string
 }
 
 interface INestEnvConfigAWS {
@@ -78,6 +81,14 @@ interface INestEnvConfigFront {
 	host: string
 }
 
+interface INestEnvConfigExternalApisGoogle {
+	key?: string
+}
+
+interface INestEnvConfigExternalApis {
+	google?: INestEnvConfigExternalApisGoogle
+}
+
 export interface INestEnvConfig {
 	settings?: INestEnvConfigSettings
 	gateway?: INestEnvConfigGateway
@@ -87,4 +98,5 @@ export interface INestEnvConfig {
 	aws?: INestEnvConfigAWS
 	i18n?: INestEnvConfigI18n
 	front?: INestEnvConfigFront
+	externalApis?: INestEnvConfigExternalApis
 }

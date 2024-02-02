@@ -2,6 +2,8 @@ import { IUser, Role } from '@bookhood/shared'
 import { Document } from 'mongoose'
 
 export interface UserEntity extends Document, IUser {
+	readonly _id: string
+
 	readonly createdAt: string
 
 	readonly updatedAt: string

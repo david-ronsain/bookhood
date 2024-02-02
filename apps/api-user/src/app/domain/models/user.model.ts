@@ -3,6 +3,7 @@ import { IUser, Role } from '@bookhood/shared'
 export default class UserModel {
 	constructor(user?: IUser) {
 		if (user) {
+			this._id = user?._id?.toString()
 			this.firstName = user.firstName
 			this.lastName = user.lastName
 			this.email = user.email
@@ -14,6 +15,8 @@ export default class UserModel {
 			this.tokenExpiration = user.tokenExpiration
 		}
 	}
+
+	readonly _id?: string
 
 	readonly firstName: string
 

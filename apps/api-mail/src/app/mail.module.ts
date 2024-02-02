@@ -52,7 +52,7 @@ import {
 				AcceptLanguageResolver,
 			],
 			loaderOptions: {
-				path: path.join(__dirname, '/application/locales/'),
+				path: path.join(__dirname, '/app/application/locales/'),
 				watch: true,
 			},
 		}),

@@ -24,6 +24,7 @@ export default (): INestEnvConfig => ({
 		queues: {
 			gateway: process.env.RMQ_GATEWAY_QUEUE || '',
 			mail: process.env.RMQ_MAIL_QUEUE || '',
+			user: process.env.RMQ_USER_QUEUE || '',
 		},
 	},
 	settings: {

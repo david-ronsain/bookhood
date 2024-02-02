@@ -1,3 +1,7 @@
+export { default as BhBookArticle } from './lib/articles/bookArticle/bhBookArticle.vue'
+export { default as BhDialog } from './lib/dialogs/dialog/bhDialog.vue'
+export { default as BhFloatingButton } from './lib/buttons/floatingButton/bhFloatingButton.vue'
+export { default as BhCard } from './lib/cards/card/bhCard.vue'
 export { default as BhSearchBar } from './lib/inputs/search/bhSearchBar.vue'
 export { default as BhSnackbarError } from './lib/alerts/snackbars/bhSnackbarError.vue'
 export { default as BhSnackbarSuccess } from './lib/alerts/snackbars/bhSnackbarSuccess.vue'

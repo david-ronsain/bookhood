@@ -26,7 +26,7 @@ import { SendLinkDTO, SigninDTO } from '../dto/auth.dto'
 @Controller('auth')
 export class AuthController {
 	constructor(
-		@Inject('RabbitGateway') private readonly gatewayQueue: ClientProxy
+		@Inject('RabbitUser') private readonly userQueue: ClientProxy
 	) {}
 
 	@Post('link')
@@ -39,7 +39,7 @@ export class AuthController {
 	async sendLink(@Body() dto: SendLinkDTO): Promise<boolean> {
 		const sent = await firstValueFrom<
 			MicroserviceResponseFormatter<boolean>
-		>(this.gatewayQueue.send('auth-send-link', dto))
+		>(this.userQueue.send('auth-send-link', dto))
 		if (!sent.success) {
 			throw new UserNotFoundException(sent.message)
 		}
@@ -57,7 +57,7 @@ export class AuthController {
 	async signin(@Body() dto: SigninDTO): Promise<boolean> {
 		const verified = await firstValueFrom<
 			MicroserviceResponseFormatter<boolean>
-		>(this.gatewayQueue.send('auth-signin', dto))
+		>(this.userQueue.send('auth-signin', dto))
 		if (!verified.success) {
 			throw new ForbiddenException(verified.message)
 		}

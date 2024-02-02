@@ -14,12 +14,16 @@
 		ISearchingEventProps,
 		ISearchTypeItem,
 	} from '../../../interfaces/searchBar.interface'
+	import type { IBookSearchResult } from '@bookhood/shared'
 
 	const props = withDefaults(defineProps<BhSearchBarProps>(), {
 		isLoading: false,
 		noResultLabel: 'No result',
 		authorLabel: 'By author',
 		bookLabel: 'By title',
+		callback: false,
+		appendButton: true,
+		autoLoad: true,
 	})
 
 	const loading = ref(false)
@@ -82,7 +86,7 @@
 	}
 
 	function loadMore(isIntersecting: boolean) {
-		if (isIntersecting && items.value.length) {
+		if (props.autoLoad && isIntersecting && items.value.length) {
 			startSearch(searchValue.value)
 		}
 	}
@@ -94,7 +98,15 @@
 
 	const events = defineEmits<{
 		(e: 'searching', search: ISearchingEventProps): void
+		(e: 'itemclicked', item: IBookSearchResult): void
 	}>()
+
+	const clickCallback = (e, item: { raw: IBookSearchResult }) => {
+		events('itemclicked', item.raw)
+		if (!props.callback) {
+			resetSearch()
+		}
+	}
 
 	defineExpose({
 		setItems,
@@ -131,8 +143,12 @@
 				class="product-item"
 				max-width="450"
 				density="compact"
-				@click="resetSearch"
-				:to="{ name: 'book', params: { id: item.value } }"
+				@click="(e) => clickCallback(e, item)"
+				:to="
+					callback
+						? undefined
+						: { name: 'book', params: { id: item.value } }
+				"
 				v-intersect="index === items.length - 1 ? loadMore : undefined">
 				<div class="d-flex align-center">
 					<v-list-item-media class="flex-shrink-1 mr-4">
@@ -177,7 +193,9 @@
 				</template>
 			</v-select>
 		</template>
-		<template v-slot:append-inner>
+		<template
+			v-if="appendButton"
+			v-slot:append-inner>
 			<router-link
 				@click="resetSearch"
 				:to="{

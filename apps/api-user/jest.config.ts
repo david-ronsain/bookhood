@@ -11,7 +11,7 @@ export default {
 	},
 	moduleFileExtensions: ['ts', 'js', 'html'],
 	resolver: '@nx/jest/plugins/resolver',
-	coverageDirectory: '../../coverage/apps/api-gateway',
+	coverageDirectory: '../../coverage/apps/api-user',
 	coverageReporters: ['text'],
 	coverageThreshold: {
 		global: {
@@ -21,9 +21,6 @@ export default {
 	collectCoverageFrom: [
 		'**/*.ts',
 		'!**/node_modules/**',
-		'!**/guards/**',
-		'!**/filters/**',
-		'!**/interceptors/**',
 		'!**/jest.config.ts',
 		'!**/main.ts',
 	],

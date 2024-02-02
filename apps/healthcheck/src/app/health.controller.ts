@@ -23,6 +23,8 @@ export class HealthController {
 		private http: HttpHealthIndicator,
 		private mongo: MongooseHealthIndicator,
 		private microservice: MicroserviceHealthIndicator,
+		@Inject('RabbitMQUser') private readonly userClient: ClientProxy,
+		@Inject('RabbitMQBook') private readonly bookClient: ClientProxy,
 		@Inject('RabbitMQGateway') private readonly gatewayClient: ClientProxy,
 		@Inject('RabbitMQMail') private readonly mailClient: ClientProxy,
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
@@ -31,41 +33,6 @@ export class HealthController {
 	@Get()
 	@HealthCheck()
 	async check() {
-		const services: Promise<HealthIndicatorResult>[] = []
-		Object.keys(envConfig().gateway)
-			.filter(
-				(service: string) =>
-					![
-						envConfig().gateway.gateway.serviceName,
-						envConfig().gateway.mail.serviceName,
-					].includes(`api-${service}`)
-			)
-			.forEach((service: string) => {
-				services.push(
-					new Promise<HealthIndicatorResult>((resolve) => {
-						let promise
-						const timeout = setTimeout(() => {
-							promise = null
-							resolve(
-								new Promise((resolve) =>
-									resolve({
-										[`api-${service}`]: { status: 'down' },
-									})
-								)
-							)
-						}, 3000)
-						promise = firstValueFrom(
-							this.gatewayClient.send(`${service}-health`, {})
-						).then(() => {
-							clearTimeout(timeout)
-							return resolve({
-								[`api-${service}`]: { status: 'up' },
-							})
-						})
-					})
-				)
-			})
-
 		const checks: HealthIndicatorFunction[] = [
 			() => this.mongo.pingCheck('mongoDB'),
 			() =>
@@ -96,6 +63,42 @@ export class HealthController {
 					})
 				}),
 			() =>
+				new Promise<HealthIndicatorResult>((resolve) => {
+					let promise
+					const timeout = setTimeout(() => {
+						promise = null
+						resolve(
+							new Promise((resolve) =>
+								resolve({ [`api-user`]: { status: 'down' } })
+							)
+						)
+					}, 3000)
+					promise = firstValueFrom(
+						this.userClient.send(`user-health`, {})
+					).then(() => {
+						clearTimeout(timeout)
+						return resolve({ [`api-user`]: { status: 'up' } })
+					})
+				}),
+			() =>
+				new Promise<HealthIndicatorResult>((resolve) => {
+					let promise
+					const timeout = setTimeout(() => {
+						promise = null
+						resolve(
+							new Promise((resolve) =>
+								resolve({ [`api-book`]: { status: 'down' } })
+							)
+						)
+					}, 3000)
+					promise = firstValueFrom(
+						this.bookClient.send(`book-health`, {})
+					).then(() => {
+						clearTimeout(timeout)
+						return resolve({ [`api-book`]: { status: 'up' } })
+					})
+				}),
+			() =>
 				this.microservice.pingCheck<RedisOptions>(`redis`, {
 					transport: Transport.REDIS,
 					options: {
@@ -112,10 +115,6 @@ export class HealthController {
 					},
 				}),
 		]
-
-		services.forEach((service: Promise<HealthIndicatorResult>) => {
-			checks.push(() => service)
-		})
 
 		let results: HealthCheckResult
 

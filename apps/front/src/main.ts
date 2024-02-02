@@ -10,6 +10,9 @@ import router from './router/router'
 import { createI18n } from 'vue-i18n'
 import { createPinia } from 'pinia'
 
+import OpenLayersMap from 'vue3-openlayers'
+import 'vue3-openlayers/styles.css'
+
 export const pinia = createPinia()
 const i18n = createI18n({
 	locale: EnvConfig.i18n.defaultLocale,
@@ -28,4 +31,5 @@ app.use(i18n)
 app.use(vuetify)
 app.use(pinia)
 app.use(router)
+app.use(OpenLayersMap)
 app.mount('#root')

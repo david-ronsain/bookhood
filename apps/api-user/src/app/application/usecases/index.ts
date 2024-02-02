@@ -3,6 +3,8 @@ import CreateAuthLinkUseCase from './createAuthLink.usecase'
 import UserEmailExistsUseCase from './userEmailExists.usecase'
 import VerifyAuthTokenUseCase from './verifyAuthToken.usecase'
 import GetUserByEmailUseCase from './getUserByEmail.usecase'
+import GetUserByTokenUseCase from './getUserByToken.usecase'
+import RefreshToken from './refreshToken.usecase'
 
 export const USER_USECASES = [
 	CreateUserUseCase,
@@ -10,4 +12,6 @@ export const USER_USECASES = [
 	UserEmailExistsUseCase,
 	VerifyAuthTokenUseCase,
 	GetUserByEmailUseCase,
+	RefreshToken,
+	GetUserByTokenUseCase,
 ]

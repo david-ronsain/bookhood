@@ -57,6 +57,18 @@ const getRabbitMQConfig = (service: string): RmqOptions =>
 	providers: [
 		ConfigService,
 		{
+			provide: `RabbitMQUser`,
+			useFactory: () => {
+				return ClientProxyFactory.create(getRabbitMQConfig('user'))
+			},
+		},
+		{
+			provide: `RabbitMQBook`,
+			useFactory: () => {
+				return ClientProxyFactory.create(getRabbitMQConfig('book'))
+			},
+		},
+		{
 			provide: `RabbitMQGateway`,
 			useFactory: () => {
 				return ClientProxyFactory.create(getRabbitMQConfig('gateway'))

@@ -16,6 +16,9 @@ export interface BhSearchBarProps {
 	authorLabel?: string | undefined
 	bookLabel?: string | undefined
 	noResultLabel?: string | undefined
+	callback?: boolean
+	appendButton?: boolean
+	autoLoad?: boolean
 }
 
 export interface ISearchTypeItem {

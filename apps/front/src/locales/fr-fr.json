@@ -55,5 +55,22 @@
 			"error": "Nous n'avons pas de compte lié à cette adresse",
 			"success": "Le mail vous a été envoyé"
 		}
+	},
+	"account": {
+		"books": {
+			"yourBooks": {
+				"title": "Vos livres",
+				"addForm": {
+					"success": "Le livre \"{title}\" a été ajouté à votre bibliothèque",
+					"error": "Le livre \"{title}\" n'a pas pu être ajouté à votre bibliothèque pour la raison suivante: \n{reason}",
+					"title": "Ajouter un livre",
+					"scan": "Scanner le code barres de votre livre",
+					"searchISBN": "Entrez le code ISBN du livre",
+					"bookNotFound": "Nous n'avons pas trouvé le livre que vous cherchez",
+					"close": "Annuler",
+					"add": "Ajouter"
+				}
+			}
+		}
 	}
 }

@@ -12,10 +12,12 @@ describe('Testing the UserModel', () => {
 		const userModel = new UserModel(user)
 		expect(userModel.email).toBe(user.email)
 		expect(userModel.role).toMatchObject([Role.USER])
+		expect(userModel._id).toBeUndefined()
 	})
 
 	it('should return a model with given roles', () => {
 		const user = {
+			_id: 'id',
 			firstName: 'first',
 			lastName: 'last',
 			email: 'first.last@name.test',

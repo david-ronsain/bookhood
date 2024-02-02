@@ -25,7 +25,7 @@ import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject('RabbitGateway') private readonly gatewayQueue: ClientProxy
+		@Inject('RabbitUser') private readonly userQueue: ClientProxy
 	) {}
 
 	@Post()
@@ -39,7 +39,7 @@ export class UserController {
 	async createUser(@Body() user: CreateUserDTO): Promise<CreateUserDTO> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<CreateUserDTO>
-		>(this.gatewayQueue.send('user-create', user))
+		>(this.userQueue.send('user-create', user))
 		if (!created.success) {
 			throw new UserEmailExistException(created.message)
 		}

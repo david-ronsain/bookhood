@@ -4,76 +4,52 @@
 	import { useDisplay } from 'vuetify'
 	import { useI18n } from 'vue-i18n'
 	import { BhSearchBar, type ISearchingEventProps } from '@bookhood/ui'
-	import axios from 'axios'
-	import { mapBooks } from '../../mappers/bookMapper'
-	import { type IBookAutocompleteItem } from '../../interfaces/book.interface'
-	import { EnvConfig } from '../../../config/env'
+	import { type IBook } from '../../interfaces/book.interface'
 	import { useRoute } from 'vue-router'
 	import { watch } from 'vue'
+	import { isAuthenticated } from '../../plugins/authentication'
+	import { useBookStore } from '../../store/book.store'
 
+	const bookStore = useBookStore()
 	const route = useRoute()
 	const { t } = useI18n({})
-	const { mdAndDown, lgAndUp } = useDisplay()
+	const { lgAndUp, smAndDown } = useDisplay()
 	const drawerOpened = ref(false)
 	const searchBar = ref(null)
-	const maxResults = ref<number>(0)
 	const menuItems = ref([])
 
-	watch(
-		() => route.meta,
-		() => {
-			menuItems.value = []
+	watch(route, () => {
+		menuItems.value = []
 
-			if (route.meta.authenticated) {
-				menuItems.value.push({
-					prependIcon: mdiAccountCircle,
-					title: t('common.menu.profile'),
-					link: { name: 'account' },
-				})
-			} else {
-				menuItems.value.push({
-					prependIcon: mdiLogin,
-					title: t('common.menu.signin'),
-					link: { name: 'signin' },
-				})
-			}
+		if (isAuthenticated()) {
+			menuItems.value.push({
+				prependIcon: mdiAccountCircle,
+				title: t('common.menu.profile'),
+				link: { name: 'account' },
+			})
+		} else {
+			menuItems.value.push({
+				prependIcon: mdiLogin,
+				title: t('common.menu.signin'),
+				link: { name: 'signin' },
+			})
 		}
-	)
+	})
 
 	async function search(search: ISearchingEventProps) {
 		const startAt = search.page * 10
 		if (search.page === 0) {
-			maxResults.value = 0
+			bookStore.searchMaxResults = 0
 		}
 		if (
-			(maxResults.value > 0 && startAt < maxResults.value) ||
-			maxResults.value === 0
+			(bookStore.searchMaxResults > 0 &&
+				startAt < bookStore.searchMaxResults) ||
+			bookStore.searchMaxResults === 0
 		) {
-			const books: IBookAutocompleteItem[] = await axios
-				.get(EnvConfig.googleApi.url, {
-					params: {
-						//fields: '',
-						q: `${search.type}:${search.text.replace(/ /, '+')}`,
-						startIndex: startAt,
-						key: EnvConfig.googleApi.key,
-						printType: 'books',
-						langRestrict: 'fr',
-					},
-				})
-				.then((results) => {
-					maxResults.value = parseInt(results.data.totalItems)
-					return mapBooks(
-						results.data.items.filter((book) =>
-							(book.volumeInfo?.industryIdentifiers || []).find(
-								(id) => ['ISBN_10', 'ISBN_13'].includes(id.type)
-							)
-						)
-					)
-				})
-				.catch(() => {
-					return []
-				})
-
+			const books: IBook[] = await bookStore.searchGoogleByName(
+				search,
+				startAt
+			)
 			searchBar.value.setItems(books)
 		}
 	}
@@ -85,20 +61,40 @@
 		elevation="2"
 		height="50">
 		<template v-slot:prepend>
-			<div>
+			<div
+				class="d-flex align-center"
+				v-if="smAndDown">
 				<v-app-bar-nav-icon
-					v-if="mdAndDown"
 					@click.stop="drawerOpened = !drawerOpened" />
-				<div class="d-flex align-center justify-space-between">
-					<v-icon size="20">
-						{{ mdiBook }}
-					</v-icon>
-					<span>{{ $t('common.websiteName') }}</span>
-				</div>
+				<router-link :to="{ name: 'home' }">
+					<div class="d-flex align-center justify-space-between">
+						<v-icon size="20">
+							{{ mdiBook }}
+						</v-icon>
+						<span>{{ $t('common.websiteName') }}</span>
+					</div>
+				</router-link>
 			</div>
+			<router-link
+				v-else
+				:to="{ name: 'home' }">
+				<div>
+					<v-app-bar-nav-icon
+						v-if="smAndDown"
+						@click.stop="drawerOpened = !drawerOpened" />
+					<div class="d-flex align-center justify-space-between">
+						<v-icon size="20">
+							{{ mdiBook }}
+						</v-icon>
+						<span>{{ $t('common.websiteName') }}</span>
+					</div>
+				</div>
+			</router-link>
 		</template>
 
-		<template v-slot:title>
+		<template
+			v-if="false"
+			v-slot:title>
 			<bh-search-bar
 				ref="searchBar"
 				:placeholder="$t('common.header.searchbar.label')"
@@ -139,6 +135,7 @@
 	</v-app-bar>
 
 	<v-navigation-drawer
+		v-if="smAndDown"
 		:elevation="2"
 		:model-value="drawerOpened"
 		sticky>
@@ -172,6 +169,12 @@
 
 		&-title {
 			margin-inline-start: 0;
+		}
+	}
+
+	@media (max-width: 960px) {
+		.v-app-bar .v-toolbar__prepend {
+			width: auto;
 		}
 	}
 </style>

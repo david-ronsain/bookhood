@@ -18,7 +18,7 @@ async function bootstrap() {
 					envConfig().rabbitmq.vhost
 				}`,
 			],
-			queue: process.env.RMQ_MAIL_QUEUE || '',
+			queue: envConfig().rabbitmq.queues.mail,
 			queueOptions: {
 				durable: true,
 			},

@@ -45,7 +45,7 @@ describe('Testing UserController', () => {
 			controllers: [UserController],
 			providers: [
 				{
-					provide: 'RabbitGateway',
+					provide: 'RabbitUser',
 					useValue: mock,
 				},
 			],

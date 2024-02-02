@@ -45,6 +45,13 @@ export default (): INestEnvConfig => ({
 		vhost: process.env.RMQ_VHOST || '',
 		queues: {
 			gateway: process.env.RMQ_GATEWAY_QUEUE || '',
+			user: process.env.RMQ_USER_QUEUE || '',
+			book: process.env.RMQ_BOOK_QUEUE || '',
+		},
+	},
+	externalApis: {
+		google: {
+			key: process.env.APP_GOOGLE_API_KEY || '',
 		},
 	},
 })

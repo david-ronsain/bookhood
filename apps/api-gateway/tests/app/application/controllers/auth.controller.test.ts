@@ -1,79 +1,129 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
-import { Test } from '@nestjs/testing'
-import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
+import { Test, TestingModule } from '@nestjs/testing'
+import {
+	BadRequestException,
+	ForbiddenException,
+	HttpStatus,
+} from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { Observable } from 'rxjs'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
-import { CreateUserDTO } from '../../../../src/app/application/dto/user.dto'
-import { HttpStatus } from '@nestjs/common'
+import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
 import {
 	SendLinkDTO,
 	SigninDTO,
 } from '../../../../src/app/application/dto/auth.dto'
+import { UserNotFoundException } from '../../../../src/app/application/exceptions'
+import { of } from 'rxjs'
+import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
 
-describe('Testing AuthController', () => {
+jest.mock('@nestjs/microservices', () => ({
+	ClientProxy: {
+		send: jest.fn(() => of({})),
+	},
+}))
+
+describe('AuthController', () => {
 	let controller: AuthController
 
-	const mock = {
-		send: (
-			pattern: unknown,
-			data: SendLinkDTO | SigninDTO
-		): Observable<MicroserviceResponseFormatter<boolean>> => {
-			return new Observable<MicroserviceResponseFormatter<boolean>>(
-				(subscriber) => {
-					if (
-						pattern === 'auth-send-link' &&
-						(data as SendLinkDTO).email === 'first.last@name.test'
-					)
-						subscriber.next(
-							new MicroserviceResponseFormatter<boolean>(
-								true,
-								HttpStatus.OK,
-								data,
-								true
-							)
-						)
-					else if (pattern === 'auth-send-link')
-						subscriber.next(
-							new MicroserviceResponseFormatter<boolean>(
-								false,
-								HttpStatus.NOT_FOUND,
-								data,
-								false
-							)
-						)
-				}
-			)
-		},
-	} as unknown as ClientProxy
-
 	beforeEach(async () => {
-		const module = await Test.createTestingModule({
+		const module: TestingModule = await Test.createTestingModule({
 			controllers: [AuthController],
 			providers: [
 				{
-					provide: 'RabbitGateway',
-					useValue: mock,
+					provide: 'RabbitUser',
+					useValue: {
+						send: jest.fn(() => of({})),
+					},
 				},
 			],
 		}).compile()
+
 		controller = module.get<AuthController>(AuthController)
 	})
 
-	describe('Testing the sendLink method', () => {
-		it('should send the mail', async () => {
-			const dto: SendLinkDTO = {
+	it('should be defined', () => {
+		expect(controller).toBeDefined()
+	})
+
+	describe('sendLink', () => {
+		it('should send a login link', async () => {
+			const sendLinkDTO: SendLinkDTO = {
 				email: 'first.last@name.test',
-			} as SendLinkDTO
-			const success = await controller.sendLink(dto as SendLinkDTO)
-			expect(success).toBe(true)
+			}
+
+			const response = new MicroserviceResponseFormatter<boolean>(true)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response)
+			)
+
+			const result = await controller.sendLink(sendLinkDTO)
+
+			expect(controller['userQueue'].send).toHaveBeenCalledWith(
+				'auth-send-link',
+				sendLinkDTO
+			)
+			expect(result).toBe(true)
 		})
 
-		it('should not send the mail because the email does not exist', async () => {
-			const dto: SendLinkDTO = {
-				email: '',
+		it('should handle user not found exception', async () => {
+			const sendLinkDTO: SendLinkDTO = {
+				email: 'first.last@name.test',
 			}
-			expect(controller.sendLink(dto)).rejects.toThrow()
+
+			const response = new MicroserviceResponseFormatter(
+				false,
+				HttpStatus.NOT_FOUND
+			)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response)
+			)
+
+			await expect(controller.sendLink(sendLinkDTO)).rejects.toThrow(
+				UserNotFoundException
+			)
+		})
+	})
+
+	describe('signin', () => {
+		it('should authenticate the user', async () => {
+			const signinDTO: SigninDTO = {
+				token: 'mytoken',
+			}
+
+			const response = new MicroserviceResponseFormatter(true)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response)
+			)
+
+			const result = await controller.signin(signinDTO)
+
+			expect(controller['userQueue'].send).toHaveBeenCalledWith(
+				'auth-signin',
+				signinDTO
+			)
+			expect(result).toBe(true)
+		})
+
+		it('should handle forbidden exception', async () => {
+			const signinDTO: SigninDTO = {
+				token: 'mytoken',
+			}
+
+			const response = new MicroserviceResponseFormatter(
+				false,
+				HttpStatus.FORBIDDEN
+			)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response)
+			)
+
+			await expect(controller.signin(signinDTO)).rejects.toThrow(
+				ForbiddenException
+			)
 		})
 	})
 })

@@ -23,17 +23,20 @@
 	async function sendSigninLink() {
 		loading.value = true
 		disabled.value = true
-		userStore
-			.sendSigninLink(email.value)
-			.then(() => {
-				loading.value = false
-				mainStore.success = 'Le lien vous a été envoyé'
-			})
-			.catch((err) => {
-				mainStore.error = err.message
-				loading.value = false
-				disabled.value = false
-			})
+
+		if (formValid.value) {
+			userStore
+				.sendSigninLink(email.value)
+				.then(() => {
+					loading.value = false
+					mainStore.success = 'Le lien vous a été envoyé'
+				})
+				.catch((err) => {
+					mainStore.error = err.message
+					loading.value = false
+					disabled.value = false
+				})
+		}
 	}
 </script>
 
@@ -41,7 +44,8 @@
 	<v-form
 		ref="form"
 		v-model="formValid"
-		validate-on="input lazy">
+		validate-on="input lazy"
+		@submit.prevent="sendSigninLink">
 		<v-row>
 			<v-col cols="12">
 				<h1

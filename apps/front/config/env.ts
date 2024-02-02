@@ -28,6 +28,7 @@ interface IApiConfig {
 	url: {
 		user: string
 		auth: string
+		book: string
 	}
 }
 
@@ -58,6 +59,7 @@ export const EnvConfig: IEnvConfig = {
 		url: {
 			user: `${import.meta.env.VITE_APP_FRONT_API_USER_PREFIX}`,
 			auth: `${import.meta.env.VITE_APP_FRONT_API_AUTH_PREFIX}`,
+			book: `${import.meta.env.VITE_APP_FRONT_API_BOOK_PREFIX}`,
 		},
 	},
 	googleApi: {

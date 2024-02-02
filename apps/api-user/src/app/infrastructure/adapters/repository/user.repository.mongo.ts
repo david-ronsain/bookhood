@@ -33,6 +33,12 @@ export default class UserRepositoryMongo implements UserRepository {
 		return user ? UserMapper.fromEntitytoModel(user) : null
 	}
 
+	async getUserByToken(token: string): Promise<UserModel | null> {
+		const user = await this.userModel.findOne({ token })
+
+		return user ? UserMapper.fromEntitytoModel(user) : null
+	}
+
 	async update(user: UserModel): Promise<UserModel | null> {
 		const updated = await this.userModel.findOneAndUpdate(
 			{ email: user.email },
