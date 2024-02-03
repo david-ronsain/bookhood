@@ -54,7 +54,6 @@ export class BookController {
 				book
 			)
 		} catch (err) {
-			this.logger.error(err)
 			return new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
 				err,
 				body.data.book

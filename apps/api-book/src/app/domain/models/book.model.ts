@@ -21,15 +21,15 @@ export default class BookModel {
 
 	readonly title: string
 
-	readonly authors: string[]
+	readonly authors: string[] = []
 
-	readonly categories?: string[]
+	readonly categories?: string[] = []
 
 	readonly description: string
 
 	readonly image?: IBookImageLinks
 
-	readonly isbn: IISBN[]
+	readonly isbn: IISBN[] = []
 
 	readonly language: string
 

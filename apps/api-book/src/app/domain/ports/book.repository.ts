@@ -1,3 +1,4 @@
+import { IBookSearch } from '@bookhood/shared'
 import BookModel from '../models/book.model'
 
 export interface BookRepository {
@@ -9,5 +10,5 @@ export interface BookRepository {
 		startAt: number,
 		language: string,
 		boundingBox: number[]
-	)
+	): Promise<IBookSearch>
 }

@@ -1,43 +1,49 @@
 import envConfig from '../../src/config/env.config'
-import { ConfigModule } from '@nestjs/config'
 
-describe('Testing the env configuration', () => {
-	it('should have a defined configuration', () => {
-		ConfigModule.forRoot({ envFilePath: '../../../../.env.test' })
+describe('env.config', () => {
+	it('should return environment configuration', () => {
+		process.env = {
+			MONGO_DATABASE: 'testdb',
+			MONGO_HOST: 'localhost',
+			MONGO_PORT: '27017',
+			MONGO_PROTOCOL: 'mongodb',
+			MONGO_USER: 'testuser',
+			MONGO_PASSWORD: 'testpassword',
+			APP_API_BOOK_SERVICE_NAME: 'book-service',
+			RMQ_HOST: 'rabbitmq',
+			RMQ_PORT: '5672',
+			RMQ_PROTOCOL: 'amqp',
+			RMQ_USER: 'rabbituser',
+			RMQ_PASSWORD: 'rabbitpassword',
+			RMQ_VHOST: 'bookhood',
+			RMQ_GATEWAY_QUEUE: 'gateway_queue',
+			RMQ_MAIL_QUEUE: 'mail_queue',
+			RMQ_USER_QUEUE: 'user_queue',
+			RMQ_BOOK_QUEUE: 'book_queue',
+			SESSION_DURATION: '3600',
+			APP_GOOGLE_API_KEY: 'googleapikey',
+		}
 
-		expect(envConfig().mongo.database).toBe(
-			process.env.MONGO_DATABASE || ''
-		)
-		expect(envConfig().mongo.host).toBe(process.env.MONGO_HOST || '')
-		expect(envConfig().mongo.port).toBe(
-			parseInt(process.env.MONGO_PORT || '')
-		)
-		expect(envConfig().mongo.protocol).toBe(
-			process.env.MONGO_PROTOCOL || ''
-		)
-		expect(envConfig().mongo.user).toBe(process.env.MONGO_USER || '')
+		const config = envConfig()
 
-		expect(envConfig().gateway.user.serviceName).toBe(
-			process.env.APP_API_USER_SERVICE_NAME || ''
-		)
-
-		expect(envConfig().rabbitmq.host).toBe(process.env.RMQ_HOST || '')
-		expect(envConfig().rabbitmq.port).toBe(
-			parseInt(process.env.RMQ_PORT || '')
-		)
-		expect(envConfig().rabbitmq.protocol).toBe(
-			(process.env.RMQ_PROTOCOL || '') as 'amqp'
-		)
-		expect(envConfig().rabbitmq.user).toBe(process.env.RMQ_USER || '')
-		expect(envConfig().rabbitmq.password).toBe(
-			process.env.RMQ_PASSWORD || ''
-		)
-		expect(envConfig().rabbitmq.vhost).toBe(process.env.RMQ_VHOST || '')
-		expect(envConfig().rabbitmq.queues.gateway).toBe(
-			process.env.RMQ_GATEWAY_QUEUE || ''
-		)
-		expect(envConfig().rabbitmq.queues.mail).toBe(
-			process.env.RMQ_MAIL_QUEUE || ''
-		)
+		expect(config.mongo.database).toBe('testdb')
+		expect(config.mongo.host).toBe('localhost')
+		expect(config.mongo.port).toBe(27017)
+		expect(config.mongo.protocol).toBe('mongodb')
+		expect(config.mongo.user).toBe('testuser')
+		expect(config.mongo.password).toBe('testpassword')
+		expect(config.gateway.book.serviceName).toBe('book-service')
+		expect(config.rabbitmq.host).toBe('rabbitmq')
+		expect(config.rabbitmq.port).toBe(5672)
+		expect(config.rabbitmq.protocol).toBe('amqp')
+		expect(config.rabbitmq.user).toBe('rabbituser')
+		expect(config.rabbitmq.password).toBe('rabbitpassword')
+		expect(config.rabbitmq.vhost).toBe('bookhood')
+		expect(config.rabbitmq.queues.gateway).toBe('gateway_queue')
+		expect(config.rabbitmq.queues.mail).toBe('mail_queue')
+		expect(config.rabbitmq.queues.user).toBe('user_queue')
+		expect(config.rabbitmq.queues.book).toBe('book_queue')
+		expect(config.settings.sessionDuration).toBe(3600)
+		expect(config.externalApis.google.key).toBe('googleapikey')
 	})
 })
