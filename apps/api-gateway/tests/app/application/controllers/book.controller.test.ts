@@ -57,17 +57,18 @@ describe('BookController', () => {
 				subtitle: 'subtitle',
 				publisher: 'publisher',
 				publishedDate: '2023',
+				location: { lat: 0, lng: 0 },
 			}
 
 			const response = new MicroserviceResponseFormatter(
 				true,
 				HttpStatus.CREATED,
 				addBookDTO,
-				addBookDTO
+				addBookDTO,
 			)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			const result = await controller.addBook(addBookDTO, 'fakeToken')
@@ -77,7 +78,7 @@ describe('BookController', () => {
 				{
 					token: 'fakeToken',
 					data: { book: addBookDTO },
-				}
+				},
 			)
 			expect(result).toEqual(response.data)
 		})
@@ -93,16 +94,17 @@ describe('BookController', () => {
 				subtitle: '',
 				publisher: '',
 				publishedDate: '',
+				location: { lat: 0, lng: 0 },
 			}
 
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			await expect(
-				controller.addBook(addBookDTO, 'fakeToken')
+				controller.addBook(addBookDTO, 'fakeToken'),
 			).rejects.toThrow(HttpException)
 		})
 	})
@@ -138,11 +140,11 @@ describe('BookController', () => {
 				true,
 				HttpStatus.OK,
 				{},
-				{}
+				{},
 			)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			const result = await controller.getBooks(q, startAt, box)
@@ -154,7 +156,7 @@ describe('BookController', () => {
 					startAt,
 					language: 'fr',
 					boundingBox: box,
-				}
+				},
 			)
 			expect(result).toEqual(response.data)
 		})
@@ -167,11 +169,11 @@ describe('BookController', () => {
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			await expect(controller.getBooks(q, startAt, box)).rejects.toThrow(
-				HttpException
+				HttpException,
 			)
 		})
 	})
