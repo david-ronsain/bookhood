@@ -9,7 +9,7 @@ import BookModel from '../../../../src/app/domain/models/book.model'
 import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/createBookIfNew.usecase'
 import SearchBookUseCase from '../../../../src/app/application/usecases/searchBook.usecase'
 import { of } from 'rxjs'
-import { IAddBookDTO, IBookSearch } from '../../../../../shared/src'
+import { IAddBookDTO, IBook, IBookSearch } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 
 describe('BookController', () => {
@@ -47,7 +47,7 @@ describe('BookController', () => {
 
 		controller = module.get<BookController>(BookController)
 		createBookIfNewUseCase = module.get<CreateBookIfNewUseCase>(
-			CreateBookIfNewUseCase
+			CreateBookIfNewUseCase,
 		)
 		addBookUseCase = module.get<AddBookUseCase>(AddBookUseCase)
 		searchBookUseCase = module.get<SearchBookUseCase>(SearchBookUseCase)
@@ -67,6 +67,27 @@ describe('BookController', () => {
 
 	describe('addBook', () => {
 		it('should add a book and return success', async () => {
+			const mockDTO: IAddBookDTO = {
+				authors: ['author'],
+				description: 'desc',
+				isbn: [
+					{
+						type: 'ISBN_13',
+						identifier: '01234567890123',
+					},
+				],
+				language: 'fr',
+				title: 'title',
+				categories: ['category'],
+				image: { smallThumbnail: '', thumbnail: '' },
+				publishedDate: '2024',
+				publisher: 'publisher',
+				subtitle: 'subtitle',
+				location: {
+					lat: 0,
+					lng: 0,
+				},
+			} as IAddBookDTO
 			const mockBook: BookModel = {
 				authors: ['author'],
 				description: 'desc',
@@ -87,34 +108,35 @@ describe('BookController', () => {
 			const mockToken = 'mockToken||'
 
 			jest.spyOn(createBookIfNewUseCase, 'handler').mockResolvedValue(
-				mockBook
+				mockBook,
 			)
 			jest.spyOn(userClient, 'send').mockReturnValue(
-				of({ success: true, data: { _id: 'mockUserId' } })
+				of({ success: true, data: { _id: 'mockUserId' } }),
 			)
 			jest.spyOn(addBookUseCase, 'handler').mockResolvedValue(undefined)
 
 			const result = await controller.addBook({
 				token: mockToken,
-				data: { book: mockBook },
+				data: { book: mockDTO },
 			})
 
 			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()
 			expect(userClient.send).toHaveBeenCalledWith(
 				'user-get-by-token',
-				'mockToken|'
+				'mockToken|',
 			)
 			expect(addBookUseCase.handler).toHaveBeenCalledWith(
 				mockBook._id,
-				'mockUserId'
+				'mockUserId',
+				{ lat: 0, lng: 0 },
 			)
 			expect(result).toEqual(
-				new MicroserviceResponseFormatter<IAddBookDTO>(
+				new MicroserviceResponseFormatter<IBook>(
 					true,
 					HttpStatus.CREATED,
 					undefined,
-					mockBook
-				)
+					mockBook,
+				),
 			)
 		})
 
@@ -137,7 +159,7 @@ describe('BookController', () => {
 				subtitle: 'subtitle',
 			} as IAddBookDTO
 			jest.spyOn(createBookIfNewUseCase, 'handler').mockRejectedValue(
-				new Error('Test error')
+				new Error('Test error'),
 			)
 
 			const result = await controller.addBook({
@@ -151,8 +173,8 @@ describe('BookController', () => {
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
 					new Error('Test error'),
-					book
-				)
+					book,
+				),
 			)
 		})
 	})
@@ -165,7 +187,7 @@ describe('BookController', () => {
 			}
 
 			jest.spyOn(searchBookUseCase, 'handler').mockResolvedValue(
-				mockBookSearch
+				mockBookSearch,
 			)
 
 			const result = await controller.searchBook({
@@ -181,14 +203,14 @@ describe('BookController', () => {
 					true,
 					HttpStatus.CREATED,
 					undefined,
-					mockBookSearch
-				)
+					mockBookSearch,
+				),
 			)
 		})
 
 		it('should handle errors during book search', async () => {
 			jest.spyOn(searchBookUseCase, 'handler').mockRejectedValue(
-				new Error('Test error')
+				new Error('Test error'),
 			)
 
 			const result = await controller.searchBook({
@@ -207,8 +229,8 @@ describe('BookController', () => {
 						startAt: 0,
 						language: 'en',
 						boundingBox: [0, 0, 0, 0],
-					}
-				)
+					},
+				),
 			)
 		})
 	})

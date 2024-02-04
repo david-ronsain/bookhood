@@ -11,7 +11,7 @@ export const useBookStore = defineStore('bookStore', () => {
 
 	const searchGoogleByName = async (
 		search: ISearchingEventProps,
-		startAt: number
+		startAt: number,
 	): Promise<IBook[]> =>
 		axios
 			.post(
@@ -19,16 +19,16 @@ export const useBookStore = defineStore('bookStore', () => {
 				{
 					q: `${search.type}:${search.text.replace(/ /, '+')}`,
 					startIndex: startAt,
-				}
+				},
 			)
 			.then((results) => {
 				searchMaxResults.value = parseInt(results.data.totalItems)
 				return mapBooks(
 					results.data.items.filter((book) =>
 						(book.volumeInfo?.industryIdentifiers || []).find(
-							(id) => ['ISBN_10', 'ISBN_13'].includes(id.type)
-						)
-					)
+							(id) => ['ISBN_10', 'ISBN_13'].includes(id.type),
+						),
+					),
 				)
 			})
 			.catch(() => {
@@ -38,7 +38,7 @@ export const useBookStore = defineStore('bookStore', () => {
 	const searchByName = async (
 		search: ISearchingEventProps,
 		startAt: number,
-		boundingBox: number[]
+		boundingBox: number[],
 	): Promise<IBookSearch> =>
 		axios
 			.post(EnvConfig.api.base + EnvConfig.api.url.book + 'search', {
@@ -56,18 +56,22 @@ export const useBookStore = defineStore('bookStore', () => {
 			.then((results) =>
 				results.data.totalItems > 0
 					? mapBook(results.data.items[0])
-					: null
+					: null,
 			)
 			.catch(() => {
 				return null
 			})
 
-	const add = async (book: IBook) =>
-		axios.post(EnvConfig.api.base + EnvConfig.api.url.book, book, {
-			headers: {
-				'x-token': localStorage.getItem('user'),
+	const add = async (book: IBook, location: { lat; lng }) =>
+		axios.post(
+			EnvConfig.api.base + EnvConfig.api.url.book,
+			{ ...book, location },
+			{
+				headers: {
+					'x-token': localStorage.getItem('user'),
+				},
 			},
-		})
+		)
 
 	return {
 		searchGoogleByName,

@@ -1,4 +1,9 @@
-import { IAddBookDTO, type IBookImageLinks, IISBN } from '@bookhood/shared'
+import {
+	IAddBookDTO,
+	type IBookImageLinks,
+	IISBN,
+	ICoords,
+} from '@bookhood/shared'
 import { ApiProperty } from '@nestjs/swagger'
 import {
 	IsNotEmpty,
@@ -55,4 +60,8 @@ export class AddBookDTO implements IAddBookDTO {
 	@IsNotEmpty()
 	@IsString()
 	publishedDate: string
+
+	@ApiProperty()
+	@IsNotEmpty()
+	location: ICoords
 }

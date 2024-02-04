@@ -18,7 +18,7 @@ export class BookController {
 		@Inject('RabbitUser') private readonly userClient: ClientProxy,
 		private readonly createBookIfNewUseCase: CreateBookIfNewUseCase,
 		private readonly addBookUseCase: AddBookUseCase,
-		private readonly searchBookUseCase: SearchBookUseCase
+		private readonly searchBookUseCase: SearchBookUseCase,
 	) {}
 
 	@MessagePattern('book-health')
@@ -33,7 +33,7 @@ export class BookController {
 	}): Promise<MicroserviceResponseFormatter<IBook>> {
 		try {
 			const book: BookModel = await this.createBookIfNewUseCase.handler(
-				body.data.book
+				body.data.book,
 			)
 
 			const token = body.token?.split('|') ?? []
@@ -45,18 +45,22 @@ export class BookController {
 				MicroserviceResponseFormatter<IUser | null>
 			>(this.userClient.send('user-get-by-token', token.join('|')))
 
-			await this.addBookUseCase.handler(book._id, userData.data._id)
+			await this.addBookUseCase.handler(
+				book._id,
+				userData.data._id,
+				body.data.book.location,
+			)
 
-			return new MicroserviceResponseFormatter<IAddBookDTO>(
+			return new MicroserviceResponseFormatter<IBook>(
 				true,
 				HttpStatus.CREATED,
 				undefined,
-				book
+				book,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
 				err,
-				body.data.book
+				body.data.book,
 			)
 		}
 	}
@@ -73,19 +77,19 @@ export class BookController {
 				body.search,
 				body.startAt,
 				body.language,
-				body.boundingBox
+				body.boundingBox,
 			)
 
 			return new MicroserviceResponseFormatter<IBookSearch>(
 				true,
 				HttpStatus.CREATED,
 				undefined,
-				list
+				list,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IBookSearch>().buildFromException(
 				err,
-				body
+				body,
 			)
 		}
 	}

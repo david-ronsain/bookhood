@@ -10,7 +10,7 @@ import { IBookSearch } from '@bookhood/shared'
 @Injectable()
 export default class BookRepositoryMongo implements BookRepository {
 	constructor(
-		@InjectModel('Book') private readonly bookModel: Model<BookEntity>
+		@InjectModel('Book') private readonly bookModel: Model<BookEntity>,
 	) {}
 	async getByISBN(isbn: string[]): Promise<BookModel | null> {
 		const book = await this.bookModel.findOne({
@@ -31,7 +31,7 @@ export default class BookRepositoryMongo implements BookRepository {
 		term: string,
 		startAt: number,
 		language: string,
-		boundingBox: number[]
+		boundingBox: number[],
 	): Promise<IBookSearch> {
 		const stages: PipelineStage[] = []
 
@@ -39,11 +39,11 @@ export default class BookRepositoryMongo implements BookRepository {
 		const filters: object = {
 			language,
 		}
-		if (category === 'inauthor') {
+		if (category === 'inauthor' && term.length) {
 			filters['authors'] = {
 				$regex: new RegExp(term, 'ig'),
 			}
-		} else if (category === 'intitle') {
+		} else if (category === 'intitle' && term.length) {
 			filters['title'] = {
 				$regex: new RegExp(term, 'ig'),
 			}
@@ -68,7 +68,7 @@ export default class BookRepositoryMongo implements BookRepository {
 					foreignField: '_id',
 					as: 'user',
 				},
-			}
+			},
 		)
 
 		if (boundingBox.length === 4) {
@@ -174,7 +174,7 @@ export default class BookRepositoryMongo implements BookRepository {
 				$project: {
 					_id: false,
 				},
-			}
+			},
 		)
 
 		const list: IBookSearch[] = await this.bookModel.aggregate(stages)

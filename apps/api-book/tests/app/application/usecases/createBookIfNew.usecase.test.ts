@@ -36,6 +36,7 @@ describe('CreateBookIfNewUseCase', () => {
 			publishedDate: '2024',
 			publisher: 'publisher',
 			subtitle: 'subtitle',
+			location: { lat: 0, lng: 0 },
 		}
 
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(null)
@@ -46,7 +47,7 @@ describe('CreateBookIfNewUseCase', () => {
 		}
 
 		jest.spyOn(bookRepositoryMock, 'create').mockResolvedValue(
-			createdBookModel
+			createdBookModel,
 		)
 
 		const result = await createBookIfNewUseCase.handler(addBookDTO)
@@ -56,7 +57,7 @@ describe('CreateBookIfNewUseCase', () => {
 		])
 
 		expect(bookRepositoryMock.create).toHaveBeenCalledWith(
-			new BookModel(addBookDTO)
+			new BookModel(addBookDTO),
 		)
 
 		const expectedOutput: IBook = createdBookModel
@@ -80,6 +81,7 @@ describe('CreateBookIfNewUseCase', () => {
 			publishedDate: '2024',
 			publisher: 'publisher',
 			subtitle: 'subtitle',
+			location: { lat: 0, lng: 0 },
 		}
 
 		const existingBookModel: BookModel = {
@@ -87,7 +89,7 @@ describe('CreateBookIfNewUseCase', () => {
 			...addBookDTO,
 		}
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(
-			existingBookModel
+			existingBookModel,
 		)
 
 		const result = await createBookIfNewUseCase.handler(addBookDTO)

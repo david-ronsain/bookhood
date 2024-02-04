@@ -24,7 +24,7 @@ describe('AddBookUseCase', () => {
 
 		jest.spyOn(
 			libraryRepositoryMock,
-			'getByUserIdAndBookId'
+			'getByUserIdAndBookId',
 		).mockResolvedValue(null)
 
 		const createdLibraryModel: LibraryModel = {
@@ -35,17 +35,20 @@ describe('AddBookUseCase', () => {
 		}
 
 		jest.spyOn(libraryRepositoryMock, 'create').mockResolvedValue(
-			createdLibraryModel
+			createdLibraryModel,
 		)
 
-		const result = await addBookUseCase.handler(bookId, userId)
+		const result = await addBookUseCase.handler(bookId, userId, {
+			lat: 0,
+			lng: 0,
+		})
 
 		expect(libraryRepositoryMock.create).toHaveBeenCalledWith(
 			new LibraryModel({
 				bookId,
 				userId,
-				location: undefined,
-			})
+				location: { type: 'Point', coordinates: [0, 0] },
+			}),
 		)
 
 		const expectedOutput =
@@ -59,7 +62,7 @@ describe('AddBookUseCase', () => {
 
 		jest.spyOn(
 			libraryRepositoryMock,
-			'getByUserIdAndBookId'
+			'getByUserIdAndBookId',
 		).mockResolvedValue({
 			_id: '789',
 			bookId: new mongoose.Types.ObjectId(bookId),
@@ -67,13 +70,13 @@ describe('AddBookUseCase', () => {
 			location: { type: 'Point', coordinates: [0, 0] },
 		})
 
-		await expect(addBookUseCase.handler(bookId, userId)).rejects.toThrow(
-			ConflictException
-		)
+		await expect(
+			addBookUseCase.handler(bookId, userId, { lat: 0, lng: 0 }),
+		).rejects.toThrow(ConflictException)
 
 		expect(libraryRepositoryMock.getByUserIdAndBookId).toHaveBeenCalledWith(
 			userId,
-			bookId
+			bookId,
 		)
 
 		expect(libraryRepositoryMock.create).not.toHaveBeenCalled()

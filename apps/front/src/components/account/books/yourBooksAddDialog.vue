@@ -5,8 +5,9 @@
 		BhPrimaryButton,
 		BhTextField,
 		BhBookArticle,
+		BhAddressAutocomplete,
 	} from '@bookhood/ui'
-	import { type IBook } from '@bookhood/shared'
+	import { type IAddBookDTO, type ICoords } from '@bookhood/shared'
 	import { mdiAlertCircleOutline, mdiMagnify } from '@mdi/js'
 	import debounce from 'debounce'
 	import { StreamBarcodeReader } from 'vue-barcode-reader'
@@ -20,15 +21,22 @@
 	const bookStore = useBookStore()
 	const mainStore = useMainStore()
 	const search = ref('')
-	const book = ref<IBook>(null)
+	const book = ref<IAddBookDTO>(null)
 	const loading = ref<boolean>(false)
 	const saveButtonLoading = ref<boolean>(false)
 	const saveButtonDisabled = ref<boolean>(true)
 	const lastSearch = ref<string>('')
 	const displayBookNotFound = ref<boolean>(false)
+	const location = ref<{ lat; lng }>()
 
-	watch(book, (newVal) => {
-		saveButtonDisabled.value = !newVal
+	watch(book, (newVal: IAddBookDTO) => {
+		saveButtonDisabled.value =
+			isNaN(location.value?.lat) || isNaN(location.value?.lng) || !newVal
+	})
+
+	watch(location, (newVal: ICoords) => {
+		saveButtonDisabled.value =
+			isNaN(newVal.lat) || isNaN(newVal.lng) || !book.value
 	})
 
 	const checkHasCamera = async () => {
@@ -73,11 +81,11 @@
 		saveButtonDisabled.value = true
 		saveButtonLoading.value = true
 		bookStore
-			.add(book.value)
+			.add(book.value, location.value)
 			.then(() => {
 				mainStore.success = t(
 					'account.books.yourBooks.addForm.success',
-					{ title: book.value.title }
+					{ title: book.value.title },
 				)
 				addDialog.value.close()
 				book.value = null
@@ -99,6 +107,13 @@
 		lastSearch.value = null
 	}
 
+	const centerUpdated = (center: number[]) => {
+		location.value = {
+			lng: parseFloat(center[0].toString()),
+			lat: parseFloat(center[1].toString()),
+		}
+	}
+
 	defineExpose({
 		open,
 	})
@@ -110,25 +125,31 @@
 		ref="addDialog"
 		fullscreen>
 		<template v-slot>
-			<div
-				id="barcodeScanner"
-				v-if="hasCamera">
-				<div v-text="$t('account.books.yourBooks.addForm.scan')" />
-				<StreamBarcodeReader @result="readBarCode" />
-			</div>
+			<div id="barcodeScanner">
+				<div
+					v-if="hasCamera"
+					class="mb-4">
+					<div v-text="$t('account.books.yourBooks.addForm.scan')" />
+					<StreamBarcodeReader @result="readBarCode" />
+				</div>
 
-			<bh-text-field
-				style="max-width: 400px"
-				class="mx-auto"
-				ref="isbnSearch"
-				:label="$t('account.books.yourBooks.addForm.searchISBN')"
-				v-model="search"
-				clearable
-				:icon="{ icon: mdiMagnify, append: true }"
-				@click:append="startSearch"
-				@blur="startSearch"
-				@click:clear="reset"
-				@update:modelValue="startSearch" />
+				<bh-text-field
+					style="max-width: 400px"
+					class="mx-auto mb-4"
+					ref="isbnSearch"
+					:label="$t('account.books.yourBooks.addForm.searchISBN')"
+					v-model="search"
+					clearable
+					:icon="{ icon: mdiMagnify, append: true }"
+					@click:append="startSearch"
+					@blur="startSearch"
+					@click:clear="reset"
+					@update:modelValue="startSearch" />
+
+				<bh-address-autocomplete
+					class="mb-8"
+					@center:updated="centerUpdated" />
+			</div>
 
 			<bh-book-article
 				class="px-4 py-8 ma-auto"
@@ -160,7 +181,6 @@
 <style lang="scss" scoped>
 	#barcodeScanner {
 		max-width: 400px;
-		max-height: 400px;
 		margin: 0 auto 32px;
 	}
 </style>

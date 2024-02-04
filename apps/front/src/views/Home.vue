@@ -1,8 +1,8 @@
 <script setup lang="ts">
 	import {
 		BhPrimaryButton,
-		BhSearchBar,
 		BhTextField,
+		BhAddressAutocomplete,
 		type ISearchingEventProps,
 	} from '@bookhood/ui'
 	import { isAuthenticated } from '../plugins/authentication'
@@ -29,7 +29,6 @@
 		mdiCrosshairsGps,
 		mdiMagnify,
 	} from '@mdi/js'
-	import axios from 'axios'
 
 	const bookStore = useBookStore()
 	const center = ref([0, 0])
@@ -38,10 +37,7 @@
 	const boundingBox = ref<number[]>([])
 	const books = ref<IBookSearchResult[]>([])
 	const nbResults = ref<number>(0)
-	const addresses = ref([])
-	const addressesLoading = ref<boolean>(false)
 	const searchAddress = ref<string>('')
-	const addressValue = ref()
 
 	const form = ref<ISearchingEventProps>({
 		type: 'intitle',
@@ -55,25 +51,20 @@
 
 	const localize = () => {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				function (coords) {
-					center.value = [
-						coords.coords.longitude,
-						coords.coords.latitude,
-					]
+			navigator.geolocation.getCurrentPosition(setUserCoords, null, {
+				enableHighAccuracy: true,
+				timeout: 5000,
+			})
+		}
+	}
 
-					if (!map.value) {
-						initMap()
-					} else {
-						map.value.getView().setCenter(fromLonLat(center.value))
-					}
-				},
-				null,
-				{
-					enableHighAccuracy: true,
-					timeout: 5000,
-				}
-			)
+	const setUserCoords = (coords: { coords: { longitude; latitude } }) => {
+		center.value = [coords.coords.longitude, coords.coords.latitude]
+
+		if (!map.value) {
+			initMap()
+		} else {
+			map.value.getView().setCenter(fromLonLat(center.value))
 		}
 	}
 
@@ -106,7 +97,7 @@
 				? undefined
 				: map.value.forEachFeatureAtPixel(pixel, function (feature) {
 						return feature
-				  })
+					})
 			if (feature) {
 				info.style.left = pixel[0] + 'px'
 				info.style.top = pixel[1] + 'px'
@@ -166,36 +157,26 @@
 			const results = await bookStore.searchByName(
 				form.value,
 				startAt,
-				boundingBox.value
+				boundingBox.value,
 			)
 			nbResults.value = parseInt(results.data.total)
 			books.value = results.data.results.map(
 				(book: IBookSearchResult) => ({
 					...book,
 					value: book._id,
-				})
+				}),
 			)
 
 			setMarkers()
 		}
 	}, 750)
 
-	const loadAddresses = (text?: string) => {
-		if (!text) {
-			text = searchAddress.value
-		} else {
-			searchAddress.value = text
-		}
-
-		debounceLoadAddresses(text)
-	}
-
 	const setMarkers = () => {
 		const features: Feature[] = books.value.flatMap((book) =>
 			book.owner.map((owner) => {
 				const feat = new Feature({
 					geometry: new Point(
-						fromLonLat([owner.coords.lng, owner.coords.lat])
+						fromLonLat([owner.coords.lng, owner.coords.lat]),
 					),
 				})
 				feat.setProperties({
@@ -213,10 +194,10 @@
 							src: 'http://static.arcgis.com/images/Symbols/NPS/npsPictograph_0231b.png',
 							scale: 0.25,
 						}),
-					})
+					}),
 				)
 				return feat
-			})
+			}),
 		)
 		map.value.removeLayer(map.value.getAllLayers()[1])
 		map.value.addLayer(
@@ -224,42 +205,20 @@
 				source: new VectorSource({
 					features: features,
 				}),
-			})
+			}),
 		)
 	}
 
-	const debounceLoadAddresses = debounce((searchText) => {
-		if (searchText?.length) {
-			addressesLoading.value = true
-			axios
-				.get('https://nominatim.openstreetmap.org/search', {
-					params: {
-						format: 'jsonv2',
-						q: searchText,
-						addressdetails: 1,
-					},
-				})
-				.then((response) => {
-					addresses.value = response.data.map((address) => ({
-						value: address.place_id,
-						title: address.display_name,
-						boundingBox: address.boundingbox,
-					}))
-				})
-				.finally(() => {
-					addressesLoading.value = false
-				})
-		}
-	}, 500)
+	const centerUpdated = (point: number[]) => {
+		center.value = point
+		map.value.getView().setCenter(fromLonLat(center.value))
+	}
 
-	const chooseAddress = (obj) => {
-		if (obj?.boundingBox) {
-			boundingBox.value = [
-				...fromLonLat([obj.boundingBox[2], obj.boundingBox[0]]),
-				...fromLonLat([obj.boundingBox[3], obj.boundingBox[1]]),
-			]
-			map.value.getView().fit(boundingBox.value)
-		}
+	const boundingBoxUpdated = (point: number[]) => {
+		boundingBox.value = [
+			...fromLonLat([point[2], point[0]]),
+			...fromLonLat([point[3], point[1]]),
+		]
 		search()
 	}
 </script>
@@ -311,18 +270,9 @@
 						@update:modelValue="search"
 						@update:focused="search" />
 
-					<v-autocomplete
-						class="mb-4"
-						clearable
-						hideDetails
-						density="compact"
-						:modelValue="addressValue"
-						:items="addresses"
-						placeholder=""
-						variant="outlined"
-						@update:modelValue="chooseAddress"
-						@update:search="loadAddresses"
-						returnObject />
+					<bh-address-autocomplete
+						@center:updated="centerUpdated"
+						@boundingbox:updated="boundingBoxUpdated" />
 				</div>
 
 				<div

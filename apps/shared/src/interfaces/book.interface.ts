@@ -18,6 +18,8 @@ export interface IAddBookDTO {
 	publisher?: string
 
 	publishedDate?: string
+
+	location: ICoords
 }
 
 export interface IBook {
@@ -85,12 +87,12 @@ export interface IBookSearchResult {
 export interface IBookSearchResultOwner {
 	_id: unknown
 
-	coords: IBookSearchResultOwnerCoords
+	coords: ICoords
 
 	user: IBookSearchResultOwnerUser
 }
 
-interface IBookSearchResultOwnerCoords {
+export interface ICoords {
 	lat: number
 
 	lng: number
