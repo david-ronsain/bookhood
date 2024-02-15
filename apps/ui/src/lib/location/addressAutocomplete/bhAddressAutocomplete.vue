@@ -2,6 +2,7 @@
 	import { ref } from 'vue'
 	import debounce from 'debounce'
 	import axios from 'axios'
+	import { EnvConfig } from '../../../../config/env'
 
 	interface Address {
 		value: string
@@ -9,7 +10,12 @@
 		boundingBox: number[]
 		lon: number
 		lat: number
+		city?: string
+		department?: string
+		region?: string
 	}
+
+	const props = defineProps<{ placeholder?: string }>()
 
 	const addressValue = ref()
 	const addresses = ref([])
@@ -19,9 +25,9 @@
 
 	const chooseAddress = (obj: Address) => {
 		if (obj?.boundingBox) {
-			events('boundingbox:updated', obj.boundingBox)
 			events('center:updated', [obj.lon, obj.lat])
 		}
+		events('place:updated', obj.city ?? obj.department ?? obj.region)
 	}
 
 	const loadAddresses = (text?: string) => {
@@ -44,20 +50,45 @@
 			lastSearch.value = searchAddress.value
 			addressesLoading.value = true
 			axios
-				.get('https://nominatim.openstreetmap.org/search', {
-					params: {
-						format: 'jsonv2',
-						q: searchAddress.value,
-						addressdetails: 1,
+				.post(
+					EnvConfig.googleApis.places.url,
+					{
+						textQuery: searchAddress.value,
 					},
-				})
+					{
+						headers: {
+							'X-Goog-Api-Key': EnvConfig.googleApis.key,
+							'X-Goog-FieldMask':
+								'places.formattedAddress,places.id,places.viewport,places.location,places.addressComponents',
+						},
+					},
+				)
 				.then((response) => {
-					addresses.value = response.data.map((address) => ({
-						value: address.place_id,
-						title: `${address.address.road ? address.address.road + ', ' : ''}${address.address.postcode ? address.address.postcode + ' ' + (address.address.town ?? address.address.village ?? address.address.suburb) + ', ' : ''}${address.address.country}`,
-						boundingBox: address.boundingbox,
-						lat: address.lat,
-						lon: address.lon,
+					addresses.value = response.data.places.map((address) => ({
+						value: address.id,
+						title: address.formattedAddress,
+						boundingBox: [
+							address.viewport.low.longitude,
+							address.viewport.low.latitude,
+							address.viewport.high.longitude,
+							address.viewport.high.latitude,
+						],
+						lat: address.location.latitude,
+						lon: address.location.longitude,
+						city: address.addressComponents.find((component) =>
+							component.types.includes('locality'),
+						)?.longText,
+						department: address.addressComponents.find(
+							(component) =>
+								component.types.includes(
+									'administrative_area_level_2',
+								),
+						)?.longText,
+						region: address.addressComponents.find((component) =>
+							component.types.includes(
+								'administrative_area_level_1',
+							),
+						)?.longText,
 					}))
 					addressesLoading.value = false
 				})
@@ -75,6 +106,7 @@
 	const events = defineEmits<{
 		(e: 'boundingbox:updated', boundingBox: number[]): void
 		(e: 'center:updated', center: number[]): void
+		(e: 'place:updated', place: string | undefined): void
 	}>()
 </script>
 
@@ -87,7 +119,7 @@
 		density="compact"
 		:modelValue="addressValue"
 		:items="addresses"
-		placeholder=""
+		:placeholder="props.placeholder"
 		:loading="addressesLoading"
 		:search="searchAddress"
 		variant="outlined"

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { BOOK_USECASES } from './usecases'
+import { BOOK_USECASES, REQUEST_USECASES } from './usecases'
 import { DomainModule } from '../domain/domain.module'
 import { MongooseModule } from '@nestjs/mongoose'
 import {
@@ -13,6 +13,9 @@ import BookSchema from '../infrastructure/adapters/repository/schemas/book.schem
 import BookRepositoryMongo from '../infrastructure/adapters/repository/book.repository.mongo'
 import LibraryRepositoryMongo from '../infrastructure/adapters/repository/library.repository.mongo'
 import LibrarySchema from '../infrastructure/adapters/repository/schemas/library.schema'
+import RequestRepositoryMongo from '../infrastructure/adapters/repository/request.repository.mongo'
+import RequestSchema from '../infrastructure/adapters/repository/schemas/request.schema'
+import { RequestController } from './controllers/request.controller'
 
 @Module({
 	imports: [
@@ -26,11 +29,16 @@ import LibrarySchema from '../infrastructure/adapters/repository/schemas/library
 				name: 'Library',
 				schema: LibrarySchema,
 			},
+			{
+				name: 'Request',
+				schema: RequestSchema,
+			},
 		]),
 	],
-	controllers: [BookController],
+	controllers: [BookController, RequestController],
 	providers: [
 		...BOOK_USECASES,
+		...REQUEST_USECASES,
 		{
 			provide: 'BookRepository',
 			useClass: BookRepositoryMongo,
@@ -38,6 +46,10 @@ import LibrarySchema from '../infrastructure/adapters/repository/schemas/library
 		{
 			provide: 'LibraryRepository',
 			useClass: LibraryRepositoryMongo,
+		},
+		{
+			provide: 'RequestRepository',
+			useClass: RequestRepositoryMongo,
 		},
 		{
 			provide: 'RabbitUser',
@@ -62,7 +74,30 @@ import LibrarySchema from '../infrastructure/adapters/repository/schemas/library
 				} as RmqOptions)
 			},
 		},
+		{
+			provide: 'RabbitMail',
+			useFactory: () => {
+				return ClientProxyFactory.create({
+					transport: Transport.RMQ,
+					options: {
+						urls: [
+							`${envConfig().rabbitmq.protocol || ''}://${
+								envConfig().rabbitmq.user || ''
+							}:${envConfig().rabbitmq.password || ''}@${
+								envConfig().rabbitmq.host || ''
+							}:${envConfig().rabbitmq.port || ''}/${
+								envConfig().rabbitmq.vhost || ''
+							}`,
+						],
+						queue: envConfig().rabbitmq.queues.mail || '',
+						queueOptions: {
+							durable: true,
+						},
+					},
+				} as RmqOptions)
+			},
+		},
 	],
-	exports: [...BOOK_USECASES],
+	exports: [...BOOK_USECASES, ...REQUEST_USECASES],
 })
 export class ApplicationModule {}

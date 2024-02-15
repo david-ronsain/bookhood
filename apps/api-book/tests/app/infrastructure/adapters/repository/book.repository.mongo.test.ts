@@ -72,7 +72,7 @@ describe('BookRepositoryMongo', () => {
 						object,
 						BookEntity,
 						'findOne'
-					>
+					>,
 			)
 
 			const result = await bookRepository.getByISBN(['isbn'])
@@ -141,7 +141,7 @@ describe('BookRepositoryMongo', () => {
 			}
 			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
 			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
-				aggregateMock
+				aggregateMock,
 			)
 
 			const result = await bookRepository.search(
@@ -149,7 +149,7 @@ describe('BookRepositoryMongo', () => {
 				'book',
 				0,
 				'en',
-				[]
+				[],
 			)
 
 			expect(result).toEqual(mockedResult)
@@ -181,7 +181,7 @@ describe('BookRepositoryMongo', () => {
 			}
 			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
 			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
-				aggregateMock
+				aggregateMock,
 			)
 
 			const result = await bookRepository.search(
@@ -189,7 +189,29 @@ describe('BookRepositoryMongo', () => {
 				'doe',
 				0,
 				'en',
-				[0, 0, 0, 0]
+				[0, 0, 0, 0],
+				'first.last@name.test',
+			)
+
+			expect(result).toEqual(result)
+		})
+
+		it('should return an empty IBookSearch for an author', async () => {
+			const mockedResult: IBookSearch = {
+				results: [],
+				total: 0,
+			}
+			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
+			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
+				aggregateMock,
+			)
+
+			const result = await bookRepository.search(
+				'inauthor',
+				'doe',
+				0,
+				'en',
+				[0, 0, 0, 0],
 			)
 
 			expect(result).toEqual(result)

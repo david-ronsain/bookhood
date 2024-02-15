@@ -9,7 +9,12 @@ import BookModel from '../../../../src/app/domain/models/book.model'
 import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/createBookIfNew.usecase'
 import SearchBookUseCase from '../../../../src/app/application/usecases/searchBook.usecase'
 import { of } from 'rxjs'
-import { IAddBookDTO, IBook, IBookSearch } from '../../../../../shared/src'
+import {
+	BookStatus,
+	IAddBookDTO,
+	IBook,
+	IBookSearch,
+} from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 
 describe('BookController', () => {
@@ -87,6 +92,7 @@ describe('BookController', () => {
 					lat: 0,
 					lng: 0,
 				},
+				status: BookStatus.TO_LEND,
 			} as IAddBookDTO
 			const mockBook: BookModel = {
 				authors: ['author'],
@@ -104,6 +110,7 @@ describe('BookController', () => {
 				publishedDate: '2024',
 				publisher: 'publisher',
 				subtitle: 'subtitle',
+				status: BookStatus.TO_LEND,
 			} as BookModel
 			const mockToken = 'mockToken||'
 
@@ -137,6 +144,16 @@ describe('BookController', () => {
 					undefined,
 					mockBook,
 				),
+			)
+
+			await controller.addBook({
+				token: undefined,
+				data: { book: mockDTO },
+			})
+
+			expect(userClient.send).toHaveBeenCalledWith(
+				'user-get-by-token',
+				'',
 			)
 		})
 
@@ -195,9 +212,18 @@ describe('BookController', () => {
 				startAt: 0,
 				language: 'en',
 				boundingBox: [0, 0, 0, 0],
+				token:
+					Buffer.from('first.last@name.test').toString('base64') +
+					'||',
 			})
 
-			expect(searchBookUseCase.handler).toHaveBeenCalled()
+			expect(searchBookUseCase.handler).toHaveBeenCalledWith(
+				'query',
+				0,
+				'en',
+				[0, 0, 0, 0],
+				'first.last@name.test',
+			)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IBookSearch>(
 					true,
@@ -205,6 +231,22 @@ describe('BookController', () => {
 					undefined,
 					mockBookSearch,
 				),
+			)
+
+			await controller.searchBook({
+				search: 'query',
+				startAt: 0,
+				language: 'en',
+				boundingBox: [0, 0, 0, 0],
+				token: undefined,
+			})
+
+			expect(searchBookUseCase.handler).toHaveBeenCalledWith(
+				'query',
+				0,
+				'en',
+				[0, 0, 0, 0],
+				undefined,
 			)
 		})
 

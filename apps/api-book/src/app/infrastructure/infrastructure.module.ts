@@ -5,6 +5,7 @@ import BookSchema from './adapters/repository/schemas/book.schema'
 import { ApplicationModule } from '../application/application.module'
 import envConfig from '../../config/env.config'
 import LibrarySchema from './adapters/repository/schemas/library.schema'
+import RequestSchema from './adapters/repository/schemas/request.schema'
 
 @Module({
 	imports: [
@@ -16,9 +17,9 @@ import LibrarySchema from './adapters/repository/schemas/library.schema'
 				uri: `${envConfig().mongo.protocol}://${
 					envConfig().mongo.user
 						? envConfig().mongo.user +
-						  ':' +
-						  envConfig().mongo.password +
-						  '@'
+							':' +
+							envConfig().mongo.password +
+							'@'
 						: ''
 				}${
 					envConfig().mongo.host
@@ -29,6 +30,7 @@ import LibrarySchema from './adapters/repository/schemas/library.schema'
 		}),
 		MongooseModule.forFeature([{ name: 'Book', schema: BookSchema }]),
 		MongooseModule.forFeature([{ name: 'Library', schema: LibrarySchema }]),
+		MongooseModule.forFeature([{ name: 'Request', schema: RequestSchema }]),
 	],
 })
 export class InfrastructureModule {}

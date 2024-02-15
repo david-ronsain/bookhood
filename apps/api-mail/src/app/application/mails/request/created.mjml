@@ -1,0 +1,23 @@
+<mj-section>
+	<mj-column>
+		<mj-text color="#F45E43"> {{ text.text1 }} </mj-text>
+	</mj-column>
+</mj-section>
+
+<mj-section>
+	<mj-column>
+		<mj-text color="#F45E43">{{ text.text2 }}</mj-text>
+	</mj-column>
+</mj-section>
+
+<mj-section>
+	<mj-button font-family="Helvetica" background-color="#f45e43" color="white" href="{{ link }}">
+        {{ text.cta }}
+    </mj-button>
+</mj-section>
+
+<mj-section>
+	<mj-column>
+		<mj-text color="#F45E43">{{ text.text3 }}</mj-text>
+	</mj-column>
+</mj-section>

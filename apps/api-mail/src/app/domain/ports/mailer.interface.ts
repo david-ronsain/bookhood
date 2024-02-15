@@ -1,6 +1,17 @@
-import { ICreateUserDTO, IUser } from '@bookhood/shared'
+import {
+	BookRequestMailDTO,
+	ICreateUserDTO,
+	IRequestInfos,
+	IUser,
+} from '@bookhood/shared'
 
 export interface IMailer {
+	requestCreated(infos: BookRequestMailDTO): void
+
+	requestAccepted(infos: IRequestInfos): void
+
+	requestRefused(infos: IRequestInfos): void
+
 	userRegistered(user: ICreateUserDTO): void
 
 	authSendLink(user: IUser): void
@@ -11,7 +22,7 @@ export interface IMailer {
 		subject: string,
 		body: string,
 		cc: string[],
-		bcc: string[]
+		bcc: string[],
 	): unknown
 
 	mailTo(email: string): string

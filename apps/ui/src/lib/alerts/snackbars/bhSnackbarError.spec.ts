@@ -6,7 +6,6 @@ describe('BhSnackbarError', () => {
 		const wrapper = mount(BhSnackbarError, {
 			props: { text: 'Error', opened: true },
 		})
-		console.log(wrapper.html())
 		//expect(wrapper.html()).toContain('Error')
 	})
 })

@@ -19,6 +19,7 @@ import * as winston from 'winston'
 import { winstonConfig } from '@bookhood/shared'
 import { AuthController } from './application/controllers/auth.controller'
 import { BookController } from './application/controllers/book.controller'
+import { RequestController } from './application/controllers/request.controller'
 
 @Module({
 	imports: [
@@ -26,7 +27,7 @@ import { BookController } from './application/controllers/book.controller'
 			isGlobal: true,
 			load: [envConfig],
 		}),
-		CacheModule.registerAsync({
+		/*CacheModule.registerAsync({
 			isGlobal: true,
 			imports: [ConfigModule],
 			inject: [ConfigService],
@@ -36,13 +37,18 @@ import { BookController } from './application/controllers/book.controller'
 						envConfig().redis.user
 					}${envConfig().redis.host}:${envConfig().redis.port}`,
 					ttl: envConfig().redis.ttl,
-				} as CacheModuleOptions),
-		}),
+				}) as CacheModuleOptions,
+		}),*/
 		WinstonModule.forRoot(
-			winstonConfig(winston, envConfig().gateway.gateway.serviceName)
+			winstonConfig(winston, envConfig().gateway.gateway.serviceName),
 		),
 	],
-	controllers: [UserController, AuthController, BookController],
+	controllers: [
+		UserController,
+		AuthController,
+		BookController,
+		RequestController,
+	],
 	providers: [
 		ConfigService,
 		{
@@ -95,10 +101,10 @@ import { BookController } from './application/controllers/book.controller'
 			provide: APP_GUARD,
 			useClass: RolesGuard,
 		},
-		{
+		/*{
 			provide: APP_INTERCEPTOR,
 			useClass: CacheInterceptor,
-		},
+		},*/
 	],
 })
 export class AppModule {}

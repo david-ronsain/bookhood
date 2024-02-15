@@ -9,6 +9,7 @@ import {
 	Inject,
 	Param,
 	Post,
+	Query,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -16,11 +17,12 @@ import {
 	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
 import { CreateUserDTO } from '../dto/user.dto'
-import { IBook, IBookSearch, Role } from '@bookhood/shared'
+import { IBook, IBookSearch, Role, ILibraryFull } from '@bookhood/shared'
 import { Roles } from '../guards/role.guard'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import { AddBookDTO } from '../dto/book.dto'
@@ -30,7 +32,7 @@ import envConfig from '../../../config/env.config'
 @Controller('book')
 export class BookController {
 	constructor(
-		@Inject('RabbitBook') private readonly bookQueue: ClientProxy
+		@Inject('RabbitBook') private readonly bookQueue: ClientProxy,
 	) {}
 
 	@Post()
@@ -41,7 +43,7 @@ export class BookController {
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	async addBook(
 		@Body() book: AddBookDTO,
-		@Headers('x-token') token: string
+		@Headers('x-token') token: string,
 	): Promise<IBook> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBook>
@@ -66,7 +68,7 @@ export class BookController {
 	@Post('google/search')
 	async getGoogleBooks(
 		@Body('q') q: string,
-		@Body('startIndex') startAt: number
+		@Body('startIndex') startAt: number,
 	): Promise<unknown> {
 		return google
 			.books('v1')
@@ -84,7 +86,8 @@ export class BookController {
 	async getBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,
-		@Body('boundingBox') box: number[]
+		@Body('boundingBox') box: number[],
+		@Headers('x-token') token?: string,
 	): Promise<IBookSearch> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBookSearch>
@@ -94,11 +97,35 @@ export class BookController {
 				startAt,
 				language: 'fr',
 				boundingBox: box,
-			})
+				token,
+			}),
 		)
 		if (!created.success) {
 			throw new HttpException(created.message, created.code)
 		}
 		return created.data
+	}
+
+	@Get()
+	@Roles([Role.USER, Role.ADMIN])
+	@ApiOperation({ description: "Get one's books" })
+	@ApiParam({ name: 'page', type: 'number' })
+	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
+	async getUserBooks(
+		@Query('page') page: number,
+		@Headers('x-token') token?: string,
+	): Promise<ILibraryFull[]> {
+		const response = await firstValueFrom<
+			MicroserviceResponseFormatter<ILibraryFull[]>
+		>(
+			this.bookQueue.send('book-get', {
+				page,
+				token,
+			}),
+		)
+		if (!response.success) {
+			throw new HttpException(response.message, response.code)
+		}
+		return response.data
 	}
 }

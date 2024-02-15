@@ -7,7 +7,7 @@ interface II18nConfig {
 interface IEnvConfig {
 	i18n: II18nConfig
 	api: IApiConfig
-	googleApi: IGoogleApi
+	googleApis: IGoogleApi
 	settings: ISettingsConfig
 }
 
@@ -29,12 +29,18 @@ interface IApiConfig {
 		user: string
 		auth: string
 		book: string
+		request: string
 	}
 }
 
 interface IGoogleApi {
-	url: string
+	maps: IGoogleMapsApi
+}
+
+interface IGoogleMapsApi {
 	key: string
+	blueIcon: string
+	redIcon: string
 }
 
 export const EnvConfig: IEnvConfig = {
@@ -60,16 +66,21 @@ export const EnvConfig: IEnvConfig = {
 			user: `${import.meta.env.VITE_APP_FRONT_API_USER_PREFIX}`,
 			auth: `${import.meta.env.VITE_APP_FRONT_API_AUTH_PREFIX}`,
 			book: `${import.meta.env.VITE_APP_FRONT_API_BOOK_PREFIX}`,
+			request: `${import.meta.env.VITE_APP_FRONT_API_REQUEST_PREFIX}`,
 		},
 	},
-	googleApi: {
-		url: import.meta.env.VITE_APP_FRONT_GOOGLE_BOOKS_URL || '',
-		key: import.meta.env.VITE_APP_FRONT_GOOGLE_API_KEY || '',
+	googleApis: {
+		maps: {
+			key: import.meta.env.VITE_APP_FRONT_GOOGLE_MAPS_API_KEY || '',
+			blueIcon:
+				import.meta.env.VITE_APP_FRONT_GOOGLE_MAPS_BLUE_ICON || '',
+			redIcon: import.meta.env.VITE_APP_FRONT_GOOGLE_MAPS_RED_ICON || '',
+		},
 	},
 	settings: {
 		session: {
 			duration: parseInt(
-				import.meta.env.VITE_APP_FRONT_SESSION_DURATION || ''
+				import.meta.env.VITE_APP_FRONT_SESSION_DURATION || '',
 			),
 		},
 	},

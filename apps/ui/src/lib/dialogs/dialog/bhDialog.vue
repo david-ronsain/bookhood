@@ -1,8 +1,13 @@
 <script setup lang="ts">
 	import { ref } from 'vue'
-	import { type IBhDialogProps } from '../../../interfaces/bhDialog.interface'
 	import { watch } from 'vue'
 	import { BhCard } from '@bookhood/ui'
+
+	export interface IBhDialogProps {
+		opened?: boolean
+		title?: string
+		fullscreen?: boolean
+	}
 
 	const props = withDefaults(defineProps<IBhDialogProps>(), {
 		opened: false,

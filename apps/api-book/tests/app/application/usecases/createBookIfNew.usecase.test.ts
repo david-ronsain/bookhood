@@ -2,7 +2,12 @@
 import { ConflictException } from '@nestjs/common'
 import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/createBookIfNew.usecase'
 import { BookRepository } from '../../../../src/app/domain/ports/book.repository'
-import { IAddBookDTO, IBook, IISBN } from '../../../../../shared/src'
+import {
+	BookStatus,
+	IAddBookDTO,
+	IBook,
+	IISBN,
+} from '../../../../../shared/src'
 import BookModel from '../../../../src/app/domain/models/book.model'
 
 describe('CreateBookIfNewUseCase', () => {
@@ -37,6 +42,7 @@ describe('CreateBookIfNewUseCase', () => {
 			publisher: 'publisher',
 			subtitle: 'subtitle',
 			location: { lat: 0, lng: 0 },
+			status: BookStatus.TO_LEND,
 		}
 
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(null)
@@ -82,6 +88,7 @@ describe('CreateBookIfNewUseCase', () => {
 			publisher: 'publisher',
 			subtitle: 'subtitle',
 			location: { lat: 0, lng: 0 },
+			status: BookStatus.TO_LEND,
 		}
 
 		const existingBookModel: BookModel = {

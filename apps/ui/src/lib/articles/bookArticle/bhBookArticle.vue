@@ -28,8 +28,9 @@
 		:hover="false"
 		:title="book.title">
 		<template v-slot:text>
-			<div class="d-flex">
+			<div class="d-flex align-center">
 				<v-img
+					v-if="book.image"
 					class="mr-12"
 					:src="book.image.thumbnail"
 					max-width="300"

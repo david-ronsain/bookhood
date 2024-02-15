@@ -51,7 +51,7 @@ export default (): INestEnvConfig => ({
 	},
 	externalApis: {
 		google: {
-			key: process.env.APP_GOOGLE_API_KEY || '',
+			key: process.env.APP_GOOGLE_BOOK_API_KEY || '',
 		},
 	},
 })

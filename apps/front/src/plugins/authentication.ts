@@ -10,7 +10,7 @@ export const isAccessGranted = (requiresAuth: RequiresAuth) => {
 	)
 }
 
-export const isAuthenticated = (refreshToken: boolean = true): boolean => {
+export const isAuthenticated = (refreshToken = true): boolean => {
 	const token = localStorage.getItem('user')?.split('|') ?? []
 	let authenticated = false
 	if (token.length === 3) {

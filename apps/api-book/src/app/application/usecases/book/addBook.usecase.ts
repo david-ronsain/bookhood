@@ -1,8 +1,8 @@
 import { ConflictException, Inject } from '@nestjs/common'
-import { ICoords, ILibrary } from '@bookhood/shared'
-import { LibraryRepository } from '../../domain/ports/library.repository'
-import LibraryModel from '../../domain/models/library.model'
-import LibraryMapper from '../mappers/library.mapper'
+import { ICoords, ILibrary, LibraryStatus } from '@bookhood/shared'
+import { LibraryRepository } from '../../../domain/ports/library.repository'
+import LibraryModel from '../../../domain/models/library.model'
+import LibraryMapper from '../../mappers/library.mapper'
 
 export default class AddBookUseCase {
 	constructor(
@@ -14,6 +14,8 @@ export default class AddBookUseCase {
 		bookId: string,
 		userId: string,
 		location: ICoords,
+		status: LibraryStatus,
+		place: string,
 	): Promise<ILibrary> {
 		const exists = await this.libraryRepository.getByUserIdAndBookId(
 			userId,
@@ -32,6 +34,8 @@ export default class AddBookUseCase {
 					type: 'Point',
 					coordinates: [location.lng, location.lat],
 				},
+				place,
+				status,
 			}),
 		)
 

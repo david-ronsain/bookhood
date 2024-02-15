@@ -3,6 +3,9 @@ import Home from '../views/Home.vue'
 import Signup from '../views/Signup.vue'
 import Signin from '../views/Signin.vue'
 import Account from '../views/Account.vue'
+import Logout from '../views/Logout.vue'
+import YourBooks from '../views/YourBooks.vue'
+import YourBooksLent from '../views/YourBooksLent.vue'
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
@@ -28,6 +31,14 @@ const router = createRouter({
 			meta: {
 				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
 				authenticated: isAuthenticated(),
+			},
+		},
+		{
+			path: '/logout',
+			name: 'logout',
+			component: Logout,
+			meta: {
+				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
 			},
 		},
 		{
@@ -66,7 +77,7 @@ const router = createRouter({
 								to.params.token +
 									'|' +
 									(Date.now() +
-										EnvConfig.settings.session.duration)
+										EnvConfig.settings.session.duration),
 							)
 						}
 						next({ name: 'home', force: true, replace: true })
@@ -80,21 +91,38 @@ const router = createRouter({
 		},
 		{
 			path: '/account',
-			name: 'account',
-			component: Account,
-			meta: {
-				requiresAuth: RequiresAuth.AUTHENTICATED,
-				authenticated: isAuthenticated(),
-			},
 			children: [
 				{
-					path: 'your-books',
-					name: 'yourBooks',
+					path: '',
+					name: 'account',
 					component: Account,
 					meta: {
 						requiresAuth: RequiresAuth.AUTHENTICATED,
 						authenticated: isAuthenticated(),
 					},
+				},
+				{
+					path: 'your-books',
+					children: [
+						{
+							path: '',
+							name: 'yourBooks',
+							component: YourBooks,
+							meta: {
+								requiresAuth: RequiresAuth.AUTHENTICATED,
+								authenticated: isAuthenticated(),
+							},
+						},
+						{
+							path: 'lent',
+							name: 'yourBooksLent',
+							component: YourBooksLent,
+							meta: {
+								requiresAuth: RequiresAuth.AUTHENTICATED,
+								authenticated: isAuthenticated(),
+							},
+						},
+					],
 				},
 			],
 		},
@@ -122,9 +150,9 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	if (!isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
 		next({ name: to.meta.requiresAuth ? 'signin' : 'home' })
+	} else {
+		next()
 	}
-
-	next()
 })
 
 export default router

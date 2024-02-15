@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IBook } from '../../../../../shared/src'
+import { BookStatus, IBook } from '../../../../../shared/src'
 import BookModel from '../../../../src/app/domain/models/book.model'
 
 describe('BookModel', () => {
@@ -24,6 +24,7 @@ describe('BookModel', () => {
 			subtitle: 'An amazing story',
 			publisher: 'Book Publisher',
 			publishedDate: '2022-01-01',
+			status: BookStatus.TO_LEND,
 		}
 
 		let bookModel = new BookModel(bookData)

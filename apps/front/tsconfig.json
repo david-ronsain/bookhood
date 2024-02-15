@@ -9,7 +9,8 @@
 		"resolveJsonModule": true,
 		"verbatimModuleSyntax": true,
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@bookhood/shared/*": ["../shared/src/*"]
 		},
 		"module": "ESNext"
 	},

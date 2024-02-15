@@ -7,10 +7,14 @@
 		BhBookArticle,
 		BhAddressAutocomplete,
 	} from '@bookhood/ui'
-	import { type IAddBookDTO, type ICoords } from '@bookhood/shared'
+	import {
+		type IAddBookDTO,
+		type ICoords,
+		LibraryStatus,
+	} from '@bookhood/shared'
 	import { mdiAlertCircleOutline, mdiMagnify } from '@mdi/js'
 	import debounce from 'debounce'
-	import { StreamBarcodeReader } from 'vue-barcode-reader'
+	import { StreamBarcodeReader } from '@teckel/vue-barcode-reader'
 	import { watch } from 'vue'
 	import { useMainStore, useBookStore } from '../../../store'
 	import { useI18n } from 'vue-i18n'
@@ -28,15 +32,31 @@
 	const lastSearch = ref<string>('')
 	const displayBookNotFound = ref<boolean>(false)
 	const location = ref<{ lat; lng }>()
+	const place = ref<string>('')
+	const status = ref<LibraryStatus>(LibraryStatus.TO_LEND)
 
 	watch(book, (newVal: IAddBookDTO) => {
 		saveButtonDisabled.value =
-			isNaN(location.value?.lat) || isNaN(location.value?.lng) || !newVal
+			isNaN(location.value?.lat) ||
+			isNaN(location.value?.lng) ||
+			!newVal ||
+			!status.value
 	})
 
 	watch(location, (newVal: ICoords) => {
 		saveButtonDisabled.value =
-			isNaN(newVal.lat) || isNaN(newVal.lng) || !book.value
+			isNaN(newVal.lat) ||
+			isNaN(newVal.lng) ||
+			!book.value ||
+			!status.value
+	})
+
+	watch(status, (newVal: LibraryStatus) => {
+		saveButtonDisabled.value =
+			isNaN(location.value.lat) ||
+			isNaN(location.value.lng) ||
+			!book.value ||
+			!newVal
 	})
 
 	const checkHasCamera = async () => {
@@ -81,7 +101,7 @@
 		saveButtonDisabled.value = true
 		saveButtonLoading.value = true
 		bookStore
-			.add(book.value, location.value)
+			.add(book.value, status.value, location.value, place.value)
 			.then(() => {
 				mainStore.success = t(
 					'account.books.yourBooks.addForm.success',
@@ -114,6 +134,10 @@
 		}
 	}
 
+	const placeUpdated = (name: string) => {
+		place.value = name
+	}
+
 	defineExpose({
 		open,
 	})
@@ -125,43 +149,77 @@
 		ref="addDialog"
 		fullscreen>
 		<template v-slot>
-			<div id="barcodeScanner">
-				<div
-					v-if="hasCamera"
-					class="mb-4">
-					<div v-text="$t('account.books.yourBooks.addForm.scan')" />
-					<StreamBarcodeReader @result="readBarCode" />
+			<div class="d-flex flex-wrap">
+				<div class="v-col v-col-12 v-col-md-6">
+					<div
+						v-if="hasCamera"
+						id="barcodeScanner"
+						class="mb-4 mx-auto">
+						<div
+							v-text="
+								$t('account.books.yourBooks.addForm.scan')
+							" />
+						<StreamBarcodeReader @result="readBarCode" />
+					</div>
+					<div class="mx-auto form">
+						<bh-text-field
+							style="max-width: 400px"
+							class="mx-auto mb-4"
+							ref="isbnSearch"
+							:label="
+								$t('account.books.yourBooks.addForm.searchISBN')
+							"
+							v-model="search"
+							clearable
+							:icon="{ icon: mdiMagnify, append: true }"
+							@click:append="startSearch"
+							@blur="startSearch"
+							@click:clear="reset"
+							@update:modelValue="startSearch" />
+
+						<v-radio-group
+							class="mb-4 mx-auto"
+							inline
+							v-model="status"
+							hide-details>
+							<v-radio
+								v-for="key in Object.keys(LibraryStatus)"
+								:key="'status-' + key"
+								:label="
+									$t(
+										'account.books.yourBooks.addForm.status.' +
+											key,
+									)
+								"
+								:value="LibraryStatus[key]" />
+						</v-radio-group>
+
+						<bh-address-autocomplete
+							class="mb-8"
+							:placeholder="
+								$t('account.books.yourBooks.addForm.address')
+							"
+							@center:updated="centerUpdated"
+							@place:updated="placeUpdated" />
+					</div>
 				</div>
 
-				<bh-text-field
-					style="max-width: 400px"
-					class="mx-auto mb-4"
-					ref="isbnSearch"
-					:label="$t('account.books.yourBooks.addForm.searchISBN')"
-					v-model="search"
-					clearable
-					:icon="{ icon: mdiMagnify, append: true }"
-					@click:append="startSearch"
-					@blur="startSearch"
-					@click:clear="reset"
-					@update:modelValue="startSearch" />
-
-				<bh-address-autocomplete
-					class="mb-8"
-					@center:updated="centerUpdated" />
+				<div class="v-col v-col-12 v-col-md-6">
+					<bh-book-article
+						class="px-4 py-8 ma-auto"
+						v-if="book"
+						:book="book" />
+					<v-alert
+						v-else-if="displayBookNotFound"
+						max-width="400"
+						class="mx-auto my-8"
+						color="warning"
+						:icon="mdiAlertCircleOutline"
+						:text="
+							$t('account.books.yourBooks.addForm.bookNotFound')
+						" />
+				</div>
 			</div>
-
-			<bh-book-article
-				class="px-4 py-8 ma-auto"
-				v-if="book"
-				:book="book" />
-			<v-alert
-				v-else-if="displayBookNotFound"
-				max-width="400"
-				class="mx-auto my-8"
-				color="warning"
-				:icon="mdiAlertCircleOutline"
-				:text="$t('account.books.yourBooks.addForm.bookNotFound')" />
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
@@ -180,7 +238,20 @@
 
 <style lang="scss" scoped>
 	#barcodeScanner {
+		width: 400px;
+	}
+
+	.form {
 		max-width: 400px;
-		margin: 0 auto 32px;
+	}
+</style>
+
+<style lang="scss">
+	@media screen and (orientation: landscape) {
+		video {
+			height: 200px !important;
+			max-height: 200px !important;
+			width: 400px !important;
+		}
 	}
 </style>

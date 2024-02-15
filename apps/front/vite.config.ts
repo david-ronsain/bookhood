@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import vuetify from 'vite-plugin-vuetify'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
-import { dirname, resolve } from 'path'
+import path, { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
 export default defineConfig((mode: ConfigEnv) => {
@@ -29,7 +29,7 @@ export default defineConfig((mode: ConfigEnv) => {
 			VueI18nPlugin({
 				include: resolve(
 					dirname(fileURLToPath(import.meta.url)),
-					'./src/locales/**'
+					'./src/locales/**',
 				),
 			}),
 			nxViteTsPaths(),
@@ -41,8 +41,12 @@ export default defineConfig((mode: ConfigEnv) => {
 				{
 					find: '@',
 					replacement: fileURLToPath(
-						new URL('./src', import.meta.url)
+						new URL('./src', import.meta.url),
 					),
+				},
+				{
+					find: '@bookhood/shared',
+					replacement: path.resolve(__dirname, '../shared/src'),
 				},
 			],
 		},

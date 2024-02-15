@@ -63,7 +63,7 @@ const BookSchema = new Schema(
 	},
 	{
 		timestamps: true,
-	}
+	},
 )
 
 export default BookSchema

@@ -1,4 +1,4 @@
-import { ILibrary, ILibraryLocation } from '@bookhood/shared'
+import { ILibrary, ILibraryLocation, LibraryStatus } from '@bookhood/shared'
 import mongoose from 'mongoose'
 
 export default class LibraryModel {
@@ -8,6 +8,8 @@ export default class LibraryModel {
 			this.userId = new mongoose.Types.ObjectId(library.userId)
 			this.bookId = new mongoose.Types.ObjectId(library.bookId)
 			this.location = library.location
+			this.status = library.status
+			this.place = library.place
 		}
 	}
 
@@ -18,4 +20,8 @@ export default class LibraryModel {
 	readonly bookId: mongoose.Types.ObjectId
 
 	readonly location: ILibraryLocation
+
+	readonly status: LibraryStatus
+
+	readonly place: string
 }

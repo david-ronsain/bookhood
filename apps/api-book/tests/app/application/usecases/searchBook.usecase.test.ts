@@ -59,14 +59,15 @@ describe('SearchBookUseCase', () => {
 		}
 
 		jest.spyOn(bookRepositoryMock, 'search').mockResolvedValue(
-			expectedResult
+			expectedResult,
 		)
 
 		const result = await searchBookUseCase.handler(
 			search,
 			startAt,
 			language,
-			boundingBox
+			boundingBox,
+			'first.last@name.test',
 		)
 
 		expect(bookRepositoryMock.search).toHaveBeenCalledWith(
@@ -74,7 +75,8 @@ describe('SearchBookUseCase', () => {
 			'Example',
 			startAt,
 			language,
-			boundingBox
+			boundingBox,
+			'first.last@name.test',
 		)
 
 		expect(result).toEqual(expectedResult)

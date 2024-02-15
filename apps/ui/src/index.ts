@@ -1,3 +1,4 @@
+export { default as BhDatatable } from './lib/tables/datatable/bhDatatable.vue'
 export { default as BhAddressAutocomplete } from './lib/location/addressAutocomplete/bhAddressAutocomplete.vue'
 export { default as BhBookArticle } from './lib/articles/bookArticle/bhBookArticle.vue'
 export { default as BhDialog } from './lib/dialogs/dialog/bhDialog.vue'

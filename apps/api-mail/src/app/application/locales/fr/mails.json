@@ -12,5 +12,26 @@
 			"text1": "Bienvenue, {firstName} !",
 			"text2": "Voici votre <a href='{link}'>lien</a> de connexion. Il sera valable 1h"
 		}
+	},
+	"request": {
+		"created": {
+			"subject": "Votre livre a du succès",
+			"text1": "Bonjour {firstName} !",
+			"text2": "{firstName} aimerait vous emprunter \"{book}\". Venez lui répondre !",
+			"cta": "Voir mes demandes",
+			"text3": "Bonne journée !"
+		},
+		"accepted": {
+			"subject": "{firstName} vous prête \"{book}\"",
+			"text1": "Bonjour {firstName} !",
+			"text2": "{firstName} a accepté de vous prêter \"{book}\". Mettez-vous d'accord avec lui pour récupérer le livre !",
+			"text3": "Bonne journée !"
+		},
+		"refused": {
+			"subject": "{firstName} ne peut pas vous prêter \"{book}\"",
+			"text1": "Bonjour {firstName} !",
+			"text2": "{firstName} ne peut pas vous prêter \"{book}\". Essayer de voir si quelqu'un d'autre près de chez vous peut vous le prêter !",
+			"text3": "Bonne journée !"
+		}
 	}
 }

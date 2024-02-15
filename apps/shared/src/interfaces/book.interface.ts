@@ -1,3 +1,5 @@
+import { LibraryStatus } from '../enums'
+
 export interface IAddBookDTO {
 	title: string
 
@@ -20,6 +22,10 @@ export interface IAddBookDTO {
 	publishedDate?: string
 
 	location: ICoords
+
+	status: LibraryStatus
+
+	place: string
 }
 
 export interface IBook {
@@ -44,6 +50,8 @@ export interface IBook {
 	publisher?: string
 
 	publishedDate?: string
+
+	status?: LibraryStatus
 }
 
 export interface IISBN {
@@ -65,6 +73,8 @@ export interface IBookSearch {
 export interface IBookSearchResult {
 	_id: unknown
 
+	libraryId: string
+
 	title: string
 
 	authors: string[]
@@ -85,7 +95,7 @@ export interface IBookSearchResult {
 }
 
 export interface IBookSearchResultOwner {
-	_id: unknown
+	_id: string
 
 	coords: ICoords
 

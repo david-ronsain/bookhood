@@ -2,7 +2,8 @@ import {
 	IAddBookDTO,
 	type IBookImageLinks,
 	IISBN,
-	ICoords,
+	type ICoords,
+	LibraryStatus,
 } from '@bookhood/shared'
 import { ApiProperty } from '@nestjs/swagger'
 import {
@@ -11,6 +12,7 @@ import {
 	IsArray,
 	IsOptional,
 	ArrayMinSize,
+	IsEnum,
 } from 'class-validator'
 
 export class AddBookDTO implements IAddBookDTO {
@@ -64,4 +66,13 @@ export class AddBookDTO implements IAddBookDTO {
 	@ApiProperty()
 	@IsNotEmpty()
 	location: ICoords
+
+	@ApiProperty()
+	@IsNotEmpty()
+	@IsEnum(LibraryStatus)
+	status: LibraryStatus
+
+	@ApiProperty()
+	@IsNotEmpty()
+	place: string
 }

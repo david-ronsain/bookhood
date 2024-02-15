@@ -1,4 +1,4 @@
-import { ILibrary, ILibraryLocation } from '@bookhood/shared'
+import { ILibrary, ILibraryLocation, LibraryStatus } from '@bookhood/shared'
 import { Document } from 'mongoose'
 
 export interface LibraryEntity extends Document, ILibrary {
@@ -9,6 +9,10 @@ export interface LibraryEntity extends Document, ILibrary {
 	readonly bookId: string
 
 	readonly location: ILibraryLocation
+
+	readonly status: LibraryStatus
+
+	readonly place: string
 
 	readonly createdAt: string
 

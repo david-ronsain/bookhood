@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { BookEntity } from './entities/book.entity'
 import { Injectable } from '@nestjs/common'
 import BookMapper from '../../../application/mappers/book.mapper'
-import { Model, PipelineStage } from 'mongoose'
+import mongoose, { Model, PipelineStage } from 'mongoose'
 import { IBookSearch } from '@bookhood/shared'
 
 @Injectable()
@@ -23,7 +23,7 @@ export default class BookRepositoryMongo implements BookRepository {
 	async create(book: BookModel): Promise<BookModel> {
 		const created = await this.bookModel.create(book)
 
-		return created ? BookMapper.fromEntitytoModel(created) : null
+		return BookMapper.fromEntitytoModel(created)
 	}
 
 	async search(
@@ -32,6 +32,7 @@ export default class BookRepositoryMongo implements BookRepository {
 		startAt: number,
 		language: string,
 		boundingBox: number[],
+		email?: string,
 	): Promise<IBookSearch> {
 		const stages: PipelineStage[] = []
 
@@ -71,7 +72,7 @@ export default class BookRepositoryMongo implements BookRepository {
 			},
 		)
 
-		if (boundingBox.length === 4) {
+		if (boundingBox && boundingBox.length === 4) {
 			stages.push({
 				$match: {
 					owner: {
@@ -130,6 +131,17 @@ export default class BookRepositoryMongo implements BookRepository {
 					},
 				},
 			},
+		)
+
+		if (email && email.length) {
+			stages.push({
+				$match: {
+					'owner.user.email': { $ne: email },
+				},
+			})
+		}
+
+		stages.push(
 			{
 				$project: {
 					user: false,

@@ -5,6 +5,7 @@ import { BookController } from '../../../../src/app/application/controllers/book
 import { AddBookDTO } from '../../../../src/app/application/dto/book.dto'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
+import { BookStatus } from '../../../../../shared/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -58,6 +59,7 @@ describe('BookController', () => {
 				publisher: 'publisher',
 				publishedDate: '2023',
 				location: { lat: 0, lng: 0 },
+				status: BookStatus.TO_LEND,
 			}
 
 			const response = new MicroserviceResponseFormatter(
@@ -95,6 +97,7 @@ describe('BookController', () => {
 				publisher: '',
 				publishedDate: '',
 				location: { lat: 0, lng: 0 },
+				status: BookStatus.TO_LEND,
 			}
 
 			const response = new MicroserviceResponseFormatter(false)

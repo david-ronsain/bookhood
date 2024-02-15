@@ -1,21 +1,21 @@
 {
 	"common": {
 		"websiteName": "La Folivre",
+		"yes": "Oui",
+		"no": "Non",
 		"menu": {
 			"signin": "Se connecter",
-			"profile": "Mon profil"
+			"profile": "Mon profil",
+			"logout": "Déconnexion",
+			"yourbooks": "Vos livres",
+			"lend": "Livres prêtés",
+			"borrowed": "Livres empruntés",
+			"search": "Rechercher"
 		},
-		"header": {
-			"searchbar": {
-				"label": "Chercher un livre ou un auteur",
-				"authorLabel": "Par auteur",
-				"bookLabel": "Par titre",
-				"noResultLabel": "Aucun résultat"
-			}
-		}
 	},
 	"home": {
-		"signup": "S'inscrire !"
+		"signup": "S'inscrire !",
+		"signin": "Se connecter"
 	},
 	"signup": {
 		"form": {
@@ -60,17 +60,70 @@
 		"books": {
 			"yourBooks": {
 				"title": "Vos livres",
+				"add": "Ajouter un livre",
 				"addForm": {
 					"success": "Le livre \"{title}\" a été ajouté à votre bibliothèque",
 					"error": "Le livre \"{title}\" n'a pas pu être ajouté à votre bibliothèque pour la raison suivante: \n{reason}",
 					"title": "Ajouter un livre",
 					"scan": "Scanner le code barres de votre livre",
+					"address": "Adresse du livre",
 					"searchISBN": "Entrez le code ISBN du livre",
 					"bookNotFound": "Nous n'avons pas trouvé le livre que vous cherchez",
+					"status": {
+						"TO_GIVE": "Je le donne",
+						"TO_LEND": "Je le prête"
+					},
 					"close": "Annuler",
 					"add": "Ajouter"
 				}
+			},
+			"yourBooksLent": {
+				"requests": {
+					"title": "Demandes reçues",
+					"headers": {
+						"book": "Livre",
+						"firstName": "Prénom",
+						"date": "Date",
+						"actions": "Actions"
+					},
+					"loading": "Récupération des données en cours",
+					"noData": "Pas de requêtes pour le moment !"
+				}
 			}
+		}
+	},
+	"logout": {
+		"dialog": {
+			"title": "Se déconnecter",
+			"text": "Souhaitez-vous vous déconnecter ?",
+			"cancel": "Non",
+			"confirm": "Oui"
+		}
+	},
+	"search": {
+		"label": "Chercher un livre ou un auteur",
+		"place": "Saisissez une ville, une adresse, ...",
+		"authorLabel": "Par auteur",
+		"bookLabel": "Par titre",
+		"noResultLabel": "Aucun résultat",
+		"noResult": "Nous n'avons pas de livre correspondant. Essayez de modifier vos critères ou d'élargir votre zone de recherche",
+		"borrow": "Emprunter"
+	},
+	"request": {
+		"acceptDialog": {
+			"title": "Accepter le prêt",
+			"text": "Etes-vous sûr de vouloir prêter ce livre ?",
+			"success": "La demande a été acceptée"
+		},
+		"refuseDialog": {
+			"title": "Refuser le prêt",
+			"text": "Etes-vous sûr de refuser le prêt de ce livre ?",
+			"success": "La demande a été refusée"
+		},
+		"createDialog": {
+			"title": "Emprunter un livre",
+			"text": "Voulez-vous emprunter le livre \"{book}\" ?",
+			"success": "La demande a été envoyée"
 		}
 	}
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-	import BhHeader from '../components/layout/BhHeader.vue'
+	import BhHeader from '../components/layout/header/BhHeader.vue'
 	import { BhSnackbarError, BhSnackbarSuccess } from '@bookhood/ui'
 	import { useMainStore } from '../store'
+	import { isAuthenticated } from '../plugins/authentication'
 
 	const mainStore = useMainStore()
 </script>
@@ -13,16 +14,16 @@
 		<v-container fluid>
 			<v-row>
 				<v-col
-					class="d-none d-md-block"
+					:class="isAuthenticated() ? 'd-md-block ' : ''"
+					class="d-none"
 					cols="2"></v-col>
 				<v-col
 					cols="12"
-					md="8">
-					<router-view id="main-content" />
+					:md="isAuthenticated() ? 10 : 12">
+					<router-view
+						class="pa-0"
+						id="main-content" />
 				</v-col>
-				<v-col
-					class="d-none d-md-block"
-					cols="2"></v-col>
 			</v-row>
 		</v-container>
 
@@ -41,18 +42,11 @@
 <style lang="scss" scoped>
 	@import 'vuetify/lib/styles/settings/_variables';
 	#main-content {
-		max-width: 1200px;
 		margin: 0 auto;
-	}
-
-	@media #{map-get($display-breakpoints, 'md-and-up')} {
-		#main-content {
-			width: calc(100% - 48px);
-		}
 	}
 
 	.v-application > div > .v-container {
 		position: relative;
-		top: 74px;
+		top: 50px;
 	}
 </style>
