@@ -9,6 +9,7 @@ import RequestModel from '../models/request.model'
 export interface RequestRepository {
 	getListByStatus(
 		userId: string,
+		ownerId: string,
 		status: RequestStatus,
 		startAt: number,
 	): Promise<IRequestList>

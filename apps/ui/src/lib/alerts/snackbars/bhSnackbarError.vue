@@ -36,10 +36,12 @@
 
 <template>
 	<v-snackbar
-		location="center"
+		absolute
+		location="top"
+		width="100%"
 		:close-on-back="false"
 		timeout="-1"
-		rounded
+		rounded="0"
 		multi-line
 		v-model="isOpened"
 		color="error">
@@ -55,3 +57,20 @@
 		</template>
 	</v-snackbar>
 </template>
+
+<style lang="scss">
+	.v-snackbar--multi-line {
+		margin: 0;
+
+		.v-snackbar__wrapper {
+			left: 0 !important;
+			right: 0;
+			transform: none !important;
+			max-width: 100% !important;
+
+			.v-snackbar__content {
+				text-align: center;
+			}
+		}
+	}
+</style>

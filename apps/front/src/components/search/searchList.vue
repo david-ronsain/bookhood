@@ -3,9 +3,10 @@
 	import { useDisplay } from 'vuetify'
 	import { BhPrimaryButton } from '@bookhood/ui'
 	import { type IBookSearchResult } from '@bookhood/shared'
-	import { isAuthenticated } from '../../plugins/authentication'
 	import { shortenText } from '../../composables/shortenText.composable'
 	import { mdiMapMarkerOutline } from '@mdi/js'
+	import { useMainStore } from '../../store'
+	import { computed } from 'vue'
 
 	const props = defineProps<{
 		books: IBookSearchResult[]
@@ -20,8 +21,11 @@
 		'click:borrow',
 	])
 
+	const mainStore = useMainStore()
 	const { sm, mobile } = useDisplay()
 	const bookSelected = ref<string[]>([])
+
+	const profile = computed(() => mainStore.profile)
 
 	onMounted(() => {
 		bookSelected.value = props.pickedBook
@@ -84,7 +88,7 @@
 							{{ book.owner[0].place }}
 						</div>
 						<bh-primary-button
-							v-if="isAuthenticated()"
+							v-if="profile"
 							:text="$t('search.borrow')"
 							@click.stop="events('click:borrow', book)" />
 						<bh-primary-button

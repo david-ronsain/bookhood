@@ -12,6 +12,10 @@ export interface IMailer {
 
 	requestRefused(infos: IRequestInfos): void
 
+	requestReturnedWithIssue(infos: IRequestInfos): void
+
+	requestNeverReceived(infos: IRequestInfos): void
+
 	userRegistered(user: ICreateUserDTO): void
 
 	authSendLink(user: IUser): void

@@ -5,7 +5,7 @@ import Signin from '../views/Signin.vue'
 import Account from '../views/Account.vue'
 import Logout from '../views/Logout.vue'
 import YourBooks from '../views/YourBooks.vue'
-import YourBooksLent from '../views/YourBooksLent.vue'
+import Requests from '../views/Requests.vue'
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
@@ -80,6 +80,7 @@ const router = createRouter({
 										EnvConfig.settings.session.duration),
 							)
 						}
+						mainStore.getProfile()
 						next({ name: 'home', force: true, replace: true })
 					},
 					meta: {
@@ -113,18 +114,18 @@ const router = createRouter({
 								authenticated: isAuthenticated(),
 							},
 						},
-						{
-							path: 'lent',
-							name: 'yourBooksLent',
-							component: YourBooksLent,
-							meta: {
-								requiresAuth: RequiresAuth.AUTHENTICATED,
-								authenticated: isAuthenticated(),
-							},
-						},
 					],
 				},
 			],
+		},
+		{
+			path: '/requests',
+			name: 'requests',
+			component: Requests,
+			meta: {
+				requiresAuth: RequiresAuth.AUTHENTICATED,
+				authenticated: isAuthenticated(),
+			},
 		},
 		{
 			path: '/book/:id',

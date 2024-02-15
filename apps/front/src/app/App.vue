@@ -2,9 +2,16 @@
 	import BhHeader from '../components/layout/header/BhHeader.vue'
 	import { BhSnackbarError, BhSnackbarSuccess } from '@bookhood/ui'
 	import { useMainStore } from '../store'
-	import { isAuthenticated } from '../plugins/authentication'
+	import { onMounted } from 'vue'
+	import { computed } from 'vue'
 
 	const mainStore = useMainStore()
+
+	const profile = computed(() => mainStore.profile)
+
+	onMounted(() => {
+		mainStore.getProfile()
+	})
 </script>
 
 <template>
@@ -14,12 +21,12 @@
 		<v-container fluid>
 			<v-row>
 				<v-col
-					:class="isAuthenticated() ? 'd-md-block ' : ''"
+					:class="profile ? 'd-md-block ' : ''"
 					class="d-none"
 					cols="2"></v-col>
 				<v-col
 					cols="12"
-					:md="isAuthenticated() ? 10 : 12">
+					:md="profile ? 10 : 12">
 					<router-view
 						class="pa-0"
 						id="main-content" />

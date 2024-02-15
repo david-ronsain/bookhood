@@ -6,22 +6,25 @@
 	import { computed } from 'vue'
 
 	const { t } = useI18n({})
-	const marker = ref<google.maps.Marker | null>(null)
 	const requestStore = useRequestStore()
 	const mainStore = useMainStore()
-	const borrowDialog = ref<BhDialog>(null)
+	const refuseReturnDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
 	const disabled = ref<boolean>(false)
+	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
 
-	const borrow = (libraryId: string): void => {
+	const refuse = (): void => {
 		requestStore
-			.create(libraryId)
+			.refuseReturn(request.value)
 			.then(() => {
-				borrowDialog.value.close()
+				close()
 				loading.value = false
-				mainStore.success = t('request.createDialog.success')
+				mainStore.success = t('request.refuseReturnDialog.success')
+				requestStore.getIncomingRequests({
+					ownerId: profile.value?._id,
+				})
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
@@ -30,9 +33,14 @@
 			})
 	}
 
-	const open = (markerPicked: google.maps.Marker): void => {
-		marker.value = markerPicked
-		borrowDialog.value.open()
+	const open = (requestId: string): void => {
+		refuseReturnDialog.value.open()
+		request.value = requestId
+	}
+
+	const close = (): void => {
+		refuseReturnDialog.value.close()
+		request.value = ''
 	}
 
 	defineExpose({
@@ -42,24 +50,20 @@
 
 <template>
 	<bh-dialog
-		ref="borrowDialog"
-		:title="$t('request.createDialog.title')">
+		ref="refuseReturnDialog"
+		:title="$t('request.refuseReturnDialog.title')">
 		<template v-slot:default>
-			{{
-				$t('request.createDialog.text', {
-					book: marker?.['book']?.title,
-				})
-			}}
+			{{ $t('request.refuseReturnDialog.text') }}
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
 				:text="$t('common.no')"
 				no-background
-				@click="borrowDialog?.close()" />
+				@click="close" />
 			<bh-primary-button
 				:text="$t('common.yes')"
-				@click="borrow(marker?.['book']?.libraryId)"
-				:disabled="!marker || disabled || !profile"
+				@click="refuse"
+				:disabled="disabled"
 				:loading="loading" />
 		</template>
 	</bh-dialog>

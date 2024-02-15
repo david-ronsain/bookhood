@@ -21,7 +21,7 @@ import { Logger } from 'winston'
 import { firstValueFrom } from 'rxjs'
 import CreateRequestUseCase from '../usecases/request/createRequest.usecase'
 import GetUserBookUseCase from '../usecases/book/getUserBook.usecase'
-import { CreateRequestDTO, GetRequestsByStatusDTO } from '../dto/request.dto'
+import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import GetListByStatusUseCase from '../usecases/request/getListByStatus.usecase'
 import PatchRequestUseCase from '../usecases/request/patchRequest.usecase'
 
@@ -76,14 +76,20 @@ export class RequestController {
 		}
 	}
 
-	@MessagePattern('request-get-by-status')
+	@MessagePattern('request-list')
 	async getByListStatus(
-		body: GetRequestsByStatusDTO,
+		body: GetRequestsDTO,
 	): Promise<MicroserviceResponseFormatter<IRequestList>> {
 		try {
 			const user = await this.checkUserToken(body.token)
+
+			if (!body.ownerId && !body.userId) {
+				body.ownerId = user._id
+			}
+
 			const list = await this.getListByStatusUseCase.handler(
-				user._id,
+				body.userId,
+				body.ownerId,
 				body.status,
 				body.startAt,
 			)

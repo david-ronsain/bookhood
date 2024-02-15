@@ -1,12 +1,16 @@
 <script setup lang="ts">
 	import { mdiAccountCircle, mdiBook } from '@mdi/js'
 	import { ref } from 'vue'
-	import { isAuthenticated } from '../../../plugins/authentication'
 	import BhLogoutDialog from './BhLogoutDialog.vue'
 	import BhNavigationDrawer from './BhNavigationDrawer.vue'
+	import { useMainStore } from '../../../store'
+	import { computed } from 'vue'
 
+	const mainStore = useMainStore()
 	const logoutDialog = ref(null)
 	const drawer = ref(null)
+
+	const profile = computed(() => mainStore.profile)
 </script>
 
 <template>
@@ -16,7 +20,7 @@
 		height="50">
 		<template v-slot:prepend>
 			<v-app-bar-nav-icon
-				v-if="isAuthenticated()"
+				v-if="profile"
 				:icon="mdiAccountCircle"
 				:size="30"
 				@click.stop="drawer.changeDrawerStatus()" />

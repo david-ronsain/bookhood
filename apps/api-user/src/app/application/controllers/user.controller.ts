@@ -24,7 +24,7 @@ export class UserController {
 		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly getUserByTokenUseCase: GetUserByTokenUseCase,
 		private readonly refreshTokenUseCase: RefreshTokenUseCase,
-		private readonly createUserUseCase: CreateUserUseCase
+		private readonly createUserUseCase: CreateUserUseCase,
 	) {}
 
 	@MessagePattern('user-health')
@@ -34,12 +34,11 @@ export class UserController {
 
 	@MessagePattern('user-create')
 	async createUser(
-		user: ICreateUserDTO
+		user: ICreateUserDTO,
 	): Promise<MicroserviceResponseFormatter<UserModel>> {
 		try {
-			const createdUser: UserModel = await this.createUserUseCase.handler(
-				user
-			)
+			const createdUser: UserModel =
+				await this.createUserUseCase.handler(user)
 			this.createAuthLinkUseCase.handler(createdUser)
 			this.rabbitMailClient
 				.send('mail-user-registered', createdUser)
@@ -48,12 +47,12 @@ export class UserController {
 				true,
 				HttpStatus.CREATED,
 				undefined,
-				createdUser
+				createdUser,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<UserModel>().buildFromException(
 				err,
-				user
+				user,
 			)
 		}
 	}
@@ -75,23 +74,50 @@ export class UserController {
 
 	@MessagePattern('user-get-by-token')
 	async getByToken(
-		token: string
+		token: string,
 	): Promise<MicroserviceResponseFormatter<IUser | null>> {
 		try {
-			const user: UserModel = await this.getUserByTokenUseCase.handler(
-				token
-			)
+			const user: UserModel =
+				await this.getUserByTokenUseCase.handler(token)
 
 			return new MicroserviceResponseFormatter<IUser | null>(
 				true,
 				HttpStatus.CREATED,
 				undefined,
-				user
+				user,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IUser | null>().buildFromException(
 				err,
-				{ token }
+				{ token },
+			)
+		}
+	}
+
+	@MessagePattern('user-get-profile')
+	async getProfile(
+		token: string,
+	): Promise<MicroserviceResponseFormatter<IUser | null>> {
+		try {
+			const user: UserModel =
+				await this.getUserByTokenUseCase.handler(token)
+
+			return new MicroserviceResponseFormatter<IUser | null>(
+				true,
+				HttpStatus.CREATED,
+				undefined,
+				{
+					firstName: user.firstName,
+					lastName: user.lastName,
+					email: user.email,
+					role: user.role,
+					_id: user._id,
+				},
+			)
+		} catch (err) {
+			return new MicroserviceResponseFormatter<IUser | null>().buildFromException(
+				err,
+				{ token },
 			)
 		}
 	}

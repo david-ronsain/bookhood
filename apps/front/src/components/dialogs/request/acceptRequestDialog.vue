@@ -3,6 +3,7 @@
 	import { ref } from 'vue'
 	import { useRequestStore, useMainStore } from '../../../store'
 	import { useI18n } from 'vue-i18n'
+	import { computed } from 'vue'
 
 	const { t } = useI18n({})
 	const requestStore = useRequestStore()
@@ -12,6 +13,8 @@
 	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
+	const profile = computed(() => mainStore.profile)
+
 	const accept = (): void => {
 		requestStore
 			.accept(request.value)
@@ -19,7 +22,9 @@
 				close()
 				loading.value = false
 				mainStore.success = t('request.acceptDialog.success')
-				requestStore.getPending()
+				requestStore.getIncomingRequests({
+					ownerId: profile.value?._id,
+				})
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message

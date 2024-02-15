@@ -3,7 +3,6 @@
 <template>
 	<v-data-table
 		density="compact"
-		hide-no-data
 		hover
 		:items-per-page="10"
 		no-filter

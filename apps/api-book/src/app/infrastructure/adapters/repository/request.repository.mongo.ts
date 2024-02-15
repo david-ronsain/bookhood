@@ -41,16 +41,28 @@ export default class RequestRepositoryMongo implements RequestRepository {
 
 	async getListByStatus(
 		userId: string,
+		ownerId: string,
 		status: RequestStatus,
 		startAt: number,
 	): Promise<IRequestList> {
+		const filters = {}
+
+		if (userId) {
+			filters['userId'] = new mongoose.Types.ObjectId(userId)
+		}
+
+		if (ownerId) {
+			filters['ownerId'] = new mongoose.Types.ObjectId(ownerId)
+		}
+
+		if (status) {
+			filters['status'] = status
+		}
+
 		return this.requestModel
 			.aggregate([
 				{
-					$match: {
-						status,
-						ownerId: new mongoose.Types.ObjectId(userId),
-					},
+					$match: filters,
 				},
 				{
 					$lookup: {
@@ -63,6 +75,20 @@ export default class RequestRepositoryMongo implements RequestRepository {
 				{
 					$unwind: {
 						path: '$user',
+						preserveNullAndEmptyArrays: false,
+					},
+				},
+				{
+					$lookup: {
+						from: 'users',
+						localField: 'ownerId',
+						foreignField: '_id',
+						as: 'owner',
+					},
+				},
+				{
+					$unwind: {
+						path: '$owner',
 						preserveNullAndEmptyArrays: false,
 					},
 				},
@@ -98,41 +124,18 @@ export default class RequestRepositoryMongo implements RequestRepository {
 					$project: {
 						_id: true,
 						createdAt: true,
-						'user.firstName': true,
-						'book.title': true,
-						'library.place': true,
+						dueDate: true,
+						status: true,
+						userFirstName: '$user.firstName',
+						ownerFirstName: '$owner.firstName',
+						title: '$book.title',
+						place: '$library.place',
+						userId: '$user._id',
+						ownerId: '$owner._id',
 					},
 				},
 				{
-					$replaceRoot: {
-						newRoot: {
-							$mergeObjects: ['$book', '$$ROOT'],
-						},
-					},
-				},
-				{
-					$replaceRoot: {
-						newRoot: {
-							$mergeObjects: ['$user', '$$ROOT'],
-						},
-					},
-				},
-				{
-					$replaceRoot: {
-						newRoot: {
-							$mergeObjects: ['$library', '$$ROOT'],
-						},
-					},
-				},
-				{
-					$project: {
-						user: false,
-						library: false,
-						book: false,
-					},
-				},
-				{
-					$skip: startAt,
+					$skip: parseInt(startAt.toString()),
 				},
 				{
 					$limit: 10,

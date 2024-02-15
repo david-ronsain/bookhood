@@ -1,0 +1,15 @@
+import { RequestStatus } from '@bookhood/shared'
+
+export const statusColor = (status: RequestStatus): string => {
+	if (status === RequestStatus.PENDING_VALIDATION) return 'purple-lighten-3'
+	else if (status === RequestStatus.ACCEPTED_PENDING_DELIVERY)
+		return 'pink-lighten-3'
+	else if (status === RequestStatus.REFUSED) return 'indigo-lighten-3'
+	else if (status === RequestStatus.RECEIVED) return 'blue-lighten-3'
+	else if (status === RequestStatus.NEVER_RECEIVED) return 'cyan-lighten-3'
+	else if (status === RequestStatus.RETURN_PENDING) return 'teal-lighten-3'
+	else if (status === RequestStatus.RETURN_ACCEPTED) return 'green-lighten-3'
+	else if (status === RequestStatus.RETURNED_WITH_ISSUE)
+		return 'red-lighten-3'
+	else if (status === RequestStatus.ISSUE_FIXED) return 'amber-lighten-3'
+}

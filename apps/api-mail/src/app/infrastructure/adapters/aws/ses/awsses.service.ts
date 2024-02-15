@@ -118,7 +118,7 @@ export class SESManagerService implements IMailer {
 							book: infos.book.title,
 						},
 					}),
-					text3: this.i18n.t('mails.request.created.text3'),
+					text3: this.i18n.t('mails.request.refused.text3'),
 				},
 			},
 		)
@@ -134,6 +134,91 @@ export class SESManagerService implements IMailer {
 			this.i18n.t('mails.request.refused.subject', {
 				args: {
 					firstName: infos.owner.firstName,
+					book: infos.book.title,
+				},
+			}),
+			content,
+		)
+	}
+
+	async requestNeverReceived(infos: IRequestInfos): Promise<void> {
+		const template = 'request/neverReceived.mjml'
+
+		const content = await this.parseTemplate(
+			template,
+			this.i18n.t('mails.request.neverReceived.subject'),
+			{
+				text: {
+					text1: this.i18n.t('mails.request.neverReceived.text1', {
+						args: { firstName: infos.owner.firstName },
+					}),
+					text2: this.i18n.t('mails.request.neverReceived.text2', {
+						args: {
+							firstName: infos.emitter.firstName,
+							book: infos.book.title,
+						},
+					}),
+					text3: this.i18n.t('mails.request.neverReceived.text3'),
+				},
+			},
+		)
+
+		if (!content.length) {
+			this.logger.error(`template not found - ${template}`)
+			throw new Error('template not found')
+		}
+
+		this.sendEmail(
+			envConfig().settings.mailFrom,
+			[this.mailTo(infos.owner.email)],
+			this.i18n.t('mails.request.neverReceived.subject', {
+				args: {
+					firstName: infos.emitter.firstName,
+					book: infos.book.title,
+				},
+			}),
+			content,
+		)
+	}
+
+	async requestReturnedWithIssue(infos: IRequestInfos): Promise<void> {
+		const template = 'request/returnedWithIssue.mjml'
+
+		const content = await this.parseTemplate(
+			template,
+			this.i18n.t('mails.request.returnedWithIssue.subject'),
+			{
+				text: {
+					text1: this.i18n.t(
+						'mails.request.returnedWithIssue.text1',
+						{
+							args: { firstName: infos.emitter.firstName },
+						},
+					),
+					text2: this.i18n.t(
+						'mails.request.returnedWithIssue.text2',
+						{
+							args: {
+								firstName: infos.owner.firstName,
+								book: infos.book.title,
+							},
+						},
+					),
+					text3: this.i18n.t('mails.request.returnedWithIssue.text3'),
+				},
+			},
+		)
+
+		if (!content.length) {
+			this.logger.error(`template not found - ${template}`)
+			throw new Error('template not found')
+		}
+
+		this.sendEmail(
+			envConfig().settings.mailFrom,
+			[this.mailTo(infos.emitter.email)],
+			this.i18n.t('mails.request.returnedWithIssue.subject', {
+				args: {
 					book: infos.book.title,
 				},
 			}),

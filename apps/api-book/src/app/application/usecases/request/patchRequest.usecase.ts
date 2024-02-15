@@ -57,6 +57,14 @@ export default class PatchRequestUseCase {
 			this.mailClient.send('mail-request-refused', infos).subscribe()
 		} else if (status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
 			this.mailClient.send('mail-request-accepted', infos).subscribe()
+		} else if (status === RequestStatus.NEVER_RECEIVED) {
+			this.mailClient
+				.send('mail-request-never-received', infos)
+				.subscribe()
+		} else if (status === RequestStatus.RETURNED_WITH_ISSUE) {
+			this.mailClient
+				.send('mail-request-returned-with-issue', infos)
+				.subscribe()
 		}
 
 		return RequestMapper.modelObjectIdToString(updated)
@@ -72,12 +80,17 @@ export default class PatchRequestUseCase {
 				RequestStatus.ACCEPTED_PENDING_DELIVERY,
 				RequestStatus.REFUSED,
 			],
-			[RequestStatus.ACCEPTED_PENDING_DELIVERY]: [RequestStatus.RECEIVED],
+			[RequestStatus.ACCEPTED_PENDING_DELIVERY]: [
+				RequestStatus.RECEIVED,
+				RequestStatus.NEVER_RECEIVED,
+			],
+			[RequestStatus.NEVER_RECEIVED]: [RequestStatus.RECEIVED],
 			[RequestStatus.RECEIVED]: [RequestStatus.RETURN_PENDING],
 			[RequestStatus.RETURN_PENDING]: [
 				RequestStatus.RETURN_ACCEPTED,
 				RequestStatus.RETURNED_WITH_ISSUE,
 			],
+			[RequestStatus.RETURNED_WITH_ISSUE]: [RequestStatus.ISSUE_FIXED],
 		}
 
 		return statusesAllowed[currentStatus].includes(desiredStatus)

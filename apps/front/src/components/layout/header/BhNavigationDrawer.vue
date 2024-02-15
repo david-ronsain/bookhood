@@ -1,9 +1,9 @@
 <script setup lang="ts">
-	import { isAuthenticated } from '../../../plugins/authentication'
 	import { ref, watch } from 'vue'
 	import { useDisplay } from 'vuetify'
 	import { useRoute } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
+	import { useMainStore } from '../../../store'
 	import {
 		mdiAccountCircle,
 		mdiBookArrowLeftOutline,
@@ -13,21 +13,25 @@
 		mdiLogout,
 		mdiMagnify,
 	} from '@mdi/js'
+	import { computed } from 'vue'
 
+	const mainStore = useMainStore()
 	const route = useRoute()
 	const { t } = useI18n({})
 	const { lgAndUp, mdAndDown } = useDisplay()
 	const drawerOpened = ref(false)
 	const menuItems = ref([])
 
+	const profile = computed(() => mainStore.profile)
+
 	const changeDrawerStatus = () => {
 		drawerOpened.value = !drawerOpened.value
 	}
 
-	watch(route, () => {
+	watch(profile, () => {
 		menuItems.value = []
 
-		if (isAuthenticated()) {
+		if (profile.value) {
 			menuItems.value.push(
 				{
 					prependIcon: mdiMagnify,
@@ -44,17 +48,12 @@
 							title: t('common.menu.yourbooks'),
 							link: { name: 'yourBooks' },
 						},
-						{
-							prependIcon: mdiBookArrowRightOutline,
-							title: t('common.menu.lend'),
-							link: { name: 'yourBooksLent' },
-						},
-						{
-							prependIcon: mdiBookArrowLeftOutline,
-							title: t('common.menu.borrowed'),
-							link: { name: 'yourBooks' },
-						},
 					],
+				},
+				{
+					prependIcon: mdiMagnify,
+					title: t('common.menu.requests'),
+					link: { name: 'requests' },
 				},
 			)
 		} else {
@@ -75,7 +74,7 @@
 
 <template>
 	<v-navigation-drawer
-		v-if="isAuthenticated()"
+		v-if="profile"
 		color="primary"
 		class="mobile-menu"
 		:elevation="2"
@@ -122,7 +121,7 @@
 			</v-list-group>
 
 			<v-list-item
-				v-if="isAuthenticated()"
+				v-if="profile"
 				@click.stop="events('logout')">
 				<template v-slot:prepend>
 					<v-icon

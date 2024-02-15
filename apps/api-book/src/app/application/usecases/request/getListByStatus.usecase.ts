@@ -10,11 +10,13 @@ export default class GetListByStatusUseCase {
 
 	async handler(
 		userId: string,
+		ownerId: string,
 		status: RequestStatus,
 		startAt: number,
 	): Promise<IRequestList> {
 		return await this.requestRepository.getListByStatus(
 			userId,
+			ownerId,
 			status,
 			startAt,
 		)

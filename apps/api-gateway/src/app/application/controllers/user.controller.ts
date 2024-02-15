@@ -3,6 +3,9 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	Get,
+	Headers,
+	HttpCode,
 	HttpStatus,
 	Inject,
 	Post,
@@ -11,21 +14,22 @@ import {
 import { ClientProxy } from '@nestjs/microservices'
 import {
 	ApiBody,
+	ApiExcludeEndpoint,
 	ApiOkResponse,
 	ApiOperation,
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
 import { CreateUserDTO } from '../dto/user.dto'
-import { Role } from '@bookhood/shared'
+import { IUser, Role } from '@bookhood/shared'
 import { Roles } from '../guards/role.guard'
-import { UserEmailExistException } from '../exceptions'
+import { UserEmailExistException, UserNotFoundException } from '../exceptions'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 
 @Controller('user')
 export class UserController {
 	constructor(
-		@Inject('RabbitUser') private readonly userQueue: ClientProxy
+		@Inject('RabbitUser') private readonly userQueue: ClientProxy,
 	) {}
 
 	@Post()
@@ -44,5 +48,29 @@ export class UserController {
 			throw new UserEmailExistException(created.message)
 		}
 		return created.data
+	}
+
+	@Get('me')
+	@HttpCode(HttpStatus.OK)
+	@ApiExcludeEndpoint()
+	async getProfile(@Headers('x-token') token?: string): Promise<IUser> {
+		if (!token) {
+			throw new UserNotFoundException('')
+		}
+
+		const tokenParts = token?.split('|')
+		if (tokenParts.length === 3) {
+			tokenParts.pop()
+			token = tokenParts.join('|')
+		}
+
+		const profile = await firstValueFrom<
+			MicroserviceResponseFormatter<IUser>
+		>(this.userQueue.send('user-get-profile', token))
+
+		if (!profile.success) {
+			throw new UserNotFoundException(profile.message)
+		}
+		return profile.data
 	}
 }

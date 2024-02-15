@@ -27,9 +27,11 @@ export interface IRequestEvent {
 }
 
 export interface IRequestSimple {
-	id: string
+	_id: string
 
-	firstName: string
+	userFirstName: string
+
+	ownerFirstName: string
 
 	title: string
 
@@ -38,6 +40,10 @@ export interface IRequestSimple {
 	place: string
 
 	createdAt: string
+
+	userId: string
+
+	ownerId: string
 }
 
 export interface IRequestList {
@@ -72,4 +78,12 @@ export interface IRequestInfos {
 	emitter: IRequestInfosUser
 
 	book: IRequestInfosBook
+}
+
+export interface IGetRequests {
+	status?: RequestStatus
+
+	ownerId?: string
+
+	userId?: string
 }

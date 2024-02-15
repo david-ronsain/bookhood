@@ -15,6 +15,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices'
 import {
 	ApiBody,
+	ApiExcludeEndpoint,
 	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
@@ -55,6 +56,7 @@ export class BookController {
 	}
 
 	@Get('google/:id')
+	@ApiExcludeEndpoint()
 	async getGoogleBookByISBN(@Param('id') isbn: string): Promise<unknown> {
 		return google
 			.books('v1')
@@ -66,6 +68,7 @@ export class BookController {
 	}
 
 	@Post('google/search')
+	@ApiExcludeEndpoint()
 	async getGoogleBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,

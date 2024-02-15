@@ -37,6 +37,7 @@ import {
 	PatchRequestDTO,
 	PatchRequestMQDTO,
 } from '@bookhood/shared-api'
+import { GetRequestsDTO } from '../dto/request.dto'
 
 @Controller('request')
 export class RequestController {
@@ -67,24 +68,22 @@ export class RequestController {
 		return response.data
 	}
 
-	@Get('status/:status')
+	@Get()
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({
 		description: "List an user's requests depending on the status",
 	})
-	@ApiParam({ name: 'status', type: 'string' })
+	@ApiBody({ type: GetRequestsDTO })
 	async getListByStatus(
-		@Param('status') status: RequestStatus,
-		@Query('startAt') startAt: number,
+		@Query() body: GetRequestsDTO,
 		@Headers('x-token') token?: string,
 	): Promise<IRequestList> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequestList>
 		>(
-			this.bookQueue.send('request-get-by-status', {
-				status,
+			this.bookQueue.send('request-list', {
+				...body,
 				token,
-				startAt,
 			}),
 		)
 		if (!response.success) {

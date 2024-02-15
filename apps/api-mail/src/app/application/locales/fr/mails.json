@@ -32,6 +32,18 @@
 			"text1": "Bonjour {firstName} !",
 			"text2": "{firstName} ne peut pas vous prêter \"{book}\". Essayer de voir si quelqu'un d'autre près de chez vous peut vous le prêter !",
 			"text3": "Bonne journée !"
+		},
+		"neverReceived": {
+			"subject": "{firstName} n'a jamais reçu \"{book}\"",
+			"text1": "Bonjour {firstName} !",
+			"text2": "{firstName} nous a signalé n'avoir jamais reçu \"{book}\". Essayer de le contacter pour voir ce qu'il en est !",
+			"text3": "Bonne journée !"
+		},
+		"returnedWithIssue": {
+			"subject": "Le livre \"{book}\" a été abimé",
+			"text1": "Bonjour {firstName} !",
+			"text2": "{firstName} nous a signalé que le libre \"{book}\" a été rendu endommagé. Veuillez le contacter pour vous arranger avec lui.",
+			"text3": "Bonne journée !"
 		}
 	}
 }

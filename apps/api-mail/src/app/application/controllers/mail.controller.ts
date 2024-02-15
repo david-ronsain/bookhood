@@ -9,6 +9,8 @@ import AuthSendLinkUseCase from '../usecases/user/authSendLink.usecase'
 import RequestCreatedUseCase from '../usecases/request/requestCreated.usecase'
 import RequestAcceptedtUseCase from '../usecases/request/requestAccepted.usecase'
 import RequestRefusedUseCase from '../usecases/request/requestRefused.usecase'
+import RequestNeverReceivedUseCase from '../usecases/request/requestNeverReceived.usecase'
+import RequestReturnedWithIssueUseCase from '../usecases/request/requestReturnedWithIssue.usecase'
 
 @Controller()
 export class MailController {
@@ -19,6 +21,8 @@ export class MailController {
 		private readonly requestCreatedUseCase: RequestCreatedUseCase,
 		private readonly requestAcceptedtUseCase: RequestAcceptedtUseCase,
 		private readonly requestRefusedUseCase: RequestRefusedUseCase,
+		private readonly requestNeverReceivedUseCase: RequestNeverReceivedUseCase,
+		private readonly requestReturnedWithIssueUseCase: RequestReturnedWithIssueUseCase,
 	) {}
 
 	@MessagePattern('mail-health')
@@ -49,5 +53,15 @@ export class MailController {
 	@MessagePattern('mail-request-refused')
 	requestRefused(infos: IRequestInfos): void {
 		this.requestRefusedUseCase.handler(infos)
+	}
+
+	@MessagePattern('mail-request-never-received')
+	requestNeverReceived(infos: IRequestInfos): void {
+		this.requestNeverReceivedUseCase.handler(infos)
+	}
+
+	@MessagePattern('mail-request-returned-with-issue')
+	requestReturnedWithIssue(infos: IRequestInfos): void {
+		this.requestReturnedWithIssueUseCase.handler(infos)
 	}
 }
