@@ -128,7 +128,6 @@ export class RequestController {
 				request,
 			)
 		} catch (err) {
-			console.log(err)
 			return new MicroserviceResponseFormatter<IRequest>().buildFromException(
 				err,
 				body,

@@ -1,9 +1,11 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { ConflictException } from '@nestjs/common'
-import AddBookUseCase from '../../../../src/app/application/usecases/addBook.usecase'
-import { LibraryRepository } from '../../../../src/app/domain/ports/library.repository'
-import LibraryModel from '../../../../src/app/domain/models/library.model'
-import LibraryMapper from '../../../../src/app/application/mappers/library.mapper'
+import AddBookUseCase from '../../../../../src/app/application/usecases/book/addBook.usecase'
+import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
+import LibraryModel from '../../../../../src/app/domain/models/library.model'
+import LibraryMapper from '../../../../../src/app/application/mappers/library.mapper'
 import mongoose from 'mongoose'
+import { LibraryStatus } from '../../../../../../shared/src'
 
 describe('AddBookUseCase', () => {
 	let addBookUseCase: AddBookUseCase
@@ -13,6 +15,9 @@ describe('AddBookUseCase', () => {
 		libraryRepositoryMock = {
 			getByUserIdAndBookId: jest.fn(),
 			create: jest.fn(),
+			getByUser: jest.fn(),
+			getById: jest.fn(),
+			getFullById: jest.fn(),
 		}
 
 		addBookUseCase = new AddBookUseCase(libraryRepositoryMock)
@@ -32,22 +37,32 @@ describe('AddBookUseCase', () => {
 			bookId: new mongoose.Types.ObjectId(bookId),
 			userId: new mongoose.Types.ObjectId(userId),
 			location: { type: 'Point', coordinates: [0, 0] },
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
 		}
 
 		jest.spyOn(libraryRepositoryMock, 'create').mockResolvedValue(
 			createdLibraryModel,
 		)
 
-		const result = await addBookUseCase.handler(bookId, userId, {
-			lat: 0,
-			lng: 0,
-		})
+		const result = await addBookUseCase.handler(
+			bookId,
+			userId,
+			{
+				lat: 0,
+				lng: 0,
+			},
+			LibraryStatus.TO_LEND,
+			'Some place',
+		)
 
 		expect(libraryRepositoryMock.create).toHaveBeenCalledWith(
 			new LibraryModel({
 				bookId,
 				userId,
 				location: { type: 'Point', coordinates: [0, 0] },
+				status: LibraryStatus.TO_LEND,
+				place: 'Some place',
 			}),
 		)
 
@@ -68,10 +83,18 @@ describe('AddBookUseCase', () => {
 			bookId: new mongoose.Types.ObjectId(bookId),
 			userId: new mongoose.Types.ObjectId(userId),
 			location: { type: 'Point', coordinates: [0, 0] },
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
 		})
 
 		await expect(
-			addBookUseCase.handler(bookId, userId, { lat: 0, lng: 0 }),
+			addBookUseCase.handler(
+				bookId,
+				userId,
+				{ lat: 0, lng: 0 },
+				LibraryStatus.TO_LEND,
+				'Some place',
+			),
 		).rejects.toThrow(ConflictException)
 
 		expect(libraryRepositoryMock.getByUserIdAndBookId).toHaveBeenCalledWith(

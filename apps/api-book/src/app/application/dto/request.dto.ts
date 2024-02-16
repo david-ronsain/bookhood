@@ -1,4 +1,4 @@
-import { IGetRequests } from '@bookhood/shared'
+import { IGetRequests, RequestStatus } from '@bookhood/shared'
 
 export interface CreateRequestDTO {
 	token: string
@@ -6,7 +6,13 @@ export interface CreateRequestDTO {
 	libraryId: string
 }
 
-export interface GetRequestsDTO extends IGetRequests {
+export class GetRequestsDTO implements IGetRequests {
+	status?: RequestStatus
+
+	ownerId?: string
+
+	userId?: string
+
 	token: string
 
 	startAt: number

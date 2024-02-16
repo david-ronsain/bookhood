@@ -120,6 +120,7 @@ describe('BookRepositoryMongo', () => {
 				results: [
 					{
 						_id: '123',
+						libraryId: '456',
 						title: 'Example Book',
 						authors: ['John Doe'],
 						description: 'desc',
@@ -129,6 +130,7 @@ describe('BookRepositoryMongo', () => {
 					},
 					{
 						_id: '456',
+						libraryId: '456',
 						title: 'Another Book',
 						authors: ['Jane Doe'],
 						description: 'desc',
@@ -160,6 +162,7 @@ describe('BookRepositoryMongo', () => {
 				results: [
 					{
 						_id: '123',
+						libraryId: '456',
 						title: 'Example Book',
 						authors: ['John Doe'],
 						description: 'desc',
@@ -169,6 +172,7 @@ describe('BookRepositoryMongo', () => {
 					},
 					{
 						_id: '456',
+						libraryId: '456',
 						title: 'Another Book',
 						authors: ['Jane Doe'],
 						description: 'desc',

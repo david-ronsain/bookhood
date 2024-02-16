@@ -1,14 +1,8 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { ConflictException } from '@nestjs/common'
-import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/createBookIfNew.usecase'
-import { BookRepository } from '../../../../src/app/domain/ports/book.repository'
-import {
-	BookStatus,
-	IAddBookDTO,
-	IBook,
-	IISBN,
-} from '../../../../../shared/src'
-import BookModel from '../../../../src/app/domain/models/book.model'
+import CreateBookIfNewUseCase from '../../../../../src/app/application/usecases/book/createBookIfNew.usecase'
+import { BookRepository } from '../../../../../src/app/domain/ports/book.repository'
+import { IAddBookDTO, IBook, LibraryStatus } from '../../../../../../shared/src'
+import BookModel from '../../../../../src/app/domain/models/book.model'
 
 describe('CreateBookIfNewUseCase', () => {
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
@@ -42,7 +36,8 @@ describe('CreateBookIfNewUseCase', () => {
 			publisher: 'publisher',
 			subtitle: 'subtitle',
 			location: { lat: 0, lng: 0 },
-			status: BookStatus.TO_LEND,
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
 		}
 
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(null)
@@ -88,7 +83,8 @@ describe('CreateBookIfNewUseCase', () => {
 			publisher: 'publisher',
 			subtitle: 'subtitle',
 			location: { lat: 0, lng: 0 },
-			status: BookStatus.TO_LEND,
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
 		}
 
 		const existingBookModel: BookModel = {

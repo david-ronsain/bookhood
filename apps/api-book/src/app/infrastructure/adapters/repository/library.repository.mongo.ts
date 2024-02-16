@@ -74,7 +74,12 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 	async getById(id: string): Promise<LibraryModel> {
 		return this.libraryModel
 			.findOne({ _id: new mongoose.Types.ObjectId(id) })
-			.then((lib) => LibraryMapper.fromEntitytoModel(lib))
+			.then((lib) => {
+				if (!lib) {
+					throw new Error()
+				}
+				return LibraryMapper.fromEntitytoModel(lib)
+			})
 			.catch(() => null)
 	}
 

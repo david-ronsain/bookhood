@@ -1,8 +1,11 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IBookSearch, IBookSearchResultOwner } from '../../../../../shared/src'
+import {
+	IBookSearch,
+	IBookSearchResultOwner,
+} from '../../../../../../shared/src'
 import { Test, TestingModule } from '@nestjs/testing'
-import SearchBookUseCase from '../../../../src/app/application/usecases/searchBook.usecase'
-import { BookRepository } from '../../../../src/app/domain/ports/book.repository'
+import SearchBookUseCase from '../../../../../src/app/application/usecases/book/searchBook.usecase'
+import { BookRepository } from '../../../../../src/app/domain/ports/book.repository'
 
 describe('SearchBookUseCase', () => {
 	let searchBookUseCase: SearchBookUseCase
@@ -38,6 +41,7 @@ describe('SearchBookUseCase', () => {
 			results: [
 				{
 					_id: '123',
+					libraryId: '456',
 					title: 'Example Book',
 					authors: ['John Doe'],
 					description: 'desc',
@@ -47,6 +51,7 @@ describe('SearchBookUseCase', () => {
 				},
 				{
 					_id: '456',
+					libraryId: '789',
 					title: 'Another Book',
 					authors: ['Jane Doe'],
 					description: 'desc',

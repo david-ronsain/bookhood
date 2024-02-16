@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import LibraryMapper from '../../../../src/app/application/mappers/library.mapper'
 import LibraryModel from '../../../../src/app/domain/models/library.model'
 import { LibraryEntity } from '../../../../src/app/infrastructure/adapters/repository/entities/library.entity'
+import { LibraryStatus } from '../../../../../shared/src'
 
 describe('LibraryMapper', () => {
 	it('should map LibraryEntity to LibraryModel', () => {
@@ -25,6 +26,8 @@ describe('LibraryMapper', () => {
 			userId: new mongoose.Types.ObjectId('aaaaaaaaaaaaaaaaaaaaaaaa'),
 			bookId: new mongoose.Types.ObjectId('bbbbbbbbbbbbbbbbbbbbbbbb'),
 			location: { type: 'Point', coordinates: [0, 0] },
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
 		}
 
 		const libraryWithStringIds =

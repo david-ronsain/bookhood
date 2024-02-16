@@ -1,28 +1,34 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
 import { BookController } from '../../../../src/app/application/controllers/book.controller'
-import AddBookUseCase from '../../../../src/app/application/usecases/addBook.usecase'
+import AddBookUseCase from '../../../../src/app/application/usecases/book/addBook.usecase'
 import { ClientProxy } from '@nestjs/microservices'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
-import { HttpStatus } from '@nestjs/common'
+import { ForbiddenException, HttpStatus } from '@nestjs/common'
 import BookModel from '../../../../src/app/domain/models/book.model'
-import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/createBookIfNew.usecase'
-import SearchBookUseCase from '../../../../src/app/application/usecases/searchBook.usecase'
-import { of } from 'rxjs'
+import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/book/createBookIfNew.usecase'
+import SearchBookUseCase from '../../../../src/app/application/usecases/book/searchBook.usecase'
+import { of, Observable } from 'rxjs'
 import {
-	BookStatus,
 	IAddBookDTO,
 	IBook,
 	IBookSearch,
+	ILibraryFull,
+	ILibraryLocation,
+	IUser,
+	LibraryStatus,
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
+import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
 
 describe('BookController', () => {
 	let controller: BookController
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
 	let addBookUseCase: AddBookUseCase
 	let searchBookUseCase: SearchBookUseCase
+	let getUserBooksUseCase: GetUserBooksUseCase
 	let userClient: ClientProxy
+	let mailClient: ClientProxy
 
 	const mockLogger = {
 		info: jest.fn(),
@@ -39,10 +45,19 @@ describe('BookController', () => {
 				},
 				{ provide: AddBookUseCase, useValue: { handler: jest.fn() } },
 				{
+					provide: GetUserBooksUseCase,
+					useValue: { handler: jest.fn() },
+				},
+				{
+					provide: SearchBookUseCase,
+					useValue: { handler: jest.fn() },
+				},
+				{
 					provide: SearchBookUseCase,
 					useValue: { handler: jest.fn() },
 				},
 				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
+				{ provide: 'RabbitMail', useValue: { send: jest.fn() } },
 				{
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
@@ -56,7 +71,10 @@ describe('BookController', () => {
 		)
 		addBookUseCase = module.get<AddBookUseCase>(AddBookUseCase)
 		searchBookUseCase = module.get<SearchBookUseCase>(SearchBookUseCase)
+		getUserBooksUseCase =
+			module.get<GetUserBooksUseCase>(GetUserBooksUseCase)
 		userClient = module.get<ClientProxy>('RabbitUser')
+		mailClient = module.get<ClientProxy>('RabbitMail')
 	})
 
 	it('should be defined', () => {
@@ -92,7 +110,8 @@ describe('BookController', () => {
 					lat: 0,
 					lng: 0,
 				},
-				status: BookStatus.TO_LEND,
+				status: LibraryStatus.TO_LEND,
+				place: 'Some place',
 			} as IAddBookDTO
 			const mockBook: BookModel = {
 				authors: ['author'],
@@ -110,7 +129,8 @@ describe('BookController', () => {
 				publishedDate: '2024',
 				publisher: 'publisher',
 				subtitle: 'subtitle',
-				status: BookStatus.TO_LEND,
+				status: LibraryStatus.TO_LEND,
+				place: 'Some place',
 			} as BookModel
 			const mockToken = 'mockToken||'
 
@@ -136,6 +156,8 @@ describe('BookController', () => {
 				mockBook._id,
 				'mockUserId',
 				{ lat: 0, lng: 0 },
+				mockDTO.status,
+				mockDTO.place,
 			)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IBook>(
@@ -273,6 +295,103 @@ describe('BookController', () => {
 						boundingBox: [0, 0, 0, 0],
 					},
 				),
+			)
+		})
+	})
+
+	describe('getUserBooks', () => {
+		it('should return user books when token is valid', async () => {
+			const body = { token: 'mockToken', page: 1 }
+			const mockObservable: Observable<any> = of(
+				new MicroserviceResponseFormatter(
+					true,
+					200,
+					{},
+					{
+						_id: 'mockUserId',
+						firstName: 'first',
+						lastName: 'last',
+						email: 'first.last@name.test',
+					},
+				),
+			)
+			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+			const mockUserBooks: ILibraryFull[] = [
+				{
+					_id: '123',
+					book: {
+						title: 'Title',
+						authors: ['author'],
+						description: 'desc',
+						isbn: [
+							{ type: 'ISBN_13', identifier: '1234567890123' },
+						],
+						language: 'fr',
+					},
+					location: {
+						type: 'Point',
+						coordinates: [0, 0],
+					},
+					user: {
+						firstName: 'first',
+						lastName: 'last',
+						email: 'first.last@name.test',
+					},
+				},
+			]
+			jest.spyOn(getUserBooksUseCase, 'handler').mockImplementationOnce(
+				() => Promise.resolve(mockUserBooks),
+			)
+
+			const result = await controller.getUserBooks(body)
+
+			expect(result).toEqual(
+				new MicroserviceResponseFormatter(
+					true,
+					HttpStatus.OK,
+					undefined,
+					mockUserBooks,
+				),
+			)
+			expect(userClient.send).toHaveBeenCalledWith(
+				'user-get-by-token',
+				'mockToken',
+			)
+			expect(getUserBooksUseCase.handler).toHaveBeenCalledWith(
+				expect.anything(),
+				body.page,
+			)
+		})
+
+		it('should return an error response if token is invalid', async () => {
+			const body = { token: 'mockToken', page: 1 }
+			const error = new ForbiddenException()
+			const mockObservable: Observable<any> = of(
+				new MicroserviceResponseFormatter(
+					false,
+					200,
+					{},
+					{
+						_id: 'mockUserId',
+						firstName: 'first',
+						lastName: 'last',
+						email: 'first.last@name.test',
+					},
+				),
+			)
+			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
+			const result = await controller.getUserBooks(body)
+
+			expect(result).toEqual(
+				new MicroserviceResponseFormatter().buildFromException(
+					error,
+					body,
+				),
+			)
+			expect(userClient.send).toHaveBeenCalledWith(
+				'user-get-by-token',
+				'mockToken',
 			)
 		})
 	})
