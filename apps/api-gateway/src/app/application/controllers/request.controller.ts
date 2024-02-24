@@ -13,6 +13,7 @@ import {
 	Body,
 	NotFoundException,
 	ForbiddenException,
+	HttpCode,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -27,7 +28,6 @@ import { firstValueFrom } from 'rxjs'
 import {
 	Role,
 	IRequest,
-	RequestStatus,
 	IRequestList,
 	IPatchRequestDTO,
 } from '@bookhood/shared'
@@ -46,6 +46,7 @@ export class RequestController {
 	) {}
 
 	@Post(':libraryId')
+	@HttpCode(HttpStatus.CREATED)
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({ description: 'Creates a request for a book' })
 	@ApiParam({ name: 'libraryId', type: 'string' })
@@ -69,6 +70,7 @@ export class RequestController {
 	}
 
 	@Get()
+	@HttpCode(HttpStatus.OK)
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({
 		description: "List an user's requests depending on the status",
@@ -93,6 +95,7 @@ export class RequestController {
 	}
 
 	@Patch(':id')
+	@HttpCode(HttpStatus.OK)
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({
 		description: 'Updates a request',

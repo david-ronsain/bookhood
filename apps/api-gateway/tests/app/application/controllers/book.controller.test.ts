@@ -5,7 +5,7 @@ import { BookController } from '../../../../src/app/application/controllers/book
 import { AddBookDTO } from '../../../../src/app/application/dto/book.dto'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
-import { BookStatus } from '../../../../../shared/src'
+import { LibraryStatus } from '../../../../../shared/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -59,7 +59,8 @@ describe('BookController', () => {
 				publisher: 'publisher',
 				publishedDate: '2023',
 				location: { lat: 0, lng: 0 },
-				status: BookStatus.TO_LEND,
+				status: LibraryStatus.TO_LEND,
+				place: 'Some place',
 			}
 
 			const response = new MicroserviceResponseFormatter(
@@ -97,7 +98,8 @@ describe('BookController', () => {
 				publisher: '',
 				publishedDate: '',
 				location: { lat: 0, lng: 0 },
-				status: BookStatus.TO_LEND,
+				status: LibraryStatus.TO_LEND,
+				place: 'Some place',
 			}
 
 			const response = new MicroserviceResponseFormatter(false)
@@ -176,6 +178,75 @@ describe('BookController', () => {
 			)
 
 			await expect(controller.getBooks(q, startAt, box)).rejects.toThrow(
+				HttpException,
+			)
+		})
+	})
+
+	describe('getUserBooks', () => {
+		it('should get books', async () => {
+			const page = 0
+			const token = 'token'
+
+			const response = new MicroserviceResponseFormatter(
+				true,
+				HttpStatus.OK,
+				{},
+				[
+					{
+						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+						book: {
+							title: 'title',
+							authors: ['author'],
+							isbn: [
+								{
+									type: 'ISBN_13',
+									identifier: '1234567890123',
+								},
+							],
+							language: 'fr',
+						},
+						location: {
+							type: 'Point',
+							coordinates: [0, 0],
+						},
+						user: {
+							_id: 'bbbbbbbbbbbbbbbbbbbbbbbb',
+							firstName: 'first',
+							lastName: 'last',
+							email: 'first.last@name.test',
+						},
+					},
+				],
+			)
+
+			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			const result = await controller.getUserBooks(page, token)
+
+			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
+				'book-get',
+				{
+					page,
+					token,
+				},
+			)
+			expect(result).toEqual(response.data)
+		})
+
+		it('should handle generic HTTP exception', async () => {
+			const page = 0
+			const token = 'token'
+
+			const response = new MicroserviceResponseFormatter(false)
+
+			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			await expect(controller.getUserBooks(page, token)).rejects.toThrow(
 				HttpException,
 			)
 		})

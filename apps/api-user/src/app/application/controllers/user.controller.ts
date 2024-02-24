@@ -104,7 +104,7 @@ export class UserController {
 
 			return new MicroserviceResponseFormatter<IUser | null>(
 				true,
-				HttpStatus.CREATED,
+				HttpStatus.OK,
 				undefined,
 				{
 					firstName: user.firstName,

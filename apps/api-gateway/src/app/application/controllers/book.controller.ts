@@ -4,6 +4,7 @@ import {
 	Controller,
 	Get,
 	Headers,
+	HttpCode,
 	HttpException,
 	HttpStatus,
 	Inject,
@@ -37,6 +38,7 @@ export class BookController {
 	) {}
 
 	@Post()
+	@HttpCode(HttpStatus.CREATED)
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({ description: "Add a new book to one's library" })
 	@ApiBody({ type: AddBookDTO })
@@ -57,6 +59,7 @@ export class BookController {
 
 	@Get('google/:id')
 	@ApiExcludeEndpoint()
+	@HttpCode(HttpStatus.OK)
 	async getGoogleBookByISBN(@Param('id') isbn: string): Promise<unknown> {
 		return google
 			.books('v1')
@@ -69,6 +72,7 @@ export class BookController {
 
 	@Post('google/search')
 	@ApiExcludeEndpoint()
+	@HttpCode(HttpStatus.OK)
 	async getGoogleBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,
@@ -86,6 +90,7 @@ export class BookController {
 	}
 
 	@Post('search')
+	@HttpCode(HttpStatus.OK)
 	async getBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,
@@ -110,6 +115,7 @@ export class BookController {
 	}
 
 	@Get()
+	@HttpCode(HttpStatus.OK)
 	@Roles([Role.USER, Role.ADMIN])
 	@ApiOperation({ description: "Get one's books" })
 	@ApiParam({ name: 'page', type: 'number' })

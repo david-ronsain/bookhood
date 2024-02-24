@@ -7,7 +7,7 @@ import { Logger } from 'winston'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import AuthSendLinkUseCase from '../usecases/user/authSendLink.usecase'
 import RequestCreatedUseCase from '../usecases/request/requestCreated.usecase'
-import RequestAcceptedtUseCase from '../usecases/request/requestAccepted.usecase'
+import RequestAcceptedUseCase from '../usecases/request/requestAccepted.usecase'
 import RequestRefusedUseCase from '../usecases/request/requestRefused.usecase'
 import RequestNeverReceivedUseCase from '../usecases/request/requestNeverReceived.usecase'
 import RequestReturnedWithIssueUseCase from '../usecases/request/requestReturnedWithIssue.usecase'
@@ -19,7 +19,7 @@ export class MailController {
 		private readonly userRegisteredUseCase: UserRegisteredUseCase,
 		private readonly authSendLinkUseCase: AuthSendLinkUseCase,
 		private readonly requestCreatedUseCase: RequestCreatedUseCase,
-		private readonly requestAcceptedtUseCase: RequestAcceptedtUseCase,
+		private readonly requestAcceptedUseCase: RequestAcceptedUseCase,
 		private readonly requestRefusedUseCase: RequestRefusedUseCase,
 		private readonly requestNeverReceivedUseCase: RequestNeverReceivedUseCase,
 		private readonly requestReturnedWithIssueUseCase: RequestReturnedWithIssueUseCase,
@@ -47,7 +47,7 @@ export class MailController {
 
 	@MessagePattern('mail-request-accepted')
 	requestAccepted(infos: IRequestInfos): void {
-		this.requestAcceptedtUseCase.handler(infos)
+		this.requestAcceptedUseCase.handler(infos)
 	}
 
 	@MessagePattern('mail-request-refused')

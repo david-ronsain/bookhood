@@ -33,6 +33,7 @@ export class UserController {
 	) {}
 
 	@Post()
+	@HttpCode(HttpStatus.CREATED)
 	@Roles([Role.GUEST])
 	@ApiOperation({ description: 'Creates a new user' })
 	@ApiBody({ type: CreateUserDTO })

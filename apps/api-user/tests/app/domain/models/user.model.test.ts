@@ -26,6 +26,7 @@ describe('Testing the UserModel', () => {
 		const userModel = new UserModel(user)
 
 		expect(userModel.email).toBe(user.email)
+		expect(userModel._id).toBe(user._id)
 		expect(userModel.role).toMatchObject([Role.USER, Role.ADMIN])
 	})
 })

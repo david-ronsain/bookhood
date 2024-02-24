@@ -6,6 +6,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
 import { createAwsServiceMock } from 'nest-aws-sdk/dist/testing'
 import { I18nService } from 'nestjs-i18n'
+import {
+	BookRequestMailDTO,
+	IRequestInfos,
+} from '../../../../../../../shared/src'
 
 const mockI18nService = {
 	t: jest.fn(),
@@ -59,7 +63,7 @@ describe('SESManagerService', () => {
 		it('should fail sending a user registration email', async () => {
 			const spy = jest.spyOn(
 				SESManagerService.prototype as any,
-				'parseTemplate'
+				'parseTemplate',
 			)
 			spy.mockImplementation(() => '')
 
@@ -76,7 +80,7 @@ describe('SESManagerService', () => {
 		it('should send a user registration email', async () => {
 			const spy = jest.spyOn(
 				SESManagerService.prototype as any,
-				'parseTemplate'
+				'parseTemplate',
 			)
 			spy.mockImplementation(() => 'template')
 
@@ -98,7 +102,7 @@ describe('SESManagerService', () => {
 		it('should fail sending a signin email', async () => {
 			const spy = jest.spyOn(
 				SESManagerService.prototype as any,
-				'parseTemplate'
+				'parseTemplate',
 			)
 			spy.mockImplementation(() => '')
 
@@ -115,7 +119,7 @@ describe('SESManagerService', () => {
 		it('should send a signin email', async () => {
 			const spy = jest.spyOn(
 				SESManagerService.prototype as any,
-				'parseTemplate'
+				'parseTemplate',
 			)
 			spy.mockImplementation(() => 'template')
 
@@ -141,6 +145,291 @@ describe('SESManagerService', () => {
 			const body = '<p>Test Body</p>'
 
 			await service.sendEmail(from, to, subject, body, to, to)
+			expect(sesInstance.sendEmail).toHaveBeenCalled()
+			expect(loggerInstance.info).toHaveBeenCalled()
+		})
+	})
+
+	describe('requestCreated', () => {
+		it('should fail sending a request created email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => '')
+
+			const mock: BookRequestMailDTO = {
+				book: 'title',
+				emitterFirstName: 'emitter',
+				recipientFirstName: 'recipient',
+				email: 'first.last@name.test',
+				requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			}
+
+			expect(service.requestCreated(mock)).rejects.toThrow()
+		})
+
+		it('should send a request created email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => 'template')
+
+			const mockUser = {
+				book: 'title',
+				emitterFirstName: 'emitter',
+				recipientFirstName: 'recipient',
+				email: 'first.last@name.test',
+				requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			}
+
+			await service.requestCreated(mockUser)
+
+			expect(sesInstance.sendEmail).toHaveBeenCalled()
+			expect(loggerInstance.info).toHaveBeenCalled()
+		})
+	})
+
+	describe('requestAccepted', () => {
+		it('should fail sending a request accepted email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => '')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			expect(service.requestAccepted(mock)).rejects.toThrow()
+		})
+
+		it('should send a request accepted email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => 'template')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			await service.requestAccepted(mock)
+
+			expect(sesInstance.sendEmail).toHaveBeenCalled()
+			expect(loggerInstance.info).toHaveBeenCalled()
+		})
+	})
+
+	describe('requestRefused', () => {
+		it('should fail sending a request refused email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => '')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			expect(service.requestRefused(mock)).rejects.toThrow()
+		})
+
+		it('should send a request refused email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => 'template')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			await service.requestRefused(mock)
+
+			expect(sesInstance.sendEmail).toHaveBeenCalled()
+			expect(loggerInstance.info).toHaveBeenCalled()
+		})
+	})
+
+	describe('requestNeverReceived', () => {
+		it('should fail sending a request never received email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => '')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			expect(service.requestNeverReceived(mock)).rejects.toThrow()
+		})
+
+		it('should send a request never received email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => 'template')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			await service.requestNeverReceived(mock)
+
+			expect(sesInstance.sendEmail).toHaveBeenCalled()
+			expect(loggerInstance.info).toHaveBeenCalled()
+		})
+	})
+
+	describe('requestReturnedWithIssue', () => {
+		it('should fail sending a request returned with issue email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => '')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			expect(service.requestReturnedWithIssue(mock)).rejects.toThrow()
+		})
+
+		it('should send a request returned with issue email', async () => {
+			const spy = jest.spyOn(
+				SESManagerService.prototype as any,
+				'parseTemplate',
+			)
+			spy.mockImplementation(() => 'template')
+
+			const mock: IRequestInfos = {
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				createdAt: new Date().toString(),
+				owner: {
+					firstName: '',
+					lastName: '',
+					email: 'email@fake.test',
+				},
+				emitter: {
+					firstName: '',
+					lastName: '',
+					email: 'email2@fake.test',
+				},
+				book: {
+					title: 'title',
+				},
+			}
+
+			await service.requestReturnedWithIssue(mock)
+
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
 		})

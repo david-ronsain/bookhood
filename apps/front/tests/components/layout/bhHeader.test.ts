@@ -1,6 +1,6 @@
 import { it, describe, beforeEach, expect, vi } from 'vitest'
 import { VueWrapper, mount, config } from '@vue/test-utils'
-import BhHeader from '../../../src/components/layout/BhHeader.vue'
+import BhHeader from '../../../src/components/layout/header/BhHeader.vue'
 import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 
