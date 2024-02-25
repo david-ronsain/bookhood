@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
-import { ICreateUserDTO, IUser, Role } from '@bookhood/shared'
+import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
@@ -15,6 +15,8 @@ import { Logger } from 'winston'
 import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import GetUserByTokenUseCase from '../usecases/getUserByToken.usecase'
 import RefreshTokenUseCase from '../usecases/refreshToken.usecase'
+import { GetProfileDTO } from '../dto/user.dto'
+import GetUserByIdUseCase from '../usecases/getUserById.usecase'
 
 @Controller()
 export class UserController {
@@ -23,6 +25,7 @@ export class UserController {
 		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy,
 		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly getUserByTokenUseCase: GetUserByTokenUseCase,
+		private readonly getUserByIdUseCase: GetUserByIdUseCase,
 		private readonly refreshTokenUseCase: RefreshTokenUseCase,
 		private readonly createUserUseCase: CreateUserUseCase,
 	) {}
@@ -94,8 +97,8 @@ export class UserController {
 		}
 	}
 
-	@MessagePattern('user-get-profile')
-	async getProfile(
+	@MessagePattern('user-get-me')
+	async me(
 		token: string,
 	): Promise<MicroserviceResponseFormatter<IUser | null>> {
 		try {
@@ -118,6 +121,33 @@ export class UserController {
 			return new MicroserviceResponseFormatter<IUser | null>().buildFromException(
 				err,
 				{ token },
+			)
+		}
+	}
+
+	@MessagePattern('user-get-profile')
+	async getProfile(
+		body: GetProfileDTO,
+	): Promise<MicroserviceResponseFormatter<IExternalProfile | null>> {
+		try {
+			const user: UserModel = await this.getUserByIdUseCase.handler(
+				body.userId,
+			)
+
+			return new MicroserviceResponseFormatter<IExternalProfile | null>(
+				true,
+				HttpStatus.OK,
+				undefined,
+				{
+					firstName: user.firstName,
+					lastName: user.lastName,
+					_id: user._id,
+				},
+			)
+		} catch (err) {
+			return new MicroserviceResponseFormatter<IExternalProfile | null>().buildFromException(
+				err,
+				body,
 			)
 		}
 	}

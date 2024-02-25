@@ -117,3 +117,23 @@ export interface IBookSearchResultOwnerUser {
 
 	email: string
 }
+
+export interface IBooksList {
+	results: IBooksListResult[]
+
+	total: number
+}
+
+export interface IBooksListResult {
+	_id: string
+
+	title: string
+
+	authors: string[]
+
+	description: string
+
+	place: string
+
+	status: LibraryStatus
+}

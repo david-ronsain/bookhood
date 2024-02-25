@@ -9,7 +9,7 @@ import { Model } from 'mongoose'
 @Injectable()
 export default class UserRepositoryMongo implements UserRepository {
 	constructor(
-		@InjectModel('User') private readonly userModel: Model<UserEntity>
+		@InjectModel('User') private readonly userModel: Model<UserEntity>,
 	) {}
 
 	async emailExists(email: string): Promise<boolean> {
@@ -39,10 +39,16 @@ export default class UserRepositoryMongo implements UserRepository {
 		return user ? UserMapper.fromEntitytoModel(user) : null
 	}
 
+	async getUserById(id: string): Promise<UserModel | null> {
+		const user = await this.userModel.findById(id)
+
+		return user ? UserMapper.fromEntitytoModel(user) : null
+	}
+
 	async update(user: UserModel): Promise<UserModel | null> {
 		const updated = await this.userModel.findOneAndUpdate(
 			{ email: user.email },
-			user
+			user,
 		)
 		return updated ? UserMapper.fromEntitytoModel(updated) : null
 	}

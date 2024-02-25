@@ -178,5 +178,21 @@
 			"issueFixed": "Problème résolu",
 			"chat": "Discutez"
 		}
+	},
+	"profile": {
+		"books": {
+			"list": {
+				"lend": "A prêter",
+				"give": "A donner",
+				"loading": "Chargement des données",
+				"noData": "Cet utilisateur n'a pas encore partagé de livre",
+				"title": "Livres partagés",
+				"actions": "Actions",
+				"status": "Statut",
+				"description": "Description",
+				"author": "Auteur",
+				"book": "Titre"
+			}
+		}
 	}
 }

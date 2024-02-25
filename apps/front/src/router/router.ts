@@ -6,6 +6,7 @@ import Account from '../views/Account.vue'
 import Logout from '../views/Logout.vue'
 import YourBooks from '../views/YourBooks.vue'
 import Requests from '../views/Requests.vue'
+import Profile from '../views/Profile.vue'
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
@@ -142,6 +143,15 @@ const router = createRouter({
 			component: Home,
 			meta: {
 				requiresAuth: RequiresAuth.BOTH,
+				authenticated: isAuthenticated(),
+			},
+		},
+		{
+			path: '/profile/:userId',
+			name: 'profile',
+			component: Profile,
+			meta: {
+				requiresAuth: RequiresAuth.AUTHENTICATED,
 				authenticated: isAuthenticated(),
 			},
 		},

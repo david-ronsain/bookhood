@@ -20,7 +20,7 @@ export const useUserStore = defineStore('userStore', () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}
+			},
 		)
 	}
 
@@ -32,7 +32,7 @@ export const useUserStore = defineStore('userStore', () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}
+			},
 		)
 	}
 

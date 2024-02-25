@@ -6,7 +6,12 @@ import { Observable, of } from 'rxjs'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/'
 import { CreateUserDTO } from '../../../../src/app/application/dto/user.dto'
 import { HttpException, HttpStatus } from '@nestjs/common'
-import { IUser } from '../../../../../shared/src'
+import {
+	IBooksList,
+	IExternalProfile,
+	IUser,
+	LibraryStatus,
+} from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 
 jest.mock('@nestjs/microservices', () => ({
@@ -24,6 +29,12 @@ describe('Testing UserController', () => {
 			providers: [
 				{
 					provide: 'RabbitUser',
+					useValue: {
+						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: 'RabbitBook',
 					useValue: {
 						send: jest.fn(() => of({})),
 					},
@@ -114,10 +125,10 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.getProfile(token)
+			const result = await controller.me(token)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-get-profile',
+				'user-get-me',
 				token,
 			)
 
@@ -125,9 +136,7 @@ describe('Testing UserController', () => {
 		})
 
 		it('should throw an error if no token is provided', async () => {
-			await expect(controller.getProfile()).rejects.toThrow(
-				UserNotFoundException,
-			)
+			await expect(controller.me()).rejects.toThrow(UserNotFoundException)
 		})
 
 		it('should throw an error if the microservice returns an error', async () => {
@@ -143,13 +152,133 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			await expect(controller.getProfile(inputToken)).rejects.toThrow(
+			await expect(controller.me(inputToken)).rejects.toThrow(
+				UserNotFoundException,
+			)
+
+			expect(controller['userQueue'].send).toHaveBeenCalledWith(
+				'user-get-me',
+				token,
+			)
+		})
+	})
+
+	describe('getProfile', () => {
+		it('should return the user profile', async () => {
+			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
+			const userId = 'someId'
+
+			const response =
+				new MicroserviceResponseFormatter<IExternalProfile>(
+					true,
+					HttpStatus.OK,
+					{},
+					{
+						_id: userId,
+						firstName: expect.any(String),
+						lastName: expect.any(String),
+					},
+				)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			const result = await controller.getProfile(token, userId)
+
+			expect(controller['userQueue'].send).toHaveBeenCalledWith(
+				'user-get-profile',
+				{ token, userId },
+			)
+
+			expect(result).toMatchObject(response.data)
+		})
+
+		it('should throw an error if the microservice returns an error', async () => {
+			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
+			const userId = 'someId'
+
+			const response =
+				new MicroserviceResponseFormatter<IExternalProfile>(
+					false,
+					HttpStatus.NOT_FOUND,
+				)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			await expect(controller.getProfile(token, userId)).rejects.toThrow(
 				UserNotFoundException,
 			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				'user-get-profile',
-				token,
+				{ token, userId },
+			)
+		})
+	})
+
+	describe('getProfileBooks', () => {
+		it('should return the user profile books', async () => {
+			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
+			const userId = 'someId'
+			const page = 0
+
+			const response = new MicroserviceResponseFormatter<IBooksList>(
+				true,
+				HttpStatus.OK,
+				{},
+				{
+					results: [
+						{
+							_id: 'aaaaaaaaaaaa',
+							authors: ['author'],
+							description: 'description',
+							place: 'place',
+							status: LibraryStatus.TO_LEND,
+							title: 'title',
+						},
+					],
+					total: 1,
+				},
+			)
+
+			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			const result = await controller.getProfileBooks(token, userId, page)
+
+			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
+				'profile-books',
+				{ token, userId, page },
+			)
+
+			expect(result).toMatchObject(response.data)
+		})
+
+		it('should throw an error if the microservice returns an error', async () => {
+			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
+			const userId = 'someId'
+
+			const response =
+				new MicroserviceResponseFormatter<IExternalProfile>(
+					false,
+					HttpStatus.NOT_FOUND,
+				)
+
+			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			await expect(
+				controller.getProfileBooks(token, userId, 0),
+			).rejects.toThrow(UserNotFoundException)
+
+			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
+				'profile-books',
+				{ token, userId, page: 0 },
 			)
 		})
 	})

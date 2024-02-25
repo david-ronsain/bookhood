@@ -5,7 +5,11 @@ import mongoose, { Model, Query } from 'mongoose'
 import LibraryRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/library.repository.mongo'
 import { LibraryEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/library.entity'
 import LibraryModel from '../../../../../src/app/domain/models/library.model'
-import { ILibraryFull, LibraryStatus } from '../../../../../../shared/src'
+import {
+	IBooksList,
+	ILibraryFull,
+	LibraryStatus,
+} from '../../../../../../shared/src'
 import LibraryMapper from '../../../../../src/app/application/mappers/library.mapper'
 
 describe('LibraryRepositoryMongo', () => {
@@ -148,6 +152,34 @@ describe('LibraryRepositoryMongo', () => {
 			)
 
 			const result = await libraryRepository.getByUser(userId, page)
+
+			expect(result).toEqual(expectedLibraries)
+		})
+	})
+
+	describe('getProfileBooks', () => {
+		it('should return books list with pagination', async () => {
+			const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+			const page = 1
+			const expectedLibraries: IBooksList = {
+				total: 1,
+				results: [
+					{
+						_id: 'aaaaaaaaaaaa',
+						authors: ['author'],
+						description: 'description',
+						place: 'place',
+						status: LibraryStatus.TO_LEND,
+						title: 'title',
+					},
+				],
+			}
+
+			jest.spyOn(libraryModel, 'aggregate').mockResolvedValueOnce([
+				expectedLibraries,
+			])
+
+			const result = await libraryRepository.getProfileBooks(userId, page)
 
 			expect(result).toEqual(expectedLibraries)
 		})

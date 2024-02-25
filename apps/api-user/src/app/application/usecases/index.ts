@@ -4,6 +4,7 @@ import UserEmailExistsUseCase from './userEmailExists.usecase'
 import VerifyAuthTokenUseCase from './verifyAuthToken.usecase'
 import GetUserByEmailUseCase from './getUserByEmail.usecase'
 import GetUserByTokenUseCase from './getUserByToken.usecase'
+import GetUserByIdUseCase from './getUserById.usecase'
 import RefreshToken from './refreshToken.usecase'
 
 export const USER_USECASES = [
@@ -14,4 +15,5 @@ export const USER_USECASES = [
 	GetUserByEmailUseCase,
 	RefreshToken,
 	GetUserByTokenUseCase,
+	GetUserByIdUseCase,
 ]

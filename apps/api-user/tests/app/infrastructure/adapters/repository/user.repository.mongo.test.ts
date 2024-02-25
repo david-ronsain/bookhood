@@ -10,6 +10,7 @@ const mockUserModel = () => ({
 	countDocuments: jest.fn(),
 	create: jest.fn(),
 	findOne: jest.fn(),
+	findById: jest.fn(),
 	findOneAndUpdate: jest.fn(),
 })
 
@@ -72,13 +73,13 @@ describe('UserRepositoryMongo', () => {
 					UserEntity
 				> &
 					UserEntity &
-					Required<{ _id: string }>)[]
+					Required<{ _id: string }>)[],
 			)
 
 			const result = await userRepository.createUser(user)
 
 			expect(result).toEqual(
-				UserMapper.fromEntitytoModel(createdUserEntity)
+				UserMapper.fromEntitytoModel(createdUserEntity),
 			)
 			expect(userModel.create).toHaveBeenCalledWith(user)
 		})
@@ -109,6 +110,34 @@ describe('UserRepositoryMongo', () => {
 
 			expect(result).toBeNull()
 			expect(userModel.findOne).toHaveBeenCalledWith({ email })
+		})
+	})
+
+	describe('getUserById', () => {
+		it('should get a user by id', async () => {
+			const id = 'aaaaaaaaaaaa'
+			const userEntity: UserEntity = {
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@name.test',
+				_id: id,
+			} as unknown as UserEntity
+			jest.spyOn(userModel, 'findById').mockResolvedValueOnce(userEntity)
+
+			const result = await userRepository.getUserById(id)
+
+			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(userModel.findById).toHaveBeenCalledWith(id)
+		})
+
+		it('should return null if user is not found by id', async () => {
+			const id = 'aaaaaaaaaaaa'
+			jest.spyOn(userModel, 'findById').mockResolvedValueOnce(null)
+
+			const result = await userRepository.getUserById(id)
+
+			expect(result).toBeNull()
+			expect(userModel.findById).toHaveBeenCalledWith(id)
 		})
 	})
 
@@ -158,11 +187,11 @@ describe('UserRepositoryMongo', () => {
 				UserMapper.fromEntitytoModel({
 					...user,
 					_id: '123',
-				} as unknown as UserEntity)
+				} as unknown as UserEntity),
 			)
 			expect(userModel.findOneAndUpdate).toHaveBeenCalledWith(
 				{ email: user.email },
-				user
+				user,
 			)
 		})
 
@@ -173,7 +202,7 @@ describe('UserRepositoryMongo', () => {
 				email: 'first.last@name.test',
 			}
 			jest.spyOn(userModel, 'findOneAndUpdate').mockResolvedValueOnce(
-				null
+				null,
 			)
 
 			const result = await userRepository.update(user)
@@ -181,7 +210,7 @@ describe('UserRepositoryMongo', () => {
 			expect(result).toBeNull()
 			expect(userModel.findOneAndUpdate).toHaveBeenCalledWith(
 				{ email: user.email },
-				user
+				user,
 			)
 		})
 	})

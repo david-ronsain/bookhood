@@ -23,3 +23,11 @@ export interface ICreateUserDTO {
 
 	email: string
 }
+
+export interface IExternalProfile {
+	_id: string
+
+	lastName: string
+
+	firstName: string
+}

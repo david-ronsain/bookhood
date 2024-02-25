@@ -4,7 +4,7 @@
 	import { BhPrimaryButton } from '@bookhood/ui'
 	import { type IBookSearchResult } from '@bookhood/shared'
 	import { shortenText } from '../../composables/shortenText.composable'
-	import { mdiMapMarkerOutline } from '@mdi/js'
+	import { mdiAccountOutline, mdiMapMarkerOutline } from '@mdi/js'
 	import { useMainStore } from '../../store'
 	import { computed } from 'vue'
 
@@ -79,13 +79,33 @@
 					</div>
 					<div class="d-flex align-center justify-space-between">
 						<div>
-							<v-icon
-								class="mr-2"
-								size="20"
-								color="red"
-								>{{ mdiMapMarkerOutline }}</v-icon
-							>
-							{{ book.owner[0].place }}
+							<div>
+								<v-icon
+									class="mr-2"
+									size="20"
+									color="red"
+									>{{ mdiMapMarkerOutline }}</v-icon
+								>
+								{{ book.owner[0].place }}
+							</div>
+							<div>
+								<router-link
+									target="_blank"
+									:to="{
+										name: 'profile',
+										params: {
+											userId: book.owner[0].user._id,
+										},
+									}">
+									<v-icon
+										class="mr-2"
+										size="20"
+										color="blue"
+										>{{ mdiAccountOutline }}</v-icon
+									>
+									{{ book.owner[0].user.firstName }}
+								</router-link>
+							</div>
 						</div>
 						<bh-primary-button
 							v-if="profile"

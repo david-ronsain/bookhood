@@ -7,6 +7,8 @@ export interface UserRepository {
 
 	getUserByEmail(email: string): Promise<UserModel>
 
+	getUserById(id: string): Promise<UserModel>
+
 	getUserByToken(token: string): Promise<UserModel | null>
 
 	update(user: UserModel): Promise<UserModel>

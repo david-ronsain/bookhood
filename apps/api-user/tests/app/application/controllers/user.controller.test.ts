@@ -12,8 +12,15 @@ import CreateUserUseCase from '../../../../src/app/application/usecases/createUs
 import { UserController } from '../../../../src/app/application/controllers/user.controller'
 import UserModel from '../../../../src/app/domain/models/user.model'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
-import { ICreateUserDTO, IUser, Role } from '../../../../../shared/src'
+import {
+	ICreateUserDTO,
+	IExternalProfile,
+	IUser,
+	Role,
+} from '../../../../../shared/src'
 import { of, Observable } from 'rxjs'
+import GetUserByIdUseCase from '../../../../src/app/application/usecases/getUserById.usecase'
+import { GetProfileDTO } from '../../../../src/app/application/dto/user.dto'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -23,10 +30,7 @@ describe('UserController', () => {
 	let controller: UserController
 	let loggerMock: Logger
 	let rabbitMailClientMock: ClientProxy
-	let createAuthLinkUseCaseMock: CreateAuthLinkUseCase
-	let getUserByTokenUseCaseMock: GetUserByTokenUseCase
-	let refreshTokenUseCaseMock: RefreshTokenUseCase
-	let createUserUseCaseMock: CreateUserUseCase
+	let mockedUseCase
 
 	beforeEach(async () => {
 		loggerMock = {
@@ -39,19 +43,7 @@ describe('UserController', () => {
 			send: jest.fn(() => of(null)),
 		} as any
 
-		createAuthLinkUseCaseMock = {
-			handler: jest.fn(),
-		} as any
-
-		getUserByTokenUseCaseMock = {
-			handler: jest.fn(),
-		} as any
-
-		refreshTokenUseCaseMock = {
-			handler: jest.fn(),
-		} as any
-
-		createUserUseCaseMock = {
+		mockedUseCase = {
 			handler: jest.fn(),
 		} as any
 		;(of as jest.Mock).mockReturnValue(of(null))
@@ -63,17 +55,18 @@ describe('UserController', () => {
 				{ provide: 'RabbitMail', useValue: rabbitMailClientMock },
 				{
 					provide: CreateAuthLinkUseCase,
-					useValue: createAuthLinkUseCaseMock,
+					useValue: mockedUseCase,
 				},
 				{
 					provide: GetUserByTokenUseCase,
-					useValue: getUserByTokenUseCaseMock,
+					useValue: mockedUseCase,
 				},
 				{
 					provide: RefreshTokenUseCase,
-					useValue: refreshTokenUseCaseMock,
+					useValue: mockedUseCase,
 				},
-				{ provide: CreateUserUseCase, useValue: createUserUseCaseMock },
+				{ provide: CreateUserUseCase, useValue: mockedUseCase },
+				{ provide: GetUserByIdUseCase, useValue: mockedUseCase },
 			],
 		}).compile()
 
@@ -100,25 +93,20 @@ describe('UserController', () => {
 				email: 'first.last@email.test',
 			}
 
-			jest.spyOn(createUserUseCaseMock, 'handler').mockResolvedValue(
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(
 				createUserDTO,
 			)
-			jest.spyOn(
-				createAuthLinkUseCaseMock,
-				'handler',
-			).mockImplementationOnce(() => Promise.resolve(createUserDTO))
+			jest.spyOn(mockedUseCase, 'handler').mockImplementationOnce(() =>
+				Promise.resolve(createUserDTO),
+			)
 			jest.spyOn(rabbitMailClientMock, 'send').mockReturnValue({
 				subscribe: jest.fn(() => mockObservable),
 			} as any)
 
 			const result = await controller.createUser(createUserDTO)
 
-			expect(createUserUseCaseMock.handler).toHaveBeenCalledWith(
-				createUserDTO,
-			)
-			expect(createAuthLinkUseCaseMock.handler).toHaveBeenCalledWith(
-				createUserDTO,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 			expect(rabbitMailClientMock.send).toHaveBeenCalledWith(
 				'mail-user-registered',
 				createUserDTO,
@@ -142,15 +130,11 @@ describe('UserController', () => {
 			}
 			const error = new Error('User creation error')
 
-			jest.spyOn(createUserUseCaseMock, 'handler').mockRejectedValue(
-				error,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
 
 			const result = await controller.createUser(createUserDTO)
 
-			expect(createUserUseCaseMock.handler).toHaveBeenCalledWith(
-				createUserDTO,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<UserModel>().buildFromException(
@@ -166,13 +150,11 @@ describe('UserController', () => {
 			const token = 'someToken'
 			const roles: Role[] = [Role.USER]
 
-			jest.spyOn(refreshTokenUseCaseMock, 'handler').mockResolvedValue(
-				roles,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(roles)
 
 			const result = await controller.getRoleByEmail(token)
 
-			expect(refreshTokenUseCaseMock.handler).toHaveBeenCalledWith(token)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 			expect(result).toEqual(roles)
 		})
 
@@ -180,13 +162,11 @@ describe('UserController', () => {
 			const token = 'someToken'
 			const error = new NotFoundException('user not found')
 
-			jest.spyOn(refreshTokenUseCaseMock, 'handler').mockRejectedValue(
-				error,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
 
 			const result = await controller.getRoleByEmail(token)
 
-			expect(refreshTokenUseCaseMock.handler).toHaveBeenCalledWith(token)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 			expect(loggerMock.error).toHaveBeenCalledWith(error)
 			expect(result).toEqual([Role.GUEST])
 		})
@@ -201,15 +181,11 @@ describe('UserController', () => {
 				email: 'first.last@email.test',
 			}
 
-			jest.spyOn(getUserByTokenUseCaseMock, 'handler').mockResolvedValue(
-				user,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(user)
 
 			const result = await controller.getByToken(token)
 
-			expect(getUserByTokenUseCaseMock.handler).toHaveBeenCalledWith(
-				token,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>(
 					true,
@@ -224,15 +200,11 @@ describe('UserController', () => {
 			const token = 'someToken'
 			const error = new Error('User retrieval error')
 
-			jest.spyOn(getUserByTokenUseCaseMock, 'handler').mockRejectedValue(
-				error,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
 
 			const result = await controller.getByToken(token)
 
-			expect(getUserByTokenUseCaseMock.handler).toHaveBeenCalledWith(
-				token,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>().buildFromException(
@@ -243,7 +215,7 @@ describe('UserController', () => {
 		})
 	})
 
-	describe('getProfile', () => {
+	describe('me', () => {
 		it('should get user by token', async () => {
 			const token = 'someToken'
 			const user: UserModel = {
@@ -252,15 +224,11 @@ describe('UserController', () => {
 				email: 'first.last@email.test',
 			}
 
-			jest.spyOn(getUserByTokenUseCaseMock, 'handler').mockResolvedValue(
-				user,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(user)
 
-			const result = await controller.getProfile(token)
+			const result = await controller.me(token)
 
-			expect(getUserByTokenUseCaseMock.handler).toHaveBeenCalledWith(
-				token,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>(
 					true,
@@ -275,20 +243,65 @@ describe('UserController', () => {
 			const token = 'someToken'
 			const error = new Error('User retrieval error')
 
-			jest.spyOn(getUserByTokenUseCaseMock, 'handler').mockRejectedValue(
-				error,
-			)
+			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
 
-			const result = await controller.getProfile(token)
+			const result = await controller.me(token)
 
-			expect(getUserByTokenUseCaseMock.handler).toHaveBeenCalledWith(
-				token,
-			)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>().buildFromException(
 					error,
 					{ token },
+				),
+			)
+		})
+	})
+
+	describe('getProfile', () => {
+		it('should get user by id', async () => {
+			const dto: GetProfileDTO = {
+				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				token: 'someToken',
+			}
+			const user: IExternalProfile = {
+				firstName: 'first',
+				lastName: 'last',
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			}
+
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValueOnce(user)
+
+			const result = await controller.getProfile(dto)
+
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(dto.userId)
+			expect(result).toMatchObject(
+				new MicroserviceResponseFormatter<IExternalProfile | null>(
+					true,
+					HttpStatus.OK,
+					undefined,
+					user,
+				),
+			)
+		})
+
+		it('should handle errors during user retrieval', async () => {
+			const dto: GetProfileDTO = {
+				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				token: 'someToken',
+			}
+			const error = new Error('User retrieval error')
+
+			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
+
+			const result = await controller.getProfile(dto)
+
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(dto.userId)
+
+			expect(result).toEqual(
+				new MicroserviceResponseFormatter<IUser | null>().buildFromException(
+					error,
+					dto,
 				),
 			)
 		})

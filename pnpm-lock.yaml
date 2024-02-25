@@ -14,9 +14,6 @@ importers:
       '@googlemaps/js-api-loader':
         specifier: ^1.16.2
         version: 1.16.2
-      '@googlemaps/markerclusterer':
-        specifier: ^2.5.3
-        version: 2.5.3
       '@intlify/unplugin-vue-i18n':
         specifier: ^2.0.0
         version: 2.0.0(vue-i18n@9.9.1)
@@ -83,9 +80,6 @@ importers:
       '@teckel/vue-barcode-reader':
         specifier: ^1.1.6
         version: 1.1.6
-      '@types/google.maps':
-        specifier: ^3.55.1
-        version: 3.55.1
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
@@ -5784,10 +5778,6 @@ packages:
   /@types/find-cache-dir@3.2.1:
     resolution: {integrity: sha512-frsJrz2t/CeGifcu/6uRo4b+SzAwT4NYCVPu1GN8IB9XTzrpPkGuV0tmh9mN+/L0PklAlsC3u5Fxt0ju00LXIw==}
     dev: true
-
-  /@types/google.maps@3.55.1:
-    resolution: {integrity: sha512-4JQjfA+vyAIDgjZIEO+pa12wgZXa1JyGg5eggZ4GullIUF+vVTlvgQrhAdVuNKCGVMdsWopMxLBctRmdl5bMJg==}
-    dev: false
 
   /@types/graceful-fs@4.1.9:
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}

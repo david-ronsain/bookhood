@@ -1,4 +1,4 @@
-import { RequestStatus } from '@bookhood/shared'
+import { RequestStatus, LibraryStatus } from '@bookhood/shared'
 
 export const statusColor = (status: RequestStatus): string => {
 	if (status === RequestStatus.PENDING_VALIDATION) return 'purple-lighten-3'
@@ -12,4 +12,9 @@ export const statusColor = (status: RequestStatus): string => {
 	else if (status === RequestStatus.RETURNED_WITH_ISSUE)
 		return 'red-lighten-3'
 	else if (status === RequestStatus.ISSUE_FIXED) return 'amber-lighten-3'
+}
+
+export const libraryStatusColor = (status: LibraryStatus): string => {
+	if (status === LibraryStatus.TO_GIVE) return 'purple-lighten-3'
+	else if (status === LibraryStatus.TO_LEND) return 'red-lighten-3'
 }
