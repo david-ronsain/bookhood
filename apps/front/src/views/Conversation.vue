@@ -11,10 +11,11 @@
 	import { BhCard, BhTextField } from '@bookhood/ui'
 	import { mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { ref } from 'vue'
-
 	const route = useRoute()
 	const mainStore = useMainStore()
+	import { useI18n } from 'vue-i18n'
 
+	const { t } = useI18n({})
 	const socketConnected = computed(() => state.value.connected)
 	const conversation = computed<IConversationFull>(
 		() => state.value.conversation,
@@ -42,6 +43,7 @@
 				_id: conversation.value._id,
 				userId: me.value._id,
 				roomId: conversation.value.roomId,
+				requestId: conversation.value.request?._id,
 			})
 		}
 	}
@@ -58,6 +60,14 @@
 				}
 			},
 		)
+
+		socket.on('conversation-add-message-error', () => {
+			mainStore.error = t('conversation.error.messageCanNotBeCreated')
+		})
+
+		socket.on('conversation-access-forbidden', () => {
+			mainStore.error = t('conversation.error.accessForbidden')
+		})
 	})
 
 	onUnmounted(() => {
@@ -74,14 +84,25 @@
 
 <template>
 	<v-container
-		:class="route.meta.fullHeight ? 'fullheight' : ''"
-		fluid
-		id="conversation">
+		class="d-flex justify-center"
+		:class="
+			(route.meta.fullHeight ? 'fullheight' : '') +
+			' ' +
+			(conversation ? '' : 'align-center')
+		"
+		fluid>
 		<bh-card
 			v-if="conversation"
-			height="100%"
+			border
 			flat
-			:title="`Conversation avec ${other.firstName} ${other.lastName} à propos de ${conversation?.request?.book?.title}`">
+			id="conversation"
+			:title="
+				$t('conversation.title', {
+					firstName: other.firstName,
+					lastName: other.lastName,
+					book: conversation?.request?.book?.title,
+				})
+			">
 			<template v-slot:text>
 				<div class="d-flex flex-column">
 					<bh-card
@@ -107,12 +128,13 @@
 				<bh-text-field
 					autofocus
 					clear
+					density="compact"
 					:icon="{
 						appendInner: true,
 						icon,
 						disabled: iconDisabled,
 					}"
-					placeholder="Write your message"
+					:placeholder="$t('conversation.writemessage')"
 					rounded
 					variant="outlined"
 					v-model="currentMessage"
@@ -120,11 +142,63 @@
 					@click:appendInner="send" />
 			</template>
 		</bh-card>
+		<v-progress-circular
+			v-else
+			color="primary"
+			indeterminate
+			:size="100" />
 	</v-container>
 </template>
 
 <style lang="scss" scoped>
+	@import 'vuetify/lib/styles/settings/_variables';
 	.v-container.fullheight {
-		height: 100%;
+		max-height: 100%;
+	}
+
+	@media #{map-get($display-breakpoints, 'md-and-up')} {
+		#conversation {
+			min-width: 700px;
+		}
+	}
+</style>
+
+<style lang="scss">
+	@import 'vuetify/lib/styles/settings/_colors';
+
+	#conversation {
+		max-width: 800px;
+		max-height: 100%;
+		position: absolute;
+		top: 12px;
+		bottom: 12px;
+		overflow-y: hidden;
+
+		> .v-card-title {
+			position: sticky;
+			top: 0px;
+			width: 100%;
+			background-color: map-get($shades, 'white');
+			z-index: 1000;
+		}
+
+		> .v-card-text {
+			z-index: 999;
+			overflow-y: auto;
+		}
+
+		> .v-card-actions {
+			position: sticky;
+			bottom: 0;
+			width: 100%;
+			background-color: map-get($shades, 'white');
+			z-index: 1000;
+		}
+
+		.v-card {
+			&.align-self-end {
+				background-color: map-get($grey, 'lighten-4');
+			}
+		}
 	}
 </style>

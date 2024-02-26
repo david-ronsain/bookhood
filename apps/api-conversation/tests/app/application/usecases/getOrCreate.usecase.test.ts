@@ -61,7 +61,7 @@ describe('AddMessageUseCase', () => {
 			).mockImplementationOnce(() => Promise.resolve(conversation))
 
 			expect(
-				getOrCreateUseCase.handler(request._id),
+				getOrCreateUseCase.handler(request._id, request.emitter._id),
 			).resolves.toMatchObject(conversation)
 		})
 
@@ -85,7 +85,7 @@ describe('AddMessageUseCase', () => {
 			).mockImplementationOnce(() => Promise.resolve(conversation))
 
 			expect(
-				getOrCreateUseCase.handler(request._id),
+				getOrCreateUseCase.handler(request._id, request.emitter._id),
 			).resolves.toMatchObject(conversation)
 		})
 	})

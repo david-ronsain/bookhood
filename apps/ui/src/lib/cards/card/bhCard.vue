@@ -52,4 +52,8 @@
 	.v-card-title {
 		text-align: center;
 	}
+
+	.v-card-actions {
+		display: block;
+	}
 </style>

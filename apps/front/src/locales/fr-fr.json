@@ -13,6 +13,7 @@
 			"search": "Rechercher",
 			"requests": "Demandes"
 		},
+		"hello": "Bonjour, {firstName} !"
 	},
 	"home": {
 		"signup": "S'inscrire !",
@@ -193,6 +194,14 @@
 				"author": "Auteur",
 				"book": "Titre"
 			}
+		}
+	},
+	"conversation": {
+		"title": "Conversation avec {firstName} {lastName} à propos de {book}",
+		"writemessage": "Ecrivez votre message",
+		"error": {
+			"accessForbidden": "Vous n'avez pas accès à cette conversation",
+			"messageCanNotBeCreated": "Le message n'a pas pu être envoyé"
 		}
 	}
 }

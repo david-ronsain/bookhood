@@ -6,8 +6,6 @@
 	import { useMainStore } from '../../../store'
 	import {
 		mdiAccountCircle,
-		mdiBookArrowLeftOutline,
-		mdiBookArrowRightOutline,
 		mdiBookshelf,
 		mdiLogin,
 		mdiLogout,
@@ -170,12 +168,6 @@
 		> div > .v-list {
 			position: sticky;
 			height: 100%;
-
-			> .v-list-item:last-of-type {
-				position: absolute;
-				bottom: 0;
-				width: 100%;
-			}
 		}
 	}
 </style>

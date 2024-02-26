@@ -28,6 +28,10 @@ export class AddMessageDTO extends TokenDTO {
 
 	@IsNotEmpty()
 	@IsString()
+	requestId: string
+
+	@IsNotEmpty()
+	@IsString()
 	roomId: string
 }
 

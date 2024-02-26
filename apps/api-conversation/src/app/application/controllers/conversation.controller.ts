@@ -39,10 +39,11 @@ export class ConversationController {
 		dto: GetOrCreateConversationDTO,
 	): Promise<MicroserviceResponseFormatter<IConversationFull>> {
 		try {
-			await this.checkUserToken(dto.token)
+			const user = await this.checkUserToken(dto.token)
 
 			const conversation = await this.getOrCreateUseCase.handler(
 				dto.requestId,
+				user._id,
 			)
 
 			return new MicroserviceResponseFormatter<IConversationFull>(
@@ -64,7 +65,8 @@ export class ConversationController {
 		dto: AddMessageDTO,
 	): Promise<MicroserviceResponseFormatter<IConversationMessage>> {
 		try {
-			await this.checkUserToken(dto.token)
+			const user = await this.checkUserToken(dto.token)
+			dto.userId = user._id
 
 			const conversation = await this.addMessageUseCase.handler(dto)
 

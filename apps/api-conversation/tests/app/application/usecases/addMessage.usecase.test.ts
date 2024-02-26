@@ -9,7 +9,7 @@ describe('AddMessageUseCase', () => {
 
 	beforeEach(() => {
 		conversationRepository = {
-			getById: jest.fn(),
+			getByRequestId: jest.fn(),
 			addMessage: jest.fn(),
 		} as unknown as ConversationRepository
 
@@ -22,13 +22,41 @@ describe('AddMessageUseCase', () => {
 			message: 'message',
 			roomId: 'roomId',
 			token: 'token',
-			userId: 'userId',
+			userId: 'id#1',
+			requestId: 'reqId',
+		}
+
+		const request = {
+			_id: 'reqId',
+			book: {
+				title: 'title',
+			},
+			createdAt: '',
+			emitter: {
+				_id: 'id#1',
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@email.test',
+			},
+			owner: {
+				_id: 'id#2',
+				firstName: 'first1',
+				lastName: 'last1',
+				email: 'first1.last1@email.test',
+			},
+		}
+		const conversation = {
+			_id: 'convId',
+			messages: [],
+			request,
+			roomId: 'roomId',
 		}
 
 		it('should throw an error because the conversation does not exist', () => {
-			jest.spyOn(conversationRepository, 'getById').mockReturnValueOnce(
-				Promise.resolve(null),
-			)
+			jest.spyOn(
+				conversationRepository,
+				'getByRequestId',
+			).mockReturnValueOnce(Promise.resolve(null))
 
 			expect(addMessageUseCase.handler(dto)).rejects.toThrow(
 				NotFoundException,
@@ -36,15 +64,10 @@ describe('AddMessageUseCase', () => {
 		})
 
 		it('should add the message to the conversation', async () => {
-			jest.spyOn(conversationRepository, 'getById').mockReturnValueOnce(
-				Promise.resolve({
-					_id: dto._id,
-					messages: [],
-					requestId: 'reqId',
-					roomId: dto.roomId,
-					users: [dto.userId, 'userId1'],
-				}),
-			)
+			jest.spyOn(
+				conversationRepository,
+				'getByRequestId',
+			).mockReturnValueOnce(Promise.resolve(conversation))
 			const message: IConversationMessage = {
 				from: dto.userId,
 				message: dto.message,

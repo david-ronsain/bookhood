@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { ForbiddenException, Inject } from '@nestjs/common'
 import { ConversationRepository } from '../../domain/ports/conversation.repository'
 import ConversationModel from '../../domain/models/conversation.model'
 import { ClientProxy } from '@nestjs/microservices'
@@ -14,7 +14,10 @@ export default class GetOrCreateUseCase {
 		@Inject('RabbitBook') private readonly bookClient: ClientProxy,
 	) {}
 
-	async handler(requestId: string): Promise<IConversationFull> {
+	async handler(
+		requestId: string,
+		userId: string,
+	): Promise<IConversationFull> {
 		let conversation =
 			await this.conversationRepository.getByRequestId(requestId)
 
@@ -32,6 +35,15 @@ export default class GetOrCreateUseCase {
 
 			conversation =
 				await this.conversationRepository.getByRequestId(requestId)
+		} else if (
+			![
+				conversation.request.emitter._id.toString(),
+				conversation.request.owner._id.toString(),
+			].includes(userId)
+		) {
+			throw new ForbiddenException(
+				"You don't have access to this conversation",
+			)
 		}
 
 		return conversation

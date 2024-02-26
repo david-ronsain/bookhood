@@ -1,14 +1,19 @@
 <script setup lang="ts">
 	import BhHeader from '../components/layout/header/BhHeader.vue'
+	import BhLogoutDialog from '../components/layout/header/BhLogoutDialog.vue'
+	import BhNavigationDrawer from '../components/layout/header/BhNavigationDrawer.vue'
 	import { BhSnackbarError, BhSnackbarSuccess } from '@bookhood/ui'
 	import { useMainStore } from '../store'
 	import { onMounted } from 'vue'
 	import { computed } from 'vue'
 	import { useRoute } from 'vue-router'
+	import { ref } from 'vue'
 
 	const mainStore = useMainStore()
 	const route = useRoute()
 
+	const drawer = ref(null)
+	const logoutDialog = ref(null)
 	const profile = computed(() => mainStore.profile)
 
 	onMounted(() => {
@@ -18,7 +23,13 @@
 
 <template>
 	<v-app>
-		<BhHeader />
+		<BhHeader @change-drawer-status="drawer.changeDrawerStatus()" />
+
+		<BhNavigationDrawer
+			ref="drawer"
+			@logout="logoutDialog.open()" />
+
+		<BhLogoutDialog ref="logoutDialog" />
 
 		<v-container
 			fluid
@@ -57,15 +68,15 @@
 	}
 
 	.v-application > div > .v-container {
-		position: relative;
+		position: absolute;
 		top: 50px;
+		bottom: 0px;
+		overflow-y: auto;
+		height: calc(100% - 50px);
+		max-height: calc(100% - 50px);
 
-		&.fullheight {
-			height: calc(100% - 50px);
-
-			.v-row {
-				height: 100%;
-			}
+		&.fullheight .v-row {
+			height: 100%;
 		}
 	}
 </style>

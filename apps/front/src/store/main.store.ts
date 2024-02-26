@@ -10,15 +10,17 @@ export const useMainStore = defineStore('mainStore', () => {
 	const profile = ref<IUser>(null)
 
 	const getProfile = (): void => {
-		axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.user + 'me', {
-				headers: {
-					'x-token': localStorage.getItem('user'),
-				},
-			})
-			.then((response) => {
-				profile.value = response.data
-			})
+		if (localStorage.getItem('user')) {
+			axios
+				.get(EnvConfig.api.base + EnvConfig.api.url.user + 'me', {
+					headers: {
+						'x-token': localStorage.getItem('user'),
+					},
+				})
+				.then((response) => {
+					profile.value = response.data
+				})
+		}
 	}
 
 	return {

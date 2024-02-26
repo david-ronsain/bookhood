@@ -54,27 +54,35 @@ export class ConversationGateway
 		client: Socket,
 		dto: GetOrCreateConversationDTO,
 	) {
-		this.logger.info(`Message received from client id: ${client.id}`)
-		this.logger.info(`Payload: ${dto.token}`)
+		try {
+			this.logger.info(`Message received from client id: ${client.id}`)
+			this.logger.info(`Payload: ${dto.token}`)
 
-		const conversation = await firstValueFrom<
-			MicroserviceResponseFormatter<IConversationFull>
-		>(this.conversationQueue.send('conversation-get-or-create', dto))
+			const conversation = await firstValueFrom<
+				MicroserviceResponseFormatter<IConversationFull>
+			>(this.conversationQueue.send('conversation-get-or-create', dto))
 
-		client.join(conversation.data.roomId)
+			client.join(conversation.data.roomId)
 
-		client.emit('conversation', conversation)
+			client.emit('conversation', conversation)
+		} catch (err) {
+			client.emit('conversation-access-forbidden')
+		}
 	}
 
 	@SubscribeMessage('conversation-add-message')
 	async addMessage(client: Socket, dto: AddMessageDTO) {
-		this.logger.info(`Message received from client id: ${client.id}`)
-		this.logger.info(`Payload: ${dto.message}`)
+		try {
+			this.logger.info(`Message received from client id: ${client.id}`)
+			this.logger.info(`Payload: ${dto.message}`)
 
-		const message = await firstValueFrom<
-			MicroserviceResponseFormatter<IConversationMessage>
-		>(this.conversationQueue.send('conversation-add-message', dto))
+			const message = await firstValueFrom<
+				MicroserviceResponseFormatter<IConversationMessage>
+			>(this.conversationQueue.send('conversation-add-message', dto))
 
-		client.nsp.to(dto.roomId).emit('conversation-message', message)
+			client.nsp.to(dto.roomId).emit('conversation-message', message)
+		} catch (err) {
+			client.emit('conversation-add-message-error')
+		}
 	}
 }

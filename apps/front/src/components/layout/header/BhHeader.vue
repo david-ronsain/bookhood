@@ -1,16 +1,13 @@
 <script setup lang="ts">
 	import { mdiAccountCircle, mdiBook } from '@mdi/js'
-	import { ref } from 'vue'
-	import BhLogoutDialog from './BhLogoutDialog.vue'
-	import BhNavigationDrawer from './BhNavigationDrawer.vue'
 	import { useMainStore } from '../../../store'
 	import { computed } from 'vue'
 
 	const mainStore = useMainStore()
-	const logoutDialog = ref(null)
-	const drawer = ref(null)
 
 	const profile = computed(() => mainStore.profile)
+
+	const events = defineEmits(['changeDrawerStatus'])
 </script>
 
 <template>
@@ -23,7 +20,10 @@
 				v-if="profile"
 				:icon="mdiAccountCircle"
 				:size="30"
-				@click.stop="drawer.changeDrawerStatus()" />
+				@click.stop="events('changeDrawerStatus')" />
+			<span
+				v-if="profile"
+				v-text="$t('common.hello', { firstName: profile.firstName })" />
 		</template>
 
 		<template v-slot:title>
@@ -39,12 +39,6 @@
 
 		<template v-slot:append></template>
 	</v-app-bar>
-
-	<BhLogoutDialog ref="logoutDialog" />
-
-	<BhNavigationDrawer
-		ref="drawer"
-		@logout="logoutDialog.open()" />
 </template>
 
 <style lang="scss">

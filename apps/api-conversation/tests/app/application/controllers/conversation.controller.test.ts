@@ -146,6 +146,15 @@ describe('ConversationController', () => {
 	})
 
 	describe('addMessage', () => {
+		const dto: AddMessageDTO = {
+			token: 'token',
+			_id: 'convId',
+			message: 'Message',
+			roomId: 'roomId',
+			userId: 'userId',
+			requestId: 'reqId',
+		}
+
 		it('should return a conversation after creating if it did not exist', async () => {
 			const mockObservable: Observable<any> = of(
 				new MicroserviceResponseFormatter(
@@ -161,13 +170,6 @@ describe('ConversationController', () => {
 				),
 			)
 			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-			const dto: AddMessageDTO = {
-				token: 'token',
-				_id: 'convId',
-				message: 'Message',
-				roomId: 'roomId',
-				userId: 'userId',
-			}
 			const message: IConversationMessage = {
 				_id: 'id',
 				from: dto.userId,
@@ -198,13 +200,6 @@ describe('ConversationController', () => {
 			)
 			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
-			const dto: AddMessageDTO = {
-				token: 'token',
-				_id: 'convId',
-				message: 'Message',
-				roomId: 'roomId',
-				userId: 'userId',
-			}
 			const result = await controller.addMessage(dto)
 
 			expect(result).toEqual(
