@@ -3,6 +3,8 @@ import ConversationModel from '../models/conversation.model'
 import ConversationMessageModel from '../models/message.model'
 
 export interface ConversationRepository {
+	roomIdExists(roomId: string): Promise<boolean>
+
 	getByRequestId(requestId: string): Promise<IConversationFull | null>
 
 	create(conversation: ConversationModel): Promise<ConversationModel>

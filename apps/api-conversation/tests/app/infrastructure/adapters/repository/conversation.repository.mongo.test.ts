@@ -64,6 +64,7 @@ describe('BookRepositoryMongo', () => {
 						create: jest.fn(),
 						findById: jest.fn(),
 						findOneAndUpdate: jest.fn(),
+						findOne: jest.fn(),
 					},
 				},
 			],
@@ -146,6 +147,26 @@ describe('BookRepositoryMongo', () => {
 			expect(
 				conversationRepository.addMessage(conv._id || '', message),
 			).resolves.toMatchObject(message)
+		})
+	})
+
+	describe('Testing the roomIdExists method', () => {
+		it('should return true', () => {
+			jest.spyOn(conversationModel, 'findOne').mockResolvedValueOnce(true)
+
+			expect(
+				conversationRepository.roomIdExists('aaaaaaaaaaaaaaaaaaaaaaaa'),
+			).resolves.toBe(true)
+		})
+
+		it('should return false', () => {
+			jest.spyOn(conversationModel, 'findOne').mockResolvedValueOnce(
+				false,
+			)
+
+			expect(
+				conversationRepository.roomIdExists('aaaaaaaaaaaaaaaaaaaaaaaa'),
+			).resolves.toBe(false)
 		})
 	})
 })

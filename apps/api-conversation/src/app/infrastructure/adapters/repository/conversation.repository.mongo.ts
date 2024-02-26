@@ -155,4 +155,10 @@ export default class ConversationRepositoryMongo
 			conversation.messages.slice(-1)[0],
 		)
 	}
+
+	async roomIdExists(roomId: string): Promise<boolean> {
+		return this.conversationModel
+			.findOne({ roomId })
+			.then((conv: ConversationEntity) => !!conv)
+	}
 }

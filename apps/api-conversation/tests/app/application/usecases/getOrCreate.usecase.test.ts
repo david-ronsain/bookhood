@@ -15,6 +15,7 @@ describe('AddMessageUseCase', () => {
 		conversationRepository = {
 			getByRequestId: jest.fn(),
 			create: jest.fn(),
+			roomIdExists: jest.fn(),
 		} as unknown as ConversationRepository
 
 		bookClient = {
@@ -70,6 +71,11 @@ describe('AddMessageUseCase', () => {
 				conversationRepository,
 				'getByRequestId',
 			).mockImplementationOnce(() => Promise.resolve(null))
+
+			jest.spyOn(
+				conversationRepository,
+				'roomIdExists',
+			).mockImplementationOnce(() => Promise.resolve(false))
 
 			const req = new MicroserviceResponseFormatter<IRequestInfos>(
 				true,

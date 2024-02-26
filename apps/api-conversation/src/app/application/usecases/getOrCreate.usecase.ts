@@ -25,11 +25,17 @@ export default class GetOrCreateUseCase {
 			const request = await firstValueFrom<
 				MicroserviceResponseFormatter<IRequestInfos>
 			>(this.bookClient.send('request-get', requestId))
+
+			let roomId: string
+			do {
+				roomId = v4()
+			} while (await this.conversationRepository.roomIdExists(roomId))
+
 			const conv = new ConversationModel({
 				requestId,
 				messages: [],
 				users: [request.data.emitter._id, request.data.owner._id],
-				roomId: v4(),
+				roomId: roomId,
 			})
 			await this.conversationRepository.create(conv)
 
