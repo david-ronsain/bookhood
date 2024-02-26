@@ -1,4 +1,4 @@
-import { Model } from 'mongoose'
+import { Model, UpdateWriteOpResult } from 'mongoose'
 import ConversationRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/conversation.repository.mongo'
 import { ConversationEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/conversation.entity'
 import { Test, TestingModule } from '@nestjs/testing'
@@ -8,7 +8,6 @@ import {
 	IConversationFull,
 	IConversationMessage,
 } from '../../../../../../shared/src'
-import { BookEntity } from '../../../../../../api-book/src/app/infrastructure/adapters/repository/entities/book.entity'
 
 describe('BookRepositoryMongo', () => {
 	let conversationRepository: ConversationRepositoryMongo
@@ -51,6 +50,7 @@ describe('BookRepositoryMongo', () => {
 	const message: IConversationMessage = {
 		message: 'message',
 		from: conversation.users[0],
+		seenBy: [],
 	}
 
 	beforeEach(async () => {
@@ -65,6 +65,7 @@ describe('BookRepositoryMongo', () => {
 						findById: jest.fn(),
 						findOneAndUpdate: jest.fn(),
 						findOne: jest.fn(),
+						updateOne: jest.fn(),
 					},
 				},
 			],
@@ -167,6 +168,49 @@ describe('BookRepositoryMongo', () => {
 			expect(
 				conversationRepository.roomIdExists('aaaaaaaaaaaaaaaaaaaaaaaa'),
 			).resolves.toBe(false)
+		})
+	})
+
+	describe('Testing the getMessageById method', () => {
+		it('should return null if the message does not exist', () => {
+			jest.spyOn(conversationModel, 'aggregate').mockResolvedValueOnce([])
+
+			expect(
+				conversationRepository.getMessageById(
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+				),
+			).resolves.toBeNull()
+		})
+
+		it('should return the message', () => {
+			jest.spyOn(conversationModel, 'aggregate').mockResolvedValueOnce([
+				message,
+			])
+
+			expect(
+				conversationRepository.getMessageById(
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+				),
+			).resolves.toMatchObject(message)
+		})
+	})
+
+	describe('Testing the flagAsSeen method', () => {
+		it('should flag the message as seen', () => {
+			const conv = { ...conversation, messages: [message] }
+			jest.spyOn(conversationModel, 'updateOne').mockResolvedValueOnce({
+				modifiedCount: 1,
+			} as UpdateWriteOpResult)
+
+			expect(
+				conversationRepository.flagAsSeen(
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+					'aaaaaaaaaaaaaaaaaaaaaaaa',
+				),
+			).resolves.toBe(true)
 		})
 	})
 })

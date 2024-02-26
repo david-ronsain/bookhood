@@ -1,7 +1,11 @@
 import { ref } from 'vue'
 import { io } from 'socket.io-client'
 import { EnvConfig } from '../../config/env'
-import { type IConversation, type IConversationMessage } from '@bookhood/shared'
+import type {
+	IConversation,
+	IConversationMessage,
+	FlagAsSeenMessageDTO,
+} from '@bookhood/shared'
 
 interface ISocketState {
 	connected: boolean
@@ -30,6 +34,18 @@ socket.on('conversation', (res: { data: IConversation }) => {
 
 socket.on('conversation-message', (res: { data: IConversationMessage }) => {
 	state.value.conversation.messages.push(res.data)
+})
+
+socket.on('conversation-flag-seen', (res: FlagAsSeenMessageDTO) => {
+	const index = state.value.conversation.messages.findIndex(
+		(message: IConversationMessage) => message._id === res.messageId,
+	)
+	if (index) {
+		if (!Array.isArray(state.value.conversation.messages[index].seenBy)) {
+			state.value.conversation.messages[index].seenBy = []
+		}
+		state.value.conversation.messages[index].seenBy.push(res.userId)
+	}
 })
 
 export const emitEvent = (event: string, args: any) => {

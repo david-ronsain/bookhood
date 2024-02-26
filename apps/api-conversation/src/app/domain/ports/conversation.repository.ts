@@ -3,6 +3,17 @@ import ConversationModel from '../models/conversation.model'
 import ConversationMessageModel from '../models/message.model'
 
 export interface ConversationRepository {
+	flagAsSeen(
+		conversationId: string,
+		messageId: string,
+		userId: string,
+	): Promise<boolean>
+
+	getMessageById(
+		conversationId: string,
+		messageId: string,
+	): Promise<ConversationMessageModel | null>
+
 	roomIdExists(roomId: string): Promise<boolean>
 
 	getByRequestId(requestId: string): Promise<IConversationFull | null>

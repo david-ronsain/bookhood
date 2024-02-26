@@ -12,6 +12,11 @@ const ConversationMessageSchema = new Schema(
 			required: true,
 			trim: true,
 		},
+		seenBy: {
+			type: [mongoose.Types.ObjectId],
+			required: true,
+			trim: true,
+		},
 	},
 	{
 		timestamps: true,

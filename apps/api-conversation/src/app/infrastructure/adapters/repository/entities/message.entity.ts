@@ -10,6 +10,8 @@ export interface ConversationMessageEntity
 
 	readonly from: string
 
+	readonly seenBy: string[]
+
 	readonly createdAt: string
 
 	readonly updatedAt: string

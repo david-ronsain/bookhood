@@ -8,6 +8,7 @@ import {
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import {
 	AddMessageDTO,
+	FlagAsSeenMessageDTO,
 	GetOrCreateConversationDTO,
 	IConversation,
 	IConversationFull,
@@ -20,6 +21,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetOrCreateUseCase from '../usecases/getOrCreate.usecase'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import AddMessageUseCase from '../usecases/addMessage.usecase'
+import FlagAsSeenUseCase from '../usecases/flagAsSeen.usecase'
 
 @Controller()
 export class ConversationController {
@@ -27,6 +29,7 @@ export class ConversationController {
 		@Inject('RabbitUser') private readonly userClient: ClientProxy,
 		private readonly getOrCreateUseCase: GetOrCreateUseCase,
 		private readonly addMessageUseCase: AddMessageUseCase,
+		private readonly flagAsSeenUseCase: FlagAsSeenUseCase,
 	) {}
 
 	@MessagePattern('conversation-health')
@@ -78,6 +81,30 @@ export class ConversationController {
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IConversationMessage>().buildFromException(
+				err,
+				dto,
+			)
+		}
+	}
+
+	@MessagePattern('conversation-flag-seen')
+	async flagAsSeen(
+		dto: FlagAsSeenMessageDTO,
+	): Promise<MicroserviceResponseFormatter<boolean>> {
+		try {
+			const user = await this.checkUserToken(dto.token)
+			dto.userId = user._id
+
+			await this.flagAsSeenUseCase.handler(dto)
+
+			return new MicroserviceResponseFormatter<boolean>(
+				true,
+				HttpStatus.OK,
+				undefined,
+				true,
+			)
+		} catch (err) {
+			return new MicroserviceResponseFormatter<boolean>().buildFromException(
 				err,
 				dto,
 			)

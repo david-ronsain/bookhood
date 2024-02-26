@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { IRequestInfos } from './request.interface'
 
 export class TokenDTO {
@@ -53,6 +53,8 @@ export interface IConversationMessage {
 	message: string
 
 	from: string
+
+	seenBy: string[]
 }
 
 export interface IConversationFull {
@@ -63,4 +65,18 @@ export interface IConversationFull {
 	roomId: string
 
 	messages: IConversationMessage[]
+}
+
+export class FlagAsSeenMessageDTO extends TokenDTO {
+	@IsNotEmpty()
+	@IsString()
+	messageId: string
+
+	@IsNotEmpty()
+	@IsString()
+	conversationId: string
+
+	@IsOptional()
+	@IsString()
+	userId: string
 }

@@ -72,6 +72,7 @@ describe('AddMessageUseCase', () => {
 				from: dto.userId,
 				message: dto.message,
 				_id: 'msgId',
+				seenBy: [],
 			}
 			jest.spyOn(
 				conversationRepository,

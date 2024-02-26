@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose'
 import { Injectable } from '@nestjs/common'
-import mongoose, { Model } from 'mongoose'
+import mongoose, { Model, UpdateWriteOpResult } from 'mongoose'
 import { ConversationRepository } from '../../../domain/ports/conversation.repository'
 import { ConversationEntity } from './entities/conversation.entity'
 import ConversationMapper from '../../../application/mappers/conversation.mapper'
@@ -102,6 +102,7 @@ export default class ConversationRepositoryMongo
 						createdAt: true,
 						messages: true,
 						roomId: true,
+						seenBy: true,
 						'request.emitter.firstName': true,
 						'request.emitter.lastName': true,
 						'request.emitter.email': true,
@@ -160,5 +161,59 @@ export default class ConversationRepositoryMongo
 		return this.conversationModel
 			.findOne({ roomId })
 			.then((conv: ConversationEntity) => !!conv)
+	}
+
+	async getMessageById(
+		conversationId: string,
+		messageId: string,
+	): Promise<ConversationMessageModel | null> {
+		return this.conversationModel
+			.aggregate([
+				{
+					$match: {
+						_id: new mongoose.Types.ObjectId(conversationId),
+					},
+				},
+				{
+					$unwind: {
+						path: '$messages',
+					},
+				},
+				{
+					$match: {
+						'messages._id': new mongoose.Types.ObjectId(messageId),
+					},
+				},
+				{
+					$replaceRoot: {
+						newRoot: '$messages',
+					},
+				},
+			])
+			.then((messages: IConversationMessage[]) =>
+				messages.length ? messages[0] : null,
+			)
+	}
+
+	async flagAsSeen(
+		conversationId: string,
+		messageId: string,
+		userId: string,
+	): Promise<boolean> {
+		return this.conversationModel
+			.updateOne(
+				{
+					_id: conversationId,
+					'messages._id': new mongoose.Types.ObjectId(messageId),
+				},
+				{
+					$push: {
+						'messages.$.seenBy': new mongoose.Types.ObjectId(
+							userId,
+						),
+					},
+				},
+			)
+			.then((res: UpdateWriteOpResult) => res.modifiedCount === 1)
 	}
 }

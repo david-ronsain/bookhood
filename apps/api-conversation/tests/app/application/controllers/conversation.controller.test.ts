@@ -9,15 +9,18 @@ import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
 import { Observable, of } from 'rxjs'
 import {
 	AddMessageDTO,
+	FlagAsSeenMessageDTO,
 	GetOrCreateConversationDTO,
 	IConversationFull,
 	IConversationMessage,
 } from '../../../../../shared/src'
+import FlagAsSeenUseCase from '../../../../src/app/application/usecases/flagAsSeen.usecase'
 
 describe('ConversationController', () => {
 	let userClient: ClientProxy
 	let getOrCreateUseCase: GetOrCreateUseCase
 	let addMessageUseCase: AddMessageUseCase
+	let flagAsSeenUseCase: FlagAsSeenUseCase
 	let controller: ConversationController
 
 	beforeEach(async () => {
@@ -37,11 +40,18 @@ describe('ConversationController', () => {
 						handler: jest.fn(),
 					},
 				},
+				{
+					provide: FlagAsSeenUseCase,
+					useValue: {
+						handler: jest.fn(),
+					},
+				},
 			],
 		}).compile()
 		controller = module.get<ConversationController>(ConversationController)
 		userClient = module.get<ClientProxy>('RabbitUser')
 		getOrCreateUseCase = module.get<GetOrCreateUseCase>(GetOrCreateUseCase)
+		flagAsSeenUseCase = module.get<FlagAsSeenUseCase>(FlagAsSeenUseCase)
 		addMessageUseCase = module.get<AddMessageUseCase>(AddMessageUseCase)
 	})
 
@@ -174,6 +184,7 @@ describe('ConversationController', () => {
 				_id: 'id',
 				from: dto.userId,
 				message: dto.message,
+				seenBy: [],
 			}
 
 			jest.spyOn(addMessageUseCase, 'handler').mockImplementationOnce(
@@ -201,6 +212,65 @@ describe('ConversationController', () => {
 			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
 			const result = await controller.addMessage(dto)
+
+			expect(result).toEqual(
+				new MicroserviceResponseFormatter().buildFromException(
+					new ForbiddenException(),
+					dto,
+				),
+			)
+		})
+	})
+
+	describe('flagAsSeen', () => {
+		const dto: FlagAsSeenMessageDTO = {
+			token: 'token',
+			messageId: 'msgId',
+			userId: 'userId',
+			conversationId: 'convId',
+		}
+
+		it('should flag the message as seen', async () => {
+			const mockObservable: Observable<any> = of(
+				new MicroserviceResponseFormatter(
+					true,
+					HttpStatus.OK,
+					{},
+					{
+						_id: 'userId',
+						firstName: 'first',
+						lastName: 'last',
+						email: 'first.last@name.test',
+					},
+				),
+			)
+			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
+			jest.spyOn(flagAsSeenUseCase, 'handler').mockImplementationOnce(
+				() => Promise.resolve(true),
+			)
+			const result = await controller.flagAsSeen(dto)
+
+			expect(result.data).toBe(true)
+		})
+
+		it('should fail if the user token is incorrect', async () => {
+			const mockObservable: Observable<any> = of(
+				new MicroserviceResponseFormatter(
+					false,
+					HttpStatus.FORBIDDEN,
+					{},
+					{
+						_id: 'mockUserId',
+						firstName: 'first',
+						lastName: 'last',
+						email: 'first.last@name.test',
+					},
+				),
+			)
+			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
+			const result = await controller.flagAsSeen(dto)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter().buildFromException(

@@ -11,6 +11,7 @@ describe('MessageMapper', () => {
 				_id: 'msgId',
 				from: 'userId',
 				message: 'message',
+				seenBy: [],
 			}
 			const model = new MessageModel(message)
 

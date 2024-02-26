@@ -16,6 +16,7 @@ import { firstValueFrom } from 'rxjs'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import {
 	AddMessageDTO,
+	FlagAsSeenMessageDTO,
 	GetOrCreateConversationDTO,
 	IConversationFull,
 	IConversationMessage,
@@ -55,9 +56,6 @@ export class ConversationGateway
 		dto: GetOrCreateConversationDTO,
 	) {
 		try {
-			this.logger.info(`Message received from client id: ${client.id}`)
-			this.logger.info(`Payload: ${dto.token}`)
-
 			const conversation = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationFull>
 			>(this.conversationQueue.send('conversation-get-or-create', dto))
@@ -73,9 +71,6 @@ export class ConversationGateway
 	@SubscribeMessage('conversation-add-message')
 	async addMessage(client: Socket, dto: AddMessageDTO) {
 		try {
-			this.logger.info(`Message received from client id: ${client.id}`)
-			this.logger.info(`Payload: ${dto.message}`)
-
 			const message = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationMessage>
 			>(this.conversationQueue.send('conversation-add-message', dto))
@@ -83,6 +78,18 @@ export class ConversationGateway
 			client.nsp.to(dto.roomId).emit('conversation-message', message)
 		} catch (err) {
 			client.emit('conversation-add-message-error')
+		}
+	}
+
+	@SubscribeMessage('conversation-flag-seen')
+	async flagAsSeen(client: Socket, dto: FlagAsSeenMessageDTO) {
+		try {
+			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
+				this.conversationQueue.send('conversation-flag-seen', dto),
+			)
+			client.emit('conversation-flag-seen', dto)
+		} catch (err) {
+			client.emit('conversation-flag-seen-error')
 		}
 	}
 }

@@ -48,6 +48,31 @@
 		}
 	}
 
+	const seen = (message: IConversationMessage): boolean =>
+		message.from !== me.value._id &&
+		Array.isArray(message.seenBy) &&
+		message.seenBy.includes(me.value._id)
+
+	const flagAsSeen = (
+		isIntersecting,
+		entries,
+		observer,
+		message: IConversationMessage,
+	): void => {
+		if (
+			isIntersecting &&
+			entries[0].intersectionRatio === 1 &&
+			message.from !== me.value._id &&
+			!seen(message)
+		) {
+			emitEvent('conversation-flag-seen', {
+				messageId: message._id,
+				conversationId: conversation.value._id,
+				userId: me.value._id,
+			})
+		}
+	}
+
 	onMounted(() => {
 		socket.connect()
 
@@ -118,7 +143,25 @@
 								: 'align-self-start'
 						">
 						<template v-slot:text>
-							{{ message.message }}
+							<div
+								v-text="message.message"
+								v-intersect.once="{
+									handler: (
+										isIntersecting,
+										entries,
+										observer,
+									) =>
+										flagAsSeen(
+											isIntersecting,
+											entries,
+											observer,
+											message,
+										),
+									options: {
+										threshold: [1],
+									},
+								}" />
+							<div v-if="seen(message)">vu</div>
 						</template>
 					</bh-card>
 				</div>

@@ -6,6 +6,7 @@ export default class ConversationMessageModel {
 			this._id = message._id?.toString()
 			this.message = message.message
 			this.from = message.from
+			this.seenBy = message.seenBy
 		}
 	}
 
@@ -14,4 +15,6 @@ export default class ConversationMessageModel {
 	readonly message: string
 
 	readonly from: string
+
+	readonly seenBy: string[]
 }
