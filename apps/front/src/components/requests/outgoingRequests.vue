@@ -10,13 +10,13 @@
 	import BtnValidateStatus from './actions/btnValidateStatus.vue'
 	import BtnRefuseStatus from './actions/btnRefuseStatus.vue'
 	import BtnOtherAction from './actions/btnOtherAction.vue'
-
+	import { useRouter } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
 	import { mdiChat } from '@mdi/js'
-	import { computed } from 'vue'
-	import { watch } from 'vue'
+	import { computed, watch } from 'vue'
 	import { statusColor } from '../../composables/statusColor.composable'
 
+	const router = useRouter()
 	const { t } = useI18n({})
 	const mainStore = useMainStore()
 	const requestStore = useRequestStore()
@@ -99,8 +99,11 @@
 		returnedRequestDialog.value.open(requestId)
 	}
 
-	const chat = (libraryId: string) => {
-		console.log(`chat ${libraryId}`)
+	const chat = (requestId: string) => {
+		router.push({
+			name: 'conversation',
+			params: { id: requestId },
+		})
 	}
 </script>
 
@@ -164,7 +167,6 @@
 									@status:refused="neverReceived(item._id)" />
 
 								<btn-other-action
-									v-if="false"
 									:tooltip="$t('request.tooltips.chat')"
 									:icon="mdiChat"
 									@clicked="chat(item._id)" />

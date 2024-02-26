@@ -20,6 +20,7 @@ import { winstonConfig } from '@bookhood/shared'
 import { AuthController } from './application/controllers/auth.controller'
 import { BookController } from './application/controllers/book.controller'
 import { RequestController } from './application/controllers/request.controller'
+import { ConversationGateway } from './application/sockets/conversation.socket'
 
 @Module({
 	imports: [
@@ -50,6 +51,7 @@ import { RequestController } from './application/controllers/request.controller'
 		RequestController,
 	],
 	providers: [
+		ConversationGateway,
 		ConfigService,
 		{
 			provide: 'RabbitUser',
@@ -90,6 +92,29 @@ import { RequestController } from './application/controllers/request.controller'
 							}`,
 						],
 						queue: envConfig().rabbitmq.queues.book,
+						queueOptions: {
+							durable: true,
+						},
+					},
+				} as RmqOptions)
+			},
+		},
+		{
+			provide: 'RabbitConversation',
+			useFactory: () => {
+				return ClientProxyFactory.create({
+					transport: Transport.RMQ,
+					options: {
+						urls: [
+							`${envConfig().rabbitmq.protocol || ''}://${
+								envConfig().rabbitmq.user || ''
+							}:${envConfig().rabbitmq.password || ''}@${
+								envConfig().rabbitmq.host || ''
+							}:${envConfig().rabbitmq.port || ''}/${
+								envConfig().rabbitmq.vhost || ''
+							}`,
+						],
+						queue: envConfig().rabbitmq.queues.conversation,
 						queueOptions: {
 							durable: true,
 						},

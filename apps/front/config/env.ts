@@ -9,6 +9,11 @@ interface IEnvConfig {
 	api: IApiConfig
 	googleApis: IGoogleApi
 	settings: ISettingsConfig
+	socket: ISocketConfig
+}
+
+interface ISocketConfig {
+	url: string
 }
 
 interface ISettingsConfig {
@@ -83,5 +88,8 @@ export const EnvConfig: IEnvConfig = {
 				import.meta.env.VITE_APP_FRONT_SESSION_DURATION || '',
 			),
 		},
+	},
+	socket: {
+		url: import.meta.env.VITE_APP_SOCKET_URL || '',
 	},
 }

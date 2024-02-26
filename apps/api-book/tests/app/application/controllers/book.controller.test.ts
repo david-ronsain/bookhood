@@ -23,9 +23,7 @@ import GetProfileBooksUseCase from '../../../../src/app/application/usecases/boo
 
 describe('BookController', () => {
 	let controller: BookController
-	let mockedUseCase
 	let userClient: ClientProxy
-	let mailClient: ClientProxy
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
 	let addBookUseCase: AddBookUseCase
 	let searchBookUseCase: SearchBookUseCase
@@ -72,7 +70,6 @@ describe('BookController', () => {
 					},
 				},
 				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
-				{ provide: 'RabbitMail', useValue: { send: jest.fn() } },
 				{
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
@@ -82,7 +79,6 @@ describe('BookController', () => {
 
 		controller = module.get<BookController>(BookController)
 		userClient = module.get<ClientProxy>('RabbitUser')
-		mailClient = module.get<ClientProxy>('RabbitMail')
 		createBookIfNewUseCase = module.get<CreateBookIfNewUseCase>(
 			CreateBookIfNewUseCase,
 		)

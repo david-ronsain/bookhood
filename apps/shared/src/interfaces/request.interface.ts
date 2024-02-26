@@ -57,6 +57,8 @@ export interface IPatchRequestDTO {
 }
 
 interface IRequestInfosUser {
+	_id?: string
+
 	firstName: string
 
 	lastName: string

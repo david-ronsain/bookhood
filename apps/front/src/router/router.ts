@@ -7,6 +7,7 @@ import Logout from '../views/Logout.vue'
 import YourBooks from '../views/YourBooks.vue'
 import Requests from '../views/Requests.vue'
 import Profile from '../views/Profile.vue'
+import Conversation from '../views/Conversation.vue'
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
@@ -153,6 +154,16 @@ const router = createRouter({
 			meta: {
 				requiresAuth: RequiresAuth.AUTHENTICATED,
 				authenticated: isAuthenticated(),
+			},
+		},
+		{
+			path: '/conversations/:id',
+			name: 'conversation',
+			component: Conversation,
+			meta: {
+				requiresAuth: RequiresAuth.AUTHENTICATED,
+				authenticated: isAuthenticated(),
+				fullHeight: true,
 			},
 		},
 	],

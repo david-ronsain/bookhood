@@ -47,11 +47,15 @@ export default (): INestEnvConfig => ({
 			gateway: process.env.RMQ_GATEWAY_QUEUE || '',
 			user: process.env.RMQ_USER_QUEUE || '',
 			book: process.env.RMQ_BOOK_QUEUE || '',
+			conversation: process.env.RMQ_CONVERSATION_QUEUE || '',
 		},
 	},
 	externalApis: {
 		google: {
 			key: process.env.APP_GOOGLE_BOOK_API_KEY || '',
 		},
+	},
+	socket: {
+		port: parseInt(process.env.APP_WEBSOCKET_PORT || ''),
 	},
 })

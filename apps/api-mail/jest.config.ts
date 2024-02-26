@@ -11,7 +11,7 @@ export default {
 	},
 	moduleFileExtensions: ['ts', 'js', 'html'],
 	resolver: '@nx/jest/plugins/resolver',
-	coverageDirectory: '../../coverage/apps/api-gateway',
+	coverageDirectory: '../../coverage/apps/api-mail',
 	coverageReporters: ['text'],
 	coverageThreshold: {
 		global: {

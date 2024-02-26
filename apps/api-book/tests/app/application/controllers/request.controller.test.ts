@@ -18,6 +18,7 @@ import {
 import {
 	ILibraryFull,
 	IRequest,
+	IRequestInfos,
 	IRequestList,
 	IRequestSimple,
 	RequestStatus,
@@ -26,6 +27,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { ClientProxy } from '@nestjs/microservices'
 import { Observable, of } from 'rxjs'
 import { PatchRequestMQDTO } from '../../../../../shared-api/src'
+import GetByIdUseCase from '../../../../src/app/application/usecases/request/getById.usecase'
 
 describe('RequestController', () => {
 	let controller: RequestController
@@ -33,6 +35,7 @@ describe('RequestController', () => {
 	let getUserBookUseCase: GetUserBookUseCase
 	let getListByStatusUseCase: GetListByStatusUseCase
 	let patchRequestUseCase: PatchRequestUseCase
+	let getByIdUseCase: GetByIdUseCase
 	let userClient: ClientProxy
 	let mailClient: ClientProxy
 
@@ -75,6 +78,12 @@ describe('RequestController', () => {
 						handler: jest.fn(),
 					},
 				},
+				{
+					provide: GetByIdUseCase,
+					useValue: {
+						handler: jest.fn(),
+					},
+				},
 			],
 		}).compile()
 
@@ -87,6 +96,7 @@ describe('RequestController', () => {
 		)
 		patchRequestUseCase =
 			module.get<PatchRequestUseCase>(PatchRequestUseCase)
+		getByIdUseCase = module.get<GetByIdUseCase>(GetByIdUseCase)
 		userClient = module.get<ClientProxy>('RabbitUser')
 		mailClient = module.get<ClientProxy>('RabbitMail')
 	})
@@ -526,6 +536,62 @@ describe('RequestController', () => {
 				new MicroserviceResponseFormatter<IRequest>().buildFromException(
 					new ForbiddenException(),
 					patchRequestDTO,
+				),
+			)
+		})
+	})
+
+	describe('getById', () => {
+		it('should return the request', async () => {
+			const request: IRequestInfos = {
+				_id: 'request_id',
+				book: {
+					title: 'title',
+				},
+				createdAt: '',
+				emitter: {
+					firstName: 'first',
+					lastName: 'last',
+					email: 'first.last@name.test',
+				},
+				owner: {
+					firstName: 'first1',
+					lastName: 'last1',
+					email: 'first1.last1@name.test',
+				},
+			}
+			const dto = {
+				requestId: 'id',
+			}
+			const expectedResult =
+				new MicroserviceResponseFormatter<IRequestInfos>(
+					true,
+					HttpStatus.OK,
+					dto,
+					request,
+				)
+
+			jest.spyOn(getByIdUseCase, 'handler').mockResolvedValue(request)
+
+			const result = await controller.getById(dto.requestId)
+
+			expect(result).toMatchObject(expectedResult)
+		})
+
+		it('should return error', async () => {
+			const error = new NotFoundException()
+			const dto = {
+				requestId: 'id',
+			}
+
+			jest.spyOn(getByIdUseCase, 'handler').mockRejectedValueOnce(error)
+
+			const result = await controller.getById(dto.requestId)
+
+			expect(result).toMatchObject(
+				new MicroserviceResponseFormatter().buildFromException(
+					new NotFoundException(),
+					expect.anything(),
 				),
 			)
 		})

@@ -91,6 +91,18 @@ services:
     #         main:
     #             ipv4_address: 192.168.1.106
 
+    # api-conversation:
+    #     build:
+    #         context: .
+    #         dockerfile: /apps/api-conversation/Dockerfile
+    #         target: dev
+    #     restart: unless-stopped
+    #     expose:
+    #         - ${RMQ_PORT}
+    #     networks:
+    #         main:
+    #             ipv4_address: 192.168.1.107
+
     # healthcheck:
     #     build:
     #         context: .

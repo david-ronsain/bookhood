@@ -11,6 +11,7 @@ import {
 	IRequest,
 	BookRequestMailDTO,
 	IRequestList,
+	IRequestInfos,
 } from '@bookhood/shared'
 import {
 	MicroserviceResponseFormatter,
@@ -24,6 +25,7 @@ import GetUserBookUseCase from '../usecases/book/getUserBook.usecase'
 import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import GetListByStatusUseCase from '../usecases/request/getListByStatus.usecase'
 import PatchRequestUseCase from '../usecases/request/patchRequest.usecase'
+import GetByIdUseCase from '../usecases/request/getById.usecase'
 
 @Controller()
 export class RequestController {
@@ -35,6 +37,7 @@ export class RequestController {
 		private readonly createRequestUseCase: CreateRequestUseCase,
 		private readonly getListByStatusUseCase: GetListByStatusUseCase,
 		private readonly patchRequestUseCase: PatchRequestUseCase,
+		private readonly getByIdUseCase: GetByIdUseCase,
 	) {}
 
 	@MessagePattern('request-create')
@@ -131,6 +134,27 @@ export class RequestController {
 			return new MicroserviceResponseFormatter<IRequest>().buildFromException(
 				err,
 				body,
+			)
+		}
+	}
+
+	@MessagePattern('request-get')
+	async getById(
+		requestId: string,
+	): Promise<MicroserviceResponseFormatter<IRequestInfos>> {
+		try {
+			const request = await this.getByIdUseCase.handler(requestId)
+
+			return new MicroserviceResponseFormatter<IRequestInfos>(
+				true,
+				HttpStatus.OK,
+				{ requestId },
+				request,
+			)
+		} catch (err) {
+			return new MicroserviceResponseFormatter<IRequestInfos>().buildFromException(
+				err,
+				{ requestId },
 			)
 		}
 	}

@@ -1,0 +1,54 @@
+{
+	"name": "api-conversation",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "apps/api-conversation/src",
+	"projectType": "application",
+	"targets": {
+		"build": {
+			"executor": "@nx/webpack:webpack",
+			"outputs": ["{options.outputPath}"],
+			"defaultConfiguration": "production",
+			"options": {
+				"target": "node",
+				"compiler": "tsc",
+				"outputPath": "dist/apps/api-conversation",
+				"main": "apps/api-conversation/src/main.ts",
+				"tsConfig": "apps/api-conversation/tsconfig.app.json",
+				"webpackConfig": "apps/api-conversation/webpack.config.js",
+				"assets": []
+			},
+			"configurations": {
+				"development": {},
+				"production": {}
+			}
+		},
+		"serve": {
+			"executor": "@nx/js:node",
+			"defaultConfiguration": "development",
+			"options": {
+				"buildTarget": "api-conversation:build"
+			},
+			"configurations": {
+				"development": {
+					"buildTarget": "api-conversation:build:development"
+				},
+				"production": {
+					"buildTarget": "api-conversation:build:production"
+				}
+			}
+		},
+		"lint": {
+			"executor": "@nx/eslint:lint",
+			"outputs": ["{options.outputFile}"]
+		},
+		"test": {
+			"executor": "@nx/jest:jest",
+			"outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+			"options": {
+				"jestConfig": "apps/api-conversation/jest.config.ts",
+				"codeCoverage": true
+			}
+		}
+	},
+	"tags": []
+}

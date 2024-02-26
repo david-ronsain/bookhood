@@ -4,8 +4,10 @@
 	import { useMainStore } from '../store'
 	import { onMounted } from 'vue'
 	import { computed } from 'vue'
+	import { useRoute } from 'vue-router'
 
 	const mainStore = useMainStore()
+	const route = useRoute()
 
 	const profile = computed(() => mainStore.profile)
 
@@ -18,7 +20,9 @@
 	<v-app>
 		<BhHeader />
 
-		<v-container fluid>
+		<v-container
+			fluid
+			:class="route.meta.fullHeight ? 'fullheight' : ''">
 			<v-row>
 				<v-col
 					:class="profile ? 'd-md-block ' : ''"
@@ -55,5 +59,13 @@
 	.v-application > div > .v-container {
 		position: relative;
 		top: 50px;
+
+		&.fullheight {
+			height: calc(100% - 50px);
+
+			.v-row {
+				height: 100%;
+			}
+		}
 	}
 </style>
