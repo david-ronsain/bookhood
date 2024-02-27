@@ -31,7 +31,6 @@ export class BookController {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
 		@Inject('RabbitUser') private readonly userClient: ClientProxy,
-		@Inject('RabbitMail') private readonly mailClient: ClientProxy,
 		private readonly createBookIfNewUseCase: CreateBookIfNewUseCase,
 		private readonly addBookUseCase: AddBookUseCase,
 		private readonly getUserBooksUseCase: GetUserBooksUseCase,

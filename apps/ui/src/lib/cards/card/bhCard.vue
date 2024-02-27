@@ -36,7 +36,7 @@
 		</v-card-text>
 		<div
 			v-else-if="$slots.text"
-			class="v-card-text flex-grow-1 px-3 py-2">
+			class="v-card-text flex-grow-1 px-3 py-1">
 			<slot name="text"></slot>
 		</div>
 		<slot name="default"></slot>

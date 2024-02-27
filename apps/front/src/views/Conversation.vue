@@ -9,7 +9,7 @@
 		IConversationMessage,
 	} from '@bookhood/shared'
 	import { BhCard, BhTextField } from '@bookhood/ui'
-	import { mdiLoading, mdiSendOutline } from '@mdi/js'
+	import { mdiCheck, mdiCheckBold, mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { ref } from 'vue'
 	const route = useRoute()
 	const mainStore = useMainStore()
@@ -49,9 +49,9 @@
 	}
 
 	const seen = (message: IConversationMessage): boolean =>
-		message.from !== me.value._id &&
+		message.from === me.value._id &&
 		Array.isArray(message.seenBy) &&
-		message.seenBy.includes(me.value._id)
+		message.seenBy.length
 
 	const flagAsSeen = (
 		isIntersecting,
@@ -63,7 +63,7 @@
 			isIntersecting &&
 			entries[0].intersectionRatio === 1 &&
 			message.from !== me.value._id &&
-			!seen(message)
+			!message.seenBy?.includes(me.value._id)
 		) {
 			emitEvent('conversation-flag-seen', {
 				messageId: message._id,
@@ -161,7 +161,12 @@
 										threshold: [1],
 									},
 								}" />
-							<div v-if="seen(message)">vu</div>
+							<v-icon
+								v-if="seen(message)"
+								size="12"
+								color="green">
+								{{ mdiCheckBold }}
+							</v-icon>
 						</template>
 					</bh-card>
 				</div>
@@ -228,6 +233,12 @@
 		> .v-card-text {
 			z-index: 999;
 			overflow-y: auto;
+
+			.v-icon {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+			}
 		}
 
 		> .v-card-actions {

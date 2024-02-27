@@ -199,7 +199,6 @@ describe('BookRepositoryMongo', () => {
 
 	describe('Testing the flagAsSeen method', () => {
 		it('should flag the message as seen', () => {
-			const conv = { ...conversation, messages: [message] }
 			jest.spyOn(conversationModel, 'updateOne').mockResolvedValueOnce({
 				modifiedCount: 1,
 			} as UpdateWriteOpResult)

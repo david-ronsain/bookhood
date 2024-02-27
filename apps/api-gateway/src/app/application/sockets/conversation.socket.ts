@@ -87,7 +87,7 @@ export class ConversationGateway
 			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
 				this.conversationQueue.send('conversation-flag-seen', dto),
 			)
-			client.emit('conversation-flag-seen', dto)
+			client.broadcast.emit('conversation-flag-seen', dto)
 		} catch (err) {
 			client.emit('conversation-flag-seen-error')
 		}
