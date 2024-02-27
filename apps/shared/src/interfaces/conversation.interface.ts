@@ -80,3 +80,17 @@ export class FlagAsSeenMessageDTO extends TokenDTO {
 	@IsString()
 	userId: string
 }
+
+export class WritingDTO {
+	@IsNotEmpty()
+	@IsString()
+	roomId: string
+
+	@IsNotEmpty()
+	@IsString()
+	userId: string
+
+	@IsOptional()
+	@IsString()
+	firstName?: string
+}

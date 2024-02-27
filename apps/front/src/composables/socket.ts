@@ -5,17 +5,21 @@ import type {
 	IConversation,
 	IConversationMessage,
 	FlagAsSeenMessageDTO,
+	WritingDTO,
 } from '@bookhood/shared'
 
 interface ISocketState {
 	connected: boolean
 
 	conversation: IConversation
+
+	writing: WritingDTO[]
 }
 
 export const state = ref<ISocketState>({
 	connected: false,
 	conversation: null,
+	writing: [],
 })
 
 export const socket = io(EnvConfig.socket.url)
@@ -30,6 +34,22 @@ socket.on('disconnect', () => {
 
 socket.on('conversation', (res: { data: IConversation }) => {
 	state.value.conversation = res.data
+})
+
+socket.on('conversation-writing', (res: WritingDTO) => {
+	if (
+		!state.value.writing
+			.map((user: WritingDTO) => user.userId)
+			.includes(res.userId)
+	) {
+		state.value.writing.push(res)
+	}
+})
+
+socket.on('conversation-not-writing', (res: WritingDTO) => {
+	state.value.writing = state.value.writing.filter(
+		(user: WritingDTO) => user.userId !== res.userId,
+	)
 })
 
 socket.on('conversation-message', (res: { data: IConversationMessage }) => {

@@ -7,6 +7,7 @@
 		IConversationFull,
 		IUser,
 		IConversationMessage,
+		WritingDTO,
 	} from '@bookhood/shared'
 	import { BhCard, BhTextField } from '@bookhood/ui'
 	import { mdiCheck, mdiCheckBold, mdiLoading, mdiSendOutline } from '@mdi/js'
@@ -20,6 +21,7 @@
 	const conversation = computed<IConversationFull>(
 		() => state.value.conversation,
 	)
+	const writing = computed<WritingDTO>(() => state.value.writing)
 	const me = computed(() => mainStore.profile)
 	const other = computed<IUser>(() =>
 		me.value && conversation
@@ -104,7 +106,21 @@
 			emitEvent('conversation-connect', { requestId: route.params.id })
 		}
 	})
-	watch(currentMessage, () => {})
+
+	watch(currentMessage, () => {
+		if (currentMessage.value.length) {
+			emitEvent('conversation-writing', {
+				firstName: me.value.firstName,
+				roomId: conversation.value.roomId,
+				userId: me.value._id,
+			})
+		} else {
+			emitEvent('conversation-not-writing', {
+				roomId: conversation.value.roomId,
+				userId: me.value._id,
+			})
+		}
+	})
 </script>
 
 <template>
@@ -173,6 +189,20 @@
 			</template>
 
 			<template v-slot:actions>
+				<div
+					class="is-writing"
+					v-if="writing.length"
+					v-text="
+						$t(
+							'conversation.isWriting',
+							{
+								names: writing
+									.map((user: WritingDTO) => user.firstName)
+									.join(', '),
+							},
+							writing.length,
+						)
+					" />
 				<bh-text-field
 					autofocus
 					clear
@@ -208,6 +238,11 @@
 		#conversation {
 			min-width: 700px;
 		}
+	}
+
+	.is-writing {
+		font-size: 12px;
+		font-style: italic;
 	}
 </style>
 

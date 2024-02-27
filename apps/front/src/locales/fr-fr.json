@@ -199,6 +199,7 @@
 	"conversation": {
 		"title": "Conversation avec {firstName} {lastName} à propos de {book}",
 		"writemessage": "Ecrivez votre message",
+		"isWriting": "{names} est en train d'écrire | {names} sont en train d'écrire",
 		"error": {
 			"accessForbidden": "Vous n'avez pas accès à cette conversation",
 			"messageCanNotBeCreated": "Le message n'a pas pu être envoyé"

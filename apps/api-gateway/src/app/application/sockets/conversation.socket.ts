@@ -20,6 +20,7 @@ import {
 	GetOrCreateConversationDTO,
 	IConversationFull,
 	IConversationMessage,
+	WritingDTO,
 } from '@bookhood/shared'
 import envConfig from '../../../config/env.config'
 
@@ -47,6 +48,9 @@ export class ConversationGateway
 	}
 
 	handleDisconnect(client: Socket) {
+		client.broadcast.emit('conversation-not-writing', {
+			userId: client.data.userId,
+		})
 		this.logger.info(`Cliend id:${client.id} disconnected`)
 	}
 
@@ -60,6 +64,7 @@ export class ConversationGateway
 				MicroserviceResponseFormatter<IConversationFull>
 			>(this.conversationQueue.send('conversation-get-or-create', dto))
 
+			client.data.roomId = conversation.data.roomId
 			client.join(conversation.data.roomId)
 
 			client.emit('conversation', conversation)
@@ -91,5 +96,17 @@ export class ConversationGateway
 		} catch (err) {
 			client.emit('conversation-flag-seen-error')
 		}
+	}
+
+	@SubscribeMessage('conversation-writing')
+	async isWriting(client: Socket, dto: WritingDTO) {
+		client.data.userId = dto.userId
+		client.broadcast.emit('conversation-writing', dto)
+	}
+
+	@SubscribeMessage('conversation-not-writing')
+	async isNotWriting(client: Socket, dto: WritingDTO) {
+		client.data.userId = undefined
+		client.broadcast.emit('conversation-not-writing', dto)
 	}
 }
