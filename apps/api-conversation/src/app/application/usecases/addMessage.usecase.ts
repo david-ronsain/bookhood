@@ -11,6 +11,7 @@ export default class AddMessageUseCase {
 
 	async handler(dto: AddMessageDTO): Promise<IConversationMessage> {
 		const conversation = await this.conversationRepository.getByRequestId(
+			dto._id,
 			dto.requestId,
 		)
 		if (!conversation) {

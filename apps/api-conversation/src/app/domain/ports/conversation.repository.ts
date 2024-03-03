@@ -16,7 +16,10 @@ export interface ConversationRepository {
 
 	roomIdExists(roomId: string): Promise<boolean>
 
-	getByRequestId(requestId: string): Promise<IConversationFull | null>
+	getByRequestId(
+		conversationId?: string,
+		requestId?: string,
+	): Promise<IConversationFull | null>
 
 	create(conversation: ConversationModel): Promise<ConversationModel>
 

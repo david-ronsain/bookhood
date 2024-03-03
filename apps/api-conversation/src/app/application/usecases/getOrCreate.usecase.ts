@@ -18,8 +18,10 @@ export default class GetOrCreateUseCase {
 		requestId: string,
 		userId: string,
 	): Promise<IConversationFull> {
-		let conversation =
-			await this.conversationRepository.getByRequestId(requestId)
+		let conversation = await this.conversationRepository.getByRequestId(
+			undefined,
+			requestId,
+		)
 
 		if (!conversation) {
 			const request = await firstValueFrom<
@@ -39,8 +41,10 @@ export default class GetOrCreateUseCase {
 			})
 			await this.conversationRepository.create(conv)
 
-			conversation =
-				await this.conversationRepository.getByRequestId(requestId)
+			conversation = await this.conversationRepository.getByRequestId(
+				undefined,
+				requestId,
+			)
 		} else if (
 			![
 				conversation.request.emitter._id.toString(),

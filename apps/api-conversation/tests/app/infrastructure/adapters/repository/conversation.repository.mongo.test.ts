@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Model, UpdateWriteOpResult } from 'mongoose'
 import ConversationRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/conversation.repository.mongo'
 import { ConversationEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/conversation.entity'
@@ -18,7 +19,7 @@ describe('BookRepositoryMongo', () => {
 		messages: [],
 		roomId: 'roomId',
 		request: {
-			_id: 'reqId',
+			_id: 'bbbbbbbbbbbbbbbbbbbbbbbb',
 			book: {
 				title: 'title',
 			},
@@ -91,13 +92,23 @@ describe('BookRepositoryMongo', () => {
 			).resolves.toBeNull()
 		})
 
-		it('should return the conversation', () => {
+		it('should return the conversation by its id', () => {
+			jest.spyOn(conversationModel, 'aggregate').mockImplementationOnce(
+				jest.fn().mockResolvedValue([conversationFull]),
+			)
+			expect(
+				conversationRepository.getByRequestId(conversationFull._id),
+			).resolves.toMatchObject(conversationFull)
+		})
+
+		it('should return the conversation by its request id', () => {
 			jest.spyOn(conversationModel, 'aggregate').mockImplementationOnce(
 				jest.fn().mockResolvedValue([conversationFull]),
 			)
 			expect(
 				conversationRepository.getByRequestId(
-					'aaaaaaaaaaaaaaaaaaaaaaaa',
+					undefined,
+					conversationFull.request._id,
 				),
 			).resolves.toMatchObject(conversationFull)
 		})

@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { ClientProxy } from '@nestjs/microservices'
 import GetOrCreateUseCase from '../../../../src/app/application/usecases/getOrCreate.usecase'
 import { ConversationRepository } from '../../../../src/app/domain/ports/conversation.repository'

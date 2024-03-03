@@ -18,13 +18,23 @@ export default class ConversationRepositoryMongo
 		private readonly conversationModel: Model<ConversationEntity>,
 	) {}
 
-	async getByRequestId(requestId: string): Promise<IConversationFull | null> {
+	async getByRequestId(
+		conversationId?: string,
+		requestId?: string,
+	): Promise<IConversationFull | null> {
+		const params = {}
+
+		if (conversationId) {
+			params['_id'] = new mongoose.Types.ObjectId(conversationId)
+		}
+		if (requestId) {
+			params['requestId'] = new mongoose.Types.ObjectId(requestId)
+		}
+
 		return this.conversationModel
 			.aggregate([
 				{
-					$match: {
-						requestId: new mongoose.Types.ObjectId(requestId),
-					},
+					$match: params,
 				},
 				{
 					$lookup: {
