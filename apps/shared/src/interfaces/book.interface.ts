@@ -1,4 +1,4 @@
-import { LibraryStatus } from '../enums'
+import { LibraryStatus, RequestStatus } from '../enums'
 
 export interface IAddBookDTO {
 	title: string
@@ -136,4 +136,8 @@ export interface IBooksListResult {
 	place: string
 
 	status: LibraryStatus
+
+	categories: string[]
+
+	currentStatus?: RequestStatus
 }

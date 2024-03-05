@@ -21,6 +21,7 @@ import { AuthController } from './application/controllers/auth.controller'
 import { BookController } from './application/controllers/book.controller'
 import { RequestController } from './application/controllers/request.controller'
 import { ConversationGateway } from './application/sockets/conversation.socket'
+import { LibraryController } from './application/controllers/library.controller'
 
 @Module({
 	imports: [
@@ -49,6 +50,7 @@ import { ConversationGateway } from './application/sockets/conversation.socket'
 		AuthController,
 		BookController,
 		RequestController,
+		LibraryController,
 	],
 	providers: [
 		ConversationGateway,

@@ -48,6 +48,7 @@ export default (): INestEnvConfig => ({
 			user: process.env.RMQ_USER_QUEUE || '',
 			book: process.env.RMQ_BOOK_QUEUE || '',
 			conversation: process.env.RMQ_CONVERSATION_QUEUE || '',
+			library: process.env.RMQ_LIBRARY_QUEUE || '',
 		},
 	},
 	externalApis: {

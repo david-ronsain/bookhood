@@ -10,7 +10,6 @@ import {
 	Inject,
 	Param,
 	Post,
-	Query,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -22,8 +21,8 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { CreateUserDTO } from '../dto/user.dto'
-import { IBooksList, IExternalProfile, IUser, Role } from '@bookhood/shared'
+import { CreateUserDTO, CreatedUser, ExternalProfile } from '../dto/user.dto'
+import { IExternalProfile, IUser, Role } from '@bookhood/shared'
 import { Roles } from '../guards/role.guard'
 import { UserEmailExistException, UserNotFoundException } from '../exceptions'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
@@ -40,7 +39,7 @@ export class UserController {
 	@Roles([Role.GUEST])
 	@ApiOperation({ description: 'Creates a new user' })
 	@ApiBody({ type: CreateUserDTO })
-	@ApiOkResponse({ type: CreateUserDTO, status: HttpStatus.CREATED })
+	@ApiOkResponse({ type: CreatedUser, status: HttpStatus.CREATED })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	@ApiResponse({ type: ForbiddenException, status: HttpStatus.FORBIDDEN })
 	@ApiResponse({ type: UserEmailExistException, status: HttpStatus.CONFLICT })
@@ -80,7 +79,11 @@ export class UserController {
 
 	@Get(':userId')
 	@HttpCode(HttpStatus.OK)
-	@ApiExcludeEndpoint()
+	@Roles([Role.USER, Role.ADMIN])
+	@ApiOperation({ description: "Returns an user's profile" })
+	@ApiOkResponse({ type: ExternalProfile, status: HttpStatus.OK })
+	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
+	@ApiResponse({ type: UserNotFoundException, status: HttpStatus.NOT_FOUND })
 	async getProfile(
 		@Headers('x-token') token: string,
 		@Param('userId') userId: string,
@@ -88,24 +91,6 @@ export class UserController {
 		const profile = await firstValueFrom<
 			MicroserviceResponseFormatter<IExternalProfile>
 		>(this.userQueue.send('user-get-profile', { token, userId }))
-
-		if (!profile.success) {
-			throw new UserNotFoundException(profile.message)
-		}
-		return profile.data
-	}
-
-	@Get(':userId/books')
-	@HttpCode(HttpStatus.OK)
-	@ApiExcludeEndpoint()
-	async getProfileBooks(
-		@Headers('x-token') token: string,
-		@Param('userId') userId: string,
-		@Query('page') page: number,
-	): Promise<IBooksList> {
-		const profile = await firstValueFrom<
-			MicroserviceResponseFormatter<IBooksList>
-		>(this.bookQueue.send('profile-books', { token, userId, page }))
 
 		if (!profile.success) {
 			throw new UserNotFoundException(profile.message)

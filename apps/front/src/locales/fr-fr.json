@@ -77,6 +77,26 @@
 					},
 					"close": "Annuler",
 					"add": "Ajouter"
+				},
+				"list": {
+					"book": "Livre",
+					"authors": "Auteur",
+					"category": "Categorie",
+					"status": "Statut",
+					"place": "Lieu",
+					"actions": "",
+					"title": "Vos livres",
+					"loading": "Chargement des livres",
+					"noData": "Vous n'avez pas encore ajouté de livre",
+					"currentStatus": "Statut actuel",
+					"statusNames": {
+						"lend":"A prêter",
+						"give":"A donner"
+					},
+					"patch": {
+						"success": "Le statut a été mis à jour",
+						"error": "Le statut n'a pas pu être enregistré"
+					}
 				}
 			}
 		}

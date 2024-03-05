@@ -12,7 +12,6 @@ import {
 	IUser,
 	IBookSearch,
 	ILibraryFull,
-	IBooksList,
 } from '@bookhood/shared'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
@@ -23,8 +22,6 @@ import CreateBookIfNewUseCase from '../usecases/book/createBookIfNew.usecase'
 import { firstValueFrom } from 'rxjs'
 import SearchBookUseCase from '../usecases/book/searchBook.usecase'
 import GetUserBooksUseCase from '../usecases/book/getUserBooks.usecase'
-import { GetUserBooksDTO } from '../dto/user.dto'
-import GetProfileBooksUseCase from '../usecases/book/getProfileBooks.usecase'
 
 @Controller()
 export class BookController {
@@ -35,7 +32,6 @@ export class BookController {
 		private readonly addBookUseCase: AddBookUseCase,
 		private readonly getUserBooksUseCase: GetUserBooksUseCase,
 		private readonly searchBookUseCase: SearchBookUseCase,
-		private readonly getProfileBooksUseCase: GetProfileBooksUseCase,
 	) {}
 
 	@MessagePattern('book-health')
@@ -154,31 +150,5 @@ export class BookController {
 		}
 
 		return userData.data
-	}
-
-	@MessagePattern('profile-books')
-	async getProfileBooks(
-		body: GetUserBooksDTO,
-	): Promise<MicroserviceResponseFormatter<IBooksList>> {
-		try {
-			await this.checkUserToken(body.token)
-
-			const books: IBooksList = await this.getProfileBooksUseCase.handler(
-				body.userId,
-				body.page,
-			)
-
-			return new MicroserviceResponseFormatter<IBooksList>(
-				true,
-				HttpStatus.OK,
-				undefined,
-				books,
-			)
-		} catch (err) {
-			return new MicroserviceResponseFormatter<IBooksList>().buildFromException(
-				err,
-				body,
-			)
-		}
 	}
 }

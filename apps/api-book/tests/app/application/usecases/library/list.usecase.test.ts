@@ -1,17 +1,17 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import GetProfileBooksUseCase from '../../../../../src/app/application/usecases/book/getProfileBooks.usecase'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
 import { IBooksList, LibraryStatus } from '../../../../../../shared/src'
+import ListUseCase from '../../../../../src/app/application/usecases/library/list.usecase'
 
-describe('GetProfileBooksUseCase', () => {
-	let getProfileBooksUseCase: GetProfileBooksUseCase
+describe('ListUseCase', () => {
+	let listUseCase: ListUseCase
 	let libraryRepository: LibraryRepository
 
 	beforeEach(() => {
 		libraryRepository = {
-			getProfileBooks: jest.fn(),
+			list: jest.fn(),
 		} as unknown as LibraryRepository
-		getProfileBooksUseCase = new GetProfileBooksUseCase(libraryRepository)
+		listUseCase = new ListUseCase(libraryRepository)
 	})
 
 	describe('handler', () => {
@@ -26,22 +26,17 @@ describe('GetProfileBooksUseCase', () => {
 						place: 'place',
 						status: LibraryStatus.TO_LEND,
 						title: 'title',
+						categories: ['category'],
 					},
 				],
 			}
 
-			jest.spyOn(
-				libraryRepository,
-				'getProfileBooks',
-			).mockResolvedValueOnce(list)
+			jest.spyOn(libraryRepository, 'list').mockResolvedValueOnce(list)
 
-			const result = await getProfileBooksUseCase.handler('123', 0)
+			const result = await listUseCase.handler('123', 0)
 
 			expect(result).toMatchObject(list)
-			expect(libraryRepository.getProfileBooks).toHaveBeenCalledWith(
-				'123',
-				0,
-			)
+			expect(libraryRepository.list).toHaveBeenCalledWith('123', 0)
 		})
 	})
 })

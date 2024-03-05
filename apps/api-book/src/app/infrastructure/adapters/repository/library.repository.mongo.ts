@@ -5,7 +5,13 @@ import { LibraryRepository } from '../../../domain/ports/library.repository'
 import { LibraryEntity } from './entities/library.entity'
 import LibraryModel from '../../../domain/models/library.model'
 import LibraryMapper from '../../../application/mappers/library.mapper'
-import { IBooksList, ILibraryFull } from '@bookhood/shared'
+import {
+	IBooksList,
+	ILibrary,
+	ILibraryFull,
+	LibraryStatus,
+	RequestStatus,
+} from '@bookhood/shared'
 
 @Injectable()
 export default class LibraryRepositoryMongo implements LibraryRepository {
@@ -71,7 +77,7 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 		])
 	}
 
-	async getProfileBooks(userId: string, page: number): Promise<IBooksList> {
+	async list(userId: string, page: number): Promise<IBooksList> {
 		return await this.libraryModel
 			.aggregate([
 				{
@@ -94,6 +100,40 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 					},
 				},
 				{
+					$lookup: {
+						from: 'requests',
+						localField: '_id',
+						foreignField: 'libraryId',
+						as: 'request',
+						pipeline: [
+							{
+								$match: {
+									status: {
+										$nin: [
+											RequestStatus.PENDING_VALIDATION,
+											RequestStatus.RETURN_ACCEPTED,
+										],
+									},
+								},
+							},
+							{
+								$sort: {
+									_id: -1,
+								},
+							},
+							{
+								$limit: 1,
+							},
+						],
+					},
+				},
+				{
+					$unwind: {
+						path: '$request',
+						preserveNullAndEmptyArrays: true,
+					},
+				},
+				{
 					$project: {
 						bookId: false,
 						__v: false,
@@ -109,11 +149,13 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 				{
 					$project: {
 						status: true,
-						_id: '$book._id',
+						_id: true,
 						title: '$book.title',
 						place: true,
 						authors: '$book.authors',
 						description: '$book.description',
+						categories: '$book.categories',
+						currentStatus: '$request.status',
 					},
 				},
 				{
@@ -194,5 +236,17 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 				},
 			])
 			.then((libs: ILibraryFull[]) => (libs.length ? libs[0] : null))
+	}
+
+	async update(libraryId: string, status: LibraryStatus): Promise<ILibrary> {
+		return this.libraryModel.findOneAndUpdate(
+			{ _id: libraryId },
+			{
+				status,
+			},
+			{
+				new: true,
+			},
+		)
 	}
 }

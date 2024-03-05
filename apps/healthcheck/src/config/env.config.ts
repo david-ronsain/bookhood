@@ -27,6 +27,9 @@ export default (): INestEnvConfig => ({
 		mail: {
 			serviceName: process.env.APP_API_MAIL_SERVICE_NAME || '',
 		},
+		conversation: {
+			serviceName: process.env.APP_API_CONVERSATION_SERVICE_NAME || '',
+		},
 	},
 	redis: {
 		host: process.env.REDIS_HOST || '',
@@ -55,6 +58,7 @@ export default (): INestEnvConfig => ({
 			mail: process.env.RMQ_MAIL_QUEUE || '',
 			user: process.env.RMQ_USER_QUEUE || '',
 			book: process.env.RMQ_BOOK_QUEUE || '',
+			conversation: process.env.RMQ_CONVERSATION_QUEUE || '',
 		},
 	},
 })

@@ -138,6 +138,8 @@
 		place.value = name
 	}
 
+	defineEmits(['bookCreated'])
+
 	defineExpose({
 		open,
 	})

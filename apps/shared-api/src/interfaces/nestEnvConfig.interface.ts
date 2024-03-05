@@ -63,6 +63,7 @@ interface INestEnvConfigRabbitMQQueues {
 	user?: string
 	book?: string
 	conversation?: string
+	library?: string
 }
 
 interface INestEnvConfigAWS {

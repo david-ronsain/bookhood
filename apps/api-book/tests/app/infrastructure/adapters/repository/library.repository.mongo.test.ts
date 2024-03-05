@@ -7,6 +7,7 @@ import { LibraryEntity } from '../../../../../src/app/infrastructure/adapters/re
 import LibraryModel from '../../../../../src/app/domain/models/library.model'
 import {
 	IBooksList,
+	ILibrary,
 	ILibraryFull,
 	LibraryStatus,
 } from '../../../../../../shared/src'
@@ -26,6 +27,7 @@ describe('LibraryRepositoryMongo', () => {
 						findOne: jest.fn(),
 						create: jest.fn(),
 						aggregate: jest.fn(),
+						findOneAndUpdate: jest.fn(),
 					},
 				},
 			],
@@ -157,7 +159,7 @@ describe('LibraryRepositoryMongo', () => {
 		})
 	})
 
-	describe('getProfileBooks', () => {
+	describe('list', () => {
 		it('should return books list with pagination', async () => {
 			const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 			const page = 1
@@ -171,6 +173,7 @@ describe('LibraryRepositoryMongo', () => {
 						place: 'place',
 						status: LibraryStatus.TO_LEND,
 						title: 'title',
+						categories: ['category'],
 					},
 				],
 			}
@@ -179,7 +182,7 @@ describe('LibraryRepositoryMongo', () => {
 				expectedLibraries,
 			])
 
-			const result = await libraryRepository.getProfileBooks(userId, page)
+			const result = await libraryRepository.list(userId, page)
 
 			expect(result).toEqual(expectedLibraries)
 		})
@@ -258,6 +261,52 @@ describe('LibraryRepositoryMongo', () => {
 			const result = await libraryRepository.getFullById(libraryId)
 
 			expect(result).toBeNull()
+		})
+	})
+
+	describe('update', () => {
+		it('should update the library', () => {
+			const mockedValue: ILibrary = {
+				bookId: 'bookId',
+				location: {
+					type: 'Point',
+					coordinates: [0, 0],
+				},
+				place: 'somePlace',
+				status: LibraryStatus.TO_GIVE,
+				userId: 'userId',
+			}
+			jest.spyOn(libraryModel, 'findOneAndUpdate').mockImplementationOnce(
+				() =>
+					Promise.resolve(mockedValue) as unknown as Query<
+						unknown,
+						unknown,
+						any,
+						LibraryEntity,
+						'findOneAndUpdate'
+					>,
+			)
+
+			expect(
+				libraryRepository.update('libraryId', LibraryStatus.TO_GIVE),
+			).resolves.toBe(mockedValue)
+		})
+
+		it('should not update the library', () => {
+			jest.spyOn(libraryModel, 'findOneAndUpdate').mockImplementationOnce(
+				() =>
+					Promise.resolve(null) as unknown as Query<
+						unknown,
+						unknown,
+						any,
+						LibraryEntity,
+						'findOneAndUpdate'
+					>,
+			)
+
+			expect(
+				libraryRepository.update('libraryId', LibraryStatus.TO_GIVE),
+			).resolves.toBeNull()
 		})
 	})
 })

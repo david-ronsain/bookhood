@@ -1,4 +1,9 @@
-import { IBooksList, ILibraryFull } from '@bookhood/shared'
+import {
+	IBooksList,
+	ILibrary,
+	ILibraryFull,
+	LibraryStatus,
+} from '@bookhood/shared'
 import LibraryModel from '../models/library.model'
 
 export interface LibraryRepository {
@@ -15,5 +20,7 @@ export interface LibraryRepository {
 
 	getFullById(libraryId: string): Promise<ILibraryFull | null>
 
-	getProfileBooks(userId: string, page: number): Promise<IBooksList>
+	list(userId: string, page: number): Promise<IBooksList>
+
+	update(libraryId: string, status: LibraryStatus): Promise<ILibrary>
 }

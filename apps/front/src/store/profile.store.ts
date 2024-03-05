@@ -14,7 +14,10 @@ export const useProfileStore = defineStore('profileStore', () => {
 		booksListLoading.value = true
 		axios
 			.get(
-				EnvConfig.api.base + EnvConfig.api.url.user + userId + '/books',
+				EnvConfig.api.base +
+					EnvConfig.api.url.library +
+					'user/' +
+					userId,
 				{
 					params: {
 						page: booksListPage.value - 1,

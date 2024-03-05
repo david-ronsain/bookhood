@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { BOOK_USECASES, REQUEST_USECASES } from './usecases'
+import { BOOK_USECASES, LIBRARY_USECASES, REQUEST_USECASES } from './usecases'
 import { DomainModule } from '../domain/domain.module'
 import { MongooseModule } from '@nestjs/mongoose'
 import {
@@ -16,6 +16,7 @@ import LibrarySchema from '../infrastructure/adapters/repository/schemas/library
 import RequestRepositoryMongo from '../infrastructure/adapters/repository/request.repository.mongo'
 import RequestSchema from '../infrastructure/adapters/repository/schemas/request.schema'
 import { RequestController } from './controllers/request.controller'
+import { LibraryController } from './controllers/library.controller'
 
 @Module({
 	imports: [
@@ -35,10 +36,12 @@ import { RequestController } from './controllers/request.controller'
 			},
 		]),
 	],
-	controllers: [BookController, RequestController],
+	controllers: [BookController, LibraryController, RequestController],
+
 	providers: [
 		...BOOK_USECASES,
 		...REQUEST_USECASES,
+		...LIBRARY_USECASES,
 		{
 			provide: 'BookRepository',
 			useClass: BookRepositoryMongo,
@@ -98,6 +101,6 @@ import { RequestController } from './controllers/request.controller'
 			},
 		},
 	],
-	exports: [...BOOK_USECASES, ...REQUEST_USECASES],
+	exports: [...BOOK_USECASES, ...REQUEST_USECASES, ...LIBRARY_USECASES],
 })
 export class ApplicationModule {}

@@ -32,7 +32,7 @@ const getRabbitMQConfig = (service: string): RmqOptions =>
 				durable: true,
 			},
 		},
-	} as RmqOptions)
+	}) as RmqOptions
 
 @Module({
 	imports: [
@@ -60,6 +60,15 @@ const getRabbitMQConfig = (service: string): RmqOptions =>
 			provide: `RabbitMQUser`,
 			useFactory: () => {
 				return ClientProxyFactory.create(getRabbitMQConfig('user'))
+			},
+		},
+		ConfigService,
+		{
+			provide: `RabbitMQConversation`,
+			useFactory: () => {
+				return ClientProxyFactory.create(
+					getRabbitMQConfig('conversation'),
+				)
 			},
 		},
 		{

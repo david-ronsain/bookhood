@@ -13,13 +13,11 @@ import {
 	IAddBookDTO,
 	IBook,
 	IBookSearch,
-	IBooksList,
 	ILibraryFull,
 	LibraryStatus,
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
-import GetProfileBooksUseCase from '../../../../src/app/application/usecases/book/getProfileBooks.usecase'
 
 describe('BookController', () => {
 	let controller: BookController
@@ -27,7 +25,6 @@ describe('BookController', () => {
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
 	let addBookUseCase: AddBookUseCase
 	let searchBookUseCase: SearchBookUseCase
-	let getProfileBooksUseCase: GetProfileBooksUseCase
 	let getUserBooksUseCase: GetUserBooksUseCase
 
 	const mockLogger = {
@@ -47,12 +44,6 @@ describe('BookController', () => {
 				},
 				{
 					provide: AddBookUseCase,
-					useValue: {
-						handler: jest.fn(),
-					},
-				},
-				{
-					provide: GetProfileBooksUseCase,
 					useValue: {
 						handler: jest.fn(),
 					},
@@ -84,9 +75,6 @@ describe('BookController', () => {
 		)
 		addBookUseCase = module.get<AddBookUseCase>(AddBookUseCase)
 		searchBookUseCase = module.get<SearchBookUseCase>(SearchBookUseCase)
-		getProfileBooksUseCase = module.get<GetProfileBooksUseCase>(
-			GetProfileBooksUseCase,
-		)
 		getUserBooksUseCase =
 			module.get<GetUserBooksUseCase>(GetUserBooksUseCase)
 	})
@@ -410,90 +398,6 @@ describe('BookController', () => {
 			expect(userClient.send).toHaveBeenCalledWith(
 				'user-get-by-token',
 				'mockToken',
-			)
-		})
-	})
-
-	describe('getProfileBooks', () => {
-		it('should return profile books when token is valid', async () => {
-			const body = { token: 'mockToken', page: 1, userId: 'aaaaaaaaaaaa' }
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					HttpStatus.OK,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
-			const mockProfileBooks: IBooksList = {
-				results: [
-					{
-						_id: 'aaaaaaaaaaaa',
-						authors: ['author'],
-						description: 'description',
-						place: 'place',
-						status: LibraryStatus.TO_LEND,
-						title: 'title',
-					},
-				],
-				total: 1,
-			}
-			jest.spyOn(
-				getProfileBooksUseCase,
-				'handler',
-			).mockImplementationOnce(() => Promise.resolve(mockProfileBooks))
-
-			const result = await controller.getProfileBooks(body)
-			expect(result).toEqual(
-				new MicroserviceResponseFormatter(
-					true,
-					HttpStatus.OK,
-					undefined,
-					mockProfileBooks,
-				),
-			)
-			expect(getProfileBooksUseCase.handler).toHaveBeenCalledWith(
-				body.userId,
-				body.page,
-			)
-		})
-
-		it('should return an error response if token is invalid', async () => {
-			const body = {
-				token: 'mock|Token',
-				page: 1,
-				userId: 'aaaaaaaaaaaa',
-			}
-			const error = new ForbiddenException()
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					false,
-					HttpStatus.FORBIDDEN,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
-			const result = await controller.getProfileBooks(body)
-
-			expect(result).toEqual(
-				new MicroserviceResponseFormatter().buildFromException(
-					error,
-					body,
-				),
 			)
 		})
 	})
