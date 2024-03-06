@@ -2,10 +2,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { UserController } from '../../../../src/app/application/controllers/user.controller'
 import { of } from 'rxjs'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/'
+import {
+	CurrentUser,
+	MicroserviceResponseFormatter,
+} from '../../../../../shared-api/src/'
 import { CreateUserDTO } from '../../../../src/app/application/dto/user.dto'
 import { HttpException, HttpStatus } from '@nestjs/common'
-import { IExternalProfile, IUser } from '../../../../../shared/src'
+import { IExternalProfile, IUser, Role } from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 
 jest.mock('@nestjs/microservices', () => ({
@@ -16,6 +19,14 @@ jest.mock('@nestjs/microservices', () => ({
 
 describe('Testing UserController', () => {
 	let controller: UserController
+
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
+	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -44,13 +55,13 @@ describe('Testing UserController', () => {
 	})
 
 	describe('create', () => {
-		it('should create an user', async () => {
-			const userToCreate: CreateUserDTO = {
-				email: 'first.last@name.test',
-				firstName: 'first',
-				lastName: 'last',
-			}
+		const userToCreate: CreateUserDTO = {
+			email: 'first.last@name.test',
+			firstName: 'first',
+			lastName: 'last',
+		}
 
+		it('should create an user', async () => {
 			const response = new MicroserviceResponseFormatter<CreateUserDTO>(
 				true,
 				HttpStatus.CREATED,
@@ -73,12 +84,6 @@ describe('Testing UserController', () => {
 		})
 
 		it('should throw an error if the microservice returns an error', async () => {
-			const userToCreate: CreateUserDTO = {
-				email: '',
-				firstName: '',
-				lastName: '',
-			}
-
 			const response = new MicroserviceResponseFormatter<CreateUserDTO>(
 				false,
 				HttpStatus.BAD_REQUEST,
@@ -101,7 +106,6 @@ describe('Testing UserController', () => {
 
 	describe('me', () => {
 		it("should return the current user's data", async () => {
-			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
 			const user = {
 				firstName: 'first',
 				lastName: 'last',
@@ -119,24 +123,23 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.me(token)
+			const result = await controller.me(currentUser)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				'user-get-me',
-				token,
+				currentUser.token,
 			)
 
 			expect(result).toMatchObject(user)
 		})
 
 		it('should throw an error if no token is provided', async () => {
-			await expect(controller.me()).rejects.toThrow(UserNotFoundException)
+			await expect(
+				controller.me({} as unknown as CurrentUser),
+			).rejects.toThrow(UserNotFoundException)
 		})
 
 		it('should throw an error if the microservice returns an error', async () => {
-			const inputToken = 'oibgeogezgz|iogbgzegbez.ezgz|gezg'
-			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
-
 			const response = new MicroserviceResponseFormatter<IUser>(
 				false,
 				HttpStatus.NOT_FOUND,
@@ -146,20 +149,19 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			await expect(controller.me(inputToken)).rejects.toThrow(
+			await expect(controller.me(currentUser)).rejects.toThrow(
 				UserNotFoundException,
 			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				'user-get-me',
-				token,
+				currentUser.token,
 			)
 		})
 	})
 
 	describe('getProfile', () => {
 		it('should return the user profile', async () => {
-			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
 			const userId = 'someId'
 
 			const response =
@@ -178,18 +180,17 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.getProfile(token, userId)
+			const result = await controller.getProfile(currentUser, userId)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				'user-get-profile',
-				{ token, userId },
+				{ user: currentUser, userId },
 			)
 
 			expect(result).toMatchObject(response.data)
 		})
 
 		it('should throw an error if the microservice returns an error', async () => {
-			const token = 'oibgeogezgz|iogbgzegbez.ezgz'
 			const userId = 'someId'
 
 			const response =
@@ -202,13 +203,13 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			await expect(controller.getProfile(token, userId)).rejects.toThrow(
-				UserNotFoundException,
-			)
+			await expect(
+				controller.getProfile(currentUser, userId),
+			).rejects.toThrow(UserNotFoundException)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				'user-get-profile',
-				{ token, userId },
+				{ user: currentUser, userId },
 			)
 		})
 	})

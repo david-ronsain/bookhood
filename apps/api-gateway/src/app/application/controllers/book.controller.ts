@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	ForbiddenException,
 	Get,
 	Headers,
 	HttpCode,
@@ -11,6 +12,7 @@ import {
 	Param,
 	Post,
 	Query,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -23,13 +25,20 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { CreateUserDTO } from '../dto/user.dto'
 import { IBook, IBookSearch, Role, ILibraryFull } from '@bookhood/shared'
-import { Roles } from '../guards/role.guard'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
-import { AddBookDTO } from '../dto/book.dto'
+import { RoleGuard } from '../guards/role.guard'
+import {
+	MicroserviceResponseFormatter,
+	CurrentUser,
+	AddBookMQDTO,
+	SearchBookMQDTO,
+	GetBookMQDTO,
+} from '@bookhood/shared-api'
+import { AddBookDTO, Book, BookSearch, BookSearchDTO } from '../dto/book.dto'
 import { google } from 'googleapis'
 import envConfig from '../../../config/env.config'
+import { AuthUserGuard } from '../guards/authUser.guard'
+import { User } from '../decorators/user.decorator'
 
 @Controller('book')
 export class BookController {
@@ -39,18 +48,19 @@ export class BookController {
 
 	@Post()
 	@HttpCode(HttpStatus.CREATED)
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@ApiOperation({ description: "Add a new book to one's library" })
 	@ApiBody({ type: AddBookDTO })
-	@ApiOkResponse({ type: CreateUserDTO, status: HttpStatus.CREATED })
+	@ApiOkResponse({ type: Book, status: HttpStatus.CREATED })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
+	@ApiResponse({ type: ForbiddenException, status: HttpStatus.FORBIDDEN })
 	async addBook(
+		@User() user: CurrentUser,
 		@Body() book: AddBookDTO,
-		@Headers('x-token') token: string,
 	): Promise<IBook> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBook>
-		>(this.bookQueue.send('book-add', { token, data: { book } }))
+		>(this.bookQueue.send('book-add', { user, book } as AddBookMQDTO))
 		if (!created.success) {
 			throw new HttpException(created.message, created.code)
 		}
@@ -60,6 +70,7 @@ export class BookController {
 	@Get('google/:id')
 	@ApiExcludeEndpoint()
 	@HttpCode(HttpStatus.OK)
+	@UseGuards(new RoleGuard([Role.USER, Role.ADMIN]))
 	async getGoogleBookByISBN(@Param('id') isbn: string): Promise<unknown> {
 		return google
 			.books('v1')
@@ -73,6 +84,7 @@ export class BookController {
 	@Post('google/search')
 	@ApiExcludeEndpoint()
 	@HttpCode(HttpStatus.OK)
+	@UseGuards(new RoleGuard([Role.USER, Role.ADMIN]))
 	async getGoogleBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,
@@ -91,22 +103,25 @@ export class BookController {
 
 	@Post('search')
 	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.GUEST]))
+	@ApiBody({ type: BookSearchDTO })
+	@ApiOkResponse({ type: BookSearch, status: HttpStatus.CREATED })
+	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
+	@ApiResponse({ type: ForbiddenException, status: HttpStatus.FORBIDDEN })
 	async getBooks(
-		@Body('q') q: string,
-		@Body('startIndex') startAt: number,
-		@Body('boundingBox') box: number[],
-		@Headers('x-token') token?: string,
+		@User() user: CurrentUser,
+		@Body() body: BookSearchDTO,
 	): Promise<IBookSearch> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBookSearch>
 		>(
 			this.bookQueue.send('book-search', {
-				search: q,
-				startAt,
+				search: body.q,
+				startAt: body.startIndex,
 				language: 'fr',
-				boundingBox: box,
-				token,
-			}),
+				boundingBox: body.boundingBox,
+				user,
+			} as SearchBookMQDTO),
 		)
 		if (!created.success) {
 			throw new HttpException(created.message, created.code)
@@ -116,21 +131,21 @@ export class BookController {
 
 	@Get()
 	@HttpCode(HttpStatus.OK)
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@ApiOperation({ description: "Get one's books" })
 	@ApiParam({ name: 'page', type: 'number' })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	async getUserBooks(
+		@User() user: CurrentUser,
 		@Query('page') page: number,
-		@Headers('x-token') token?: string,
 	): Promise<ILibraryFull[]> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibraryFull[]>
 		>(
 			this.bookQueue.send('book-get', {
 				page,
-				token,
-			}),
+				user,
+			} as GetBookMQDTO),
 		)
 		if (!response.success) {
 			throw new HttpException(response.message, response.code)

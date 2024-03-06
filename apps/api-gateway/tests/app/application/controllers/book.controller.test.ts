@@ -3,9 +3,12 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { BookController } from '../../../../src/app/application/controllers/book.controller'
 import { AddBookDTO } from '../../../../src/app/application/dto/book.dto'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
+import {
+	CurrentUser,
+	MicroserviceResponseFormatter,
+} from '../../../../../shared-api/src'
 import { of } from 'rxjs'
-import { LibraryStatus } from '../../../../../shared/src'
+import { LibraryStatus, Role } from '../../../../../shared/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -26,12 +29,26 @@ jest.mock('googleapis', () => ({
 describe('BookController', () => {
 	let controller: BookController
 
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
+	}
+
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [BookController],
 			providers: [
 				{
 					provide: 'RabbitBook',
+					useValue: {
+						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: 'RabbitUser',
 					useValue: {
 						send: jest.fn(() => of({})),
 					},
@@ -74,13 +91,13 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.addBook(addBookDTO, 'fakeToken')
+			const result = await controller.addBook(currentUser, addBookDTO)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'book-add',
 				{
-					token: 'fakeToken',
-					data: { book: addBookDTO },
+					user: currentUser,
+					book: addBookDTO,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -109,7 +126,7 @@ describe('BookController', () => {
 			)
 
 			await expect(
-				controller.addBook(addBookDTO, 'fakeToken'),
+				controller.addBook(currentUser, addBookDTO),
 			).rejects.toThrow(HttpException)
 		})
 	})
@@ -136,11 +153,11 @@ describe('BookController', () => {
 	})
 
 	describe('getBooks', () => {
-		it('should get books', async () => {
-			const q = 'fakeQuery'
-			const startAt = 0
-			const box = [0, 0, 0, 0]
+		const q = 'fakeQuery'
+		const startIndex = 0
+		const boundingBox = [0, 0, 0, 0]
 
+		it('should get books', async () => {
 			const response = new MicroserviceResponseFormatter(
 				true,
 				HttpStatus.OK,
@@ -152,34 +169,39 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.getBooks(q, startAt, box)
+			const result = await controller.getBooks(currentUser, {
+				q,
+				startIndex,
+				boundingBox,
+			})
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'book-search',
 				{
 					search: q,
-					startAt,
+					startAt: startIndex,
 					language: 'fr',
-					boundingBox: box,
+					boundingBox,
+					user: currentUser,
 				},
 			)
 			expect(result).toEqual(response.data)
 		})
 
 		it('should handle generic HTTP exception', async () => {
-			const q = 'fakeQuery'
-			const startAt = 0
-			const box = [0, 0, 0, 0]
-
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
 				of(response),
 			)
 
-			await expect(controller.getBooks(q, startAt, box)).rejects.toThrow(
-				HttpException,
-			)
+			await expect(
+				controller.getBooks(currentUser, {
+					q,
+					startIndex,
+					boundingBox,
+				}),
+			).rejects.toThrow(HttpException)
 		})
 	})
 
@@ -224,13 +246,13 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.getUserBooks(page, token)
+			const result = await controller.getUserBooks(currentUser, page)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'book-get',
 				{
 					page,
-					token,
+					user: currentUser,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -238,7 +260,6 @@ describe('BookController', () => {
 
 		it('should handle generic HTTP exception', async () => {
 			const page = 0
-			const token = 'token'
 
 			const response = new MicroserviceResponseFormatter(false)
 
@@ -246,9 +267,9 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			await expect(controller.getUserBooks(page, token)).rejects.toThrow(
-				HttpException,
-			)
+			await expect(
+				controller.getUserBooks(currentUser, page),
+			).rejects.toThrow(HttpException)
 		})
 	})
 })

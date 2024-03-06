@@ -57,12 +57,15 @@ const router = createRouter({
 					name: 'signinLink',
 					component: Signin,
 					beforeEnter: async (to, from, next) => {
+						console.log('####')
 						const userStore = useUserStore()
 						const mainStore = useMainStore()
 
 						const verified = await userStore
 							.signin(to.params.token.toString())
-							.then((res: { data: boolean }) => res.data)
+							.then((res: { data: boolean }) => {
+								return res.data
+							})
 							.catch((err) => {
 								mainStore.$patch({
 									error: err.response.data.message,
@@ -171,6 +174,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 	if (!isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
+		localStorage.removeItem('user')
 		next({ name: to.meta.requiresAuth ? 'signin' : 'home' })
 	} else {
 		next()

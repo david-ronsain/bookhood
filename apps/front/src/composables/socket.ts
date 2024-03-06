@@ -22,7 +22,11 @@ export const state = ref<ISocketState>({
 	writing: [],
 })
 
-export const socket = io(EnvConfig.socket.url)
+export const socket = io(EnvConfig.socket.url, {
+	extraHeaders: {
+		'x-token': localStorage.getItem('user'),
+	},
+})
 
 socket.on('connect', () => {
 	state.value.connected = true

@@ -2,7 +2,6 @@ import {
 	BadRequestException,
 	Controller,
 	Get,
-	Headers,
 	HttpException,
 	HttpStatus,
 	Inject,
@@ -14,6 +13,7 @@ import {
 	NotFoundException,
 	ForbiddenException,
 	HttpCode,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -31,13 +31,18 @@ import {
 	IRequestList,
 	IPatchRequestDTO,
 } from '@bookhood/shared'
-import { Roles } from '../guards/role.guard'
+import { RoleGuard } from '../guards/role.guard'
 import {
+	CreateRequestMQDTO,
+	CurrentUser,
+	GetRequestsMQDTO,
 	MicroserviceResponseFormatter,
 	PatchRequestDTO,
 	PatchRequestMQDTO,
 } from '@bookhood/shared-api'
 import { GetRequestsDTO } from '../dto/request.dto'
+import { AuthUserGuard } from '../guards/authUser.guard'
+import { User } from '../decorators/user.decorator'
 
 @Controller('request')
 export class RequestController {
@@ -47,21 +52,21 @@ export class RequestController {
 
 	@Post(':libraryId')
 	@HttpCode(HttpStatus.CREATED)
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@ApiOperation({ description: 'Creates a request for a book' })
 	@ApiParam({ name: 'libraryId', type: 'string' })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	async create(
+		@User() user: CurrentUser,
 		@Param('libraryId') libraryId: string,
-		@Headers('x-token') token?: string,
 	): Promise<IRequest> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
 		>(
 			this.bookQueue.send('request-create', {
 				libraryId,
-				token,
-			}),
+				user,
+			} as CreateRequestMQDTO),
 		)
 		if (!response.success) {
 			throw new HttpException(response.message, response.code)
@@ -71,22 +76,22 @@ export class RequestController {
 
 	@Get()
 	@HttpCode(HttpStatus.OK)
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@ApiOperation({
 		description: "List an user's requests depending on the status",
 	})
 	@ApiBody({ type: GetRequestsDTO })
 	async getListByStatus(
+		@User() user: CurrentUser,
 		@Query() body: GetRequestsDTO,
-		@Headers('x-token') token?: string,
 	): Promise<IRequestList> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequestList>
 		>(
 			this.bookQueue.send('request-list', {
 				...body,
-				token,
-			}),
+				user,
+			} as GetRequestsMQDTO),
 		)
 		if (!response.success) {
 			throw new HttpException(response.message, response.code)
@@ -96,7 +101,7 @@ export class RequestController {
 
 	@Patch(':id')
 	@HttpCode(HttpStatus.OK)
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@ApiOperation({
 		description: 'Updates a request',
 	})
@@ -105,9 +110,9 @@ export class RequestController {
 	@ApiResponse({ type: NotFoundException, status: HttpStatus.NOT_FOUND })
 	@ApiResponse({ type: ForbiddenException, status: HttpStatus.FORBIDDEN })
 	async patch(
+		@User() user: CurrentUser,
 		@Body() body: IPatchRequestDTO,
 		@Param('id') id: string,
-		@Headers('x-token') token?: string,
 	): Promise<IRequest> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
@@ -115,7 +120,7 @@ export class RequestController {
 			this.bookQueue.send('request-patch', {
 				...body,
 				requestId: id,
-				token,
+				user,
 			} as PatchRequestMQDTO),
 		)
 		if (!response.success) {

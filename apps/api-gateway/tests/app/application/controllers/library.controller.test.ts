@@ -2,9 +2,17 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
+import {
+	CurrentUser,
+	MicroserviceResponseFormatter,
+} from '../../../../../shared-api/src'
 import { of } from 'rxjs'
-import { IBook, IBooksList, LibraryStatus } from '../../../../../shared/src'
+import {
+	IBook,
+	IBooksList,
+	LibraryStatus,
+	Role,
+} from '../../../../../shared/src'
 import { BookNotFoundException } from '../../../../src/app/application/exceptions'
 
 jest.mock('@nestjs/microservices', () => ({
@@ -16,12 +24,26 @@ jest.mock('@nestjs/microservices', () => ({
 describe('LibraryController', () => {
 	let controller: LibraryController
 
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
+	}
+
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [LibraryController],
 			providers: [
 				{
 					provide: 'RabbitBook',
+					useValue: {
+						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: 'RabbitUser',
 					useValue: {
 						send: jest.fn(() => of({})),
 					},
@@ -37,11 +59,10 @@ describe('LibraryController', () => {
 	})
 
 	describe('getLibraries', () => {
-		it('should get libraries', async () => {
-			const page = 0
-			const token = 'token'
-			const userId = 'userId'
+		const page = 0
+		const userId = 'userId'
 
+		it('should get libraries', async () => {
 			const response = new MicroserviceResponseFormatter<IBooksList>(
 				true,
 				HttpStatus.OK,
@@ -66,24 +87,24 @@ describe('LibraryController', () => {
 				of(response),
 			)
 
-			const result = await controller.getLibraries(token, userId, page)
+			const result = await controller.getLibraries(
+				currentUser,
+				userId,
+				page,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'libraries-list',
 				{
-					token,
 					userId,
 					page,
+					user: currentUser,
 				},
 			)
 			expect(result).toEqual(response.data)
 		})
 
 		it('should handle generic HTTP exception', async () => {
-			const page = 0
-			const token = 'token'
-			const userId = 'userId'
-
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
@@ -91,17 +112,16 @@ describe('LibraryController', () => {
 			)
 
 			await expect(
-				controller.getLibraries(token, userId, page),
+				controller.getLibraries(currentUser, userId, page),
 			).rejects.toThrow(HttpException)
 		})
 	})
 
 	describe('patch', () => {
-		it('should update the library', async () => {
-			const status = LibraryStatus.TO_LEND
-			const token = 'token'
-			const libraryId = 'libId'
+		const status = LibraryStatus.TO_LEND
+		const libraryId = 'libId'
 
+		it('should update the library', async () => {
 			const response = new MicroserviceResponseFormatter<IBook>(
 				true,
 				HttpStatus.OK,
@@ -122,24 +142,24 @@ describe('LibraryController', () => {
 				of(response),
 			)
 
-			const result = await controller.patch(token, libraryId, status)
+			const result = await controller.patch(
+				currentUser,
+				libraryId,
+				status,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'library-patch',
 				{
-					token,
 					libraryId,
 					status,
+					user: currentUser,
 				},
 			)
 			expect(result).toEqual(response.data)
 		})
 
 		it('should throw an error', async () => {
-			const status = LibraryStatus.TO_LEND
-			const token = 'token'
-			const libraryId = 'userId'
-
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
@@ -147,7 +167,7 @@ describe('LibraryController', () => {
 			)
 
 			await expect(
-				controller.patch(token, libraryId, status),
+				controller.patch(currentUser, libraryId, status),
 			).rejects.toThrow(BookNotFoundException)
 		})
 	})

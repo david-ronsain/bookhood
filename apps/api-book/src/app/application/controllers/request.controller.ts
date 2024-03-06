@@ -1,28 +1,22 @@
-import {
-	Controller,
-	ForbiddenException,
-	HttpStatus,
-	Inject,
-} from '@nestjs/common'
+import { Controller, HttpStatus, Inject } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import {
-	IUser,
 	IRequest,
 	BookRequestMailDTO,
 	IRequestList,
 	IRequestInfos,
 } from '@bookhood/shared'
 import {
+	CreateRequestMQDTO,
+	GetRequestsMQDTO,
 	MicroserviceResponseFormatter,
 	PatchRequestMQDTO,
 } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
-import { firstValueFrom } from 'rxjs'
 import CreateRequestUseCase from '../usecases/request/createRequest.usecase'
 import GetUserBookUseCase from '../usecases/book/getUserBook.usecase'
-import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import GetListByStatusUseCase from '../usecases/request/getListByStatus.usecase'
 import PatchRequestUseCase from '../usecases/request/patchRequest.usecase'
 import GetByIdUseCase from '../usecases/request/getById.usecase'
@@ -31,7 +25,6 @@ import GetByIdUseCase from '../usecases/request/getById.usecase'
 export class RequestController {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-		@Inject('RabbitUser') private readonly userClient: ClientProxy,
 		@Inject('RabbitMail') private readonly mailClient: ClientProxy,
 		private readonly getUserBookUseCase: GetUserBookUseCase,
 		private readonly createRequestUseCase: CreateRequestUseCase,
@@ -42,23 +35,22 @@ export class RequestController {
 
 	@MessagePattern('request-create')
 	async create(
-		body: CreateRequestDTO,
+		body: CreateRequestMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequest>> {
 		try {
-			const userData = await this.checkUserToken(body.token)
 			const library = await this.getUserBookUseCase.handler(
 				body.libraryId,
 			)
 
 			const request = await this.createRequestUseCase.handler(
-				userData._id,
+				body.user._id,
 				body.libraryId,
 			)
 
 			this.mailClient
 				.send('mail-request-created', {
 					book: library.book.title,
-					emitterFirstName: userData.firstName,
+					emitterFirstName: body.user.firstName,
 					recipientFirstName: library.user.firstName,
 					email: library.user.email,
 					requestId: request._id.toString(),
@@ -81,13 +73,11 @@ export class RequestController {
 
 	@MessagePattern('request-list')
 	async getByListStatus(
-		body: GetRequestsDTO,
+		body: GetRequestsMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequestList>> {
 		try {
-			const user = await this.checkUserToken(body.token)
-
 			if (!body.ownerId && !body.userId) {
-				body.ownerId = user._id
+				body.ownerId = body.user._id
 			}
 
 			const list = await this.getListByStatusUseCase.handler(
@@ -116,10 +106,8 @@ export class RequestController {
 		body: PatchRequestMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequest>> {
 		try {
-			const user = await this.checkUserToken(body.token)
-
 			const request = await this.patchRequestUseCase.handler(
-				user._id,
+				body.user._id,
 				body.requestId,
 				body.status,
 			)
@@ -157,21 +145,5 @@ export class RequestController {
 				{ requestId },
 			)
 		}
-	}
-
-	private async checkUserToken(requestToken: string): Promise<IUser> {
-		const token = requestToken?.split('|') ?? []
-		if (token.length === 3) {
-			token.pop()
-		}
-
-		const userData = await firstValueFrom<
-			MicroserviceResponseFormatter<IUser | null>
-		>(this.userClient.send('user-get-by-token', token.join('|')))
-		if (!userData.success) {
-			throw new ForbiddenException()
-		}
-
-		return userData.data
 	}
 }

@@ -1,25 +1,23 @@
-import {
-	Controller,
-	ForbiddenException,
-	HttpStatus,
-	Inject,
-} from '@nestjs/common'
+import { Controller, HttpStatus, Inject } from '@nestjs/common'
 
-import { ClientProxy, MessagePattern } from '@nestjs/microservices'
+import { MessagePattern } from '@nestjs/microservices'
 import {
 	IBook,
 	type IAddBookDTO,
-	IUser,
 	IBookSearch,
 	ILibraryFull,
 } from '@bookhood/shared'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	AddBookMQDTO,
+	GetBookMQDTO,
+	MicroserviceResponseFormatter,
+	SearchBookMQDTO,
+} from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
 import AddBookUseCase from '../usecases/book/addBook.usecase'
 import BookModel from '../../domain/models/book.model'
 import CreateBookIfNewUseCase from '../usecases/book/createBookIfNew.usecase'
-import { firstValueFrom } from 'rxjs'
 import SearchBookUseCase from '../usecases/book/searchBook.usecase'
 import GetUserBooksUseCase from '../usecases/book/getUserBooks.usecase'
 
@@ -27,7 +25,6 @@ import GetUserBooksUseCase from '../usecases/book/getUserBooks.usecase'
 export class BookController {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-		@Inject('RabbitUser') private readonly userClient: ClientProxy,
 		private readonly createBookIfNewUseCase: CreateBookIfNewUseCase,
 		private readonly addBookUseCase: AddBookUseCase,
 		private readonly getUserBooksUseCase: GetUserBooksUseCase,
@@ -40,23 +37,20 @@ export class BookController {
 	}
 
 	@MessagePattern('book-add')
-	async addBook(body: {
-		token: string
-		data: { book: IAddBookDTO }
-	}): Promise<MicroserviceResponseFormatter<IBook>> {
+	async addBook(
+		body: AddBookMQDTO,
+	): Promise<MicroserviceResponseFormatter<IBook>> {
 		try {
 			const book: BookModel = await this.createBookIfNewUseCase.handler(
-				body.data.book,
+				body.book,
 			)
-
-			const userData = await this.checkUserToken(body.token)
 
 			await this.addBookUseCase.handler(
 				book._id,
-				userData._id,
-				body.data.book.location,
-				body.data.book.status,
-				body.data.book.place,
+				body.user._id,
+				body.book.location,
+				body.book.status,
+				body.book.place,
 			)
 
 			return new MicroserviceResponseFormatter<IBook>(
@@ -68,37 +62,27 @@ export class BookController {
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
 				err,
-				body.data.book,
+				body,
 			)
 		}
 	}
 
 	@MessagePattern('book-search')
-	async searchBook(body: {
-		search: string
-		startAt: number
-		language: string
-		boundingBox: number[]
-		token?: string
-	}): Promise<MicroserviceResponseFormatter<IBookSearch>> {
+	async searchBook(
+		body: SearchBookMQDTO,
+	): Promise<MicroserviceResponseFormatter<IBookSearch>> {
 		try {
-			const [email] = (body?.token?.split('|') || []).map(
-				(token: string, index: number) =>
-					index === 0
-						? Buffer.from(token, 'base64').toString()
-						: token,
-			)
 			const list = await this.searchBookUseCase.handler(
 				body.search,
 				body.startAt,
 				body.language,
 				body.boundingBox,
-				email,
+				body.user.email,
 			)
 
 			return new MicroserviceResponseFormatter<IBookSearch>(
 				true,
-				HttpStatus.CREATED,
+				HttpStatus.OK,
 				undefined,
 				list,
 			)
@@ -111,15 +95,12 @@ export class BookController {
 	}
 
 	@MessagePattern('book-get')
-	async getUserBooks(body: {
-		token: string
-		page: number
-	}): Promise<MicroserviceResponseFormatter<ILibraryFull[]>> {
+	async getUserBooks(
+		body: GetBookMQDTO,
+	): Promise<MicroserviceResponseFormatter<ILibraryFull[]>> {
 		try {
-			const userData = await this.checkUserToken(body.token)
-
 			const libs: ILibraryFull[] = await this.getUserBooksUseCase.handler(
-				userData._id,
+				body.user._id,
 				body.page,
 			)
 
@@ -134,21 +115,5 @@ export class BookController {
 				ILibraryFull[]
 			>().buildFromException(err, body)
 		}
-	}
-
-	private async checkUserToken(requestToken: string): Promise<IUser> {
-		const token = requestToken?.split('|') ?? []
-		if (token.length === 3) {
-			token.pop()
-		}
-
-		const userData = await firstValueFrom<
-			MicroserviceResponseFormatter<IUser | null>
-		>(this.userClient.send('user-get-by-token', token.join('|')))
-		if (!userData.success) {
-			throw new ForbiddenException()
-		}
-
-		return userData.data
 	}
 }

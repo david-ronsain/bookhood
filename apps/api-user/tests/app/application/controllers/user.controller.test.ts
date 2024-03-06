@@ -20,7 +20,7 @@ import {
 } from '../../../../../shared/src'
 import { of, Observable } from 'rxjs'
 import GetUserByIdUseCase from '../../../../src/app/application/usecases/getUserById.usecase'
-import { GetProfileDTO } from '../../../../src/app/application/dto/user.dto'
+import { CurrentUser, GetProfileMQDTO } from '../../../../../shared-api/src'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -31,6 +31,13 @@ describe('UserController', () => {
 	let loggerMock: Logger
 	let rabbitMailClientMock: ClientProxy
 	let mockedUseCase
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
+	}
 
 	beforeEach(async () => {
 		loggerMock = {
@@ -259,11 +266,12 @@ describe('UserController', () => {
 	})
 
 	describe('getProfile', () => {
+		const dto: GetProfileMQDTO = {
+			userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			user: currentUser,
+		}
+
 		it('should get user by id', async () => {
-			const dto: GetProfileDTO = {
-				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				token: 'someToken',
-			}
 			const user: IExternalProfile = {
 				firstName: 'first',
 				lastName: 'last',
@@ -286,10 +294,6 @@ describe('UserController', () => {
 		})
 
 		it('should handle errors during user retrieval', async () => {
-			const dto: GetProfileDTO = {
-				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				token: 'someToken',
-			}
 			const error = new Error('User retrieval error')
 
 			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)

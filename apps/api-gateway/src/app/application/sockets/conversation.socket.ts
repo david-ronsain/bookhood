@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { Logger } from 'winston'
 import { ClientProxy } from '@nestjs/microservices'
 import {
@@ -20,9 +20,12 @@ import {
 	GetOrCreateConversationDTO,
 	IConversationFull,
 	IConversationMessage,
+	Role,
 	WritingDTO,
 } from '@bookhood/shared'
 import envConfig from '../../../config/env.config'
+import { AuthUserGuard } from '../guards/authUser.guard'
+import { RoleGuard } from '../guards/role.guard'
 
 @WebSocketGateway(envConfig().socket.port, { cors: true })
 export class ConversationGateway
@@ -40,6 +43,7 @@ export class ConversationGateway
 		this.logger.info('initialized')
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	handleConnection(client: Socket, ...args: any[]) {
 		const { sockets } = this.io.sockets
 
@@ -47,6 +51,7 @@ export class ConversationGateway
 		this.logger.debug(`Number of connected clients: ${sockets.size}`)
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	handleDisconnect(client: Socket) {
 		client.broadcast.emit('conversation-not-writing', {
 			userId: client.data.userId,
@@ -54,6 +59,7 @@ export class ConversationGateway
 		this.logger.info(`Cliend id:${client.id} disconnected`)
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage('conversation-connect')
 	async getOrCreateConversation(
 		client: Socket,
@@ -73,6 +79,7 @@ export class ConversationGateway
 		}
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage('conversation-add-message')
 	async addMessage(client: Socket, dto: AddMessageDTO) {
 		try {
@@ -86,6 +93,7 @@ export class ConversationGateway
 		}
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage('conversation-flag-seen')
 	async flagAsSeen(client: Socket, dto: FlagAsSeenMessageDTO) {
 		try {
@@ -98,12 +106,14 @@ export class ConversationGateway
 		}
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage('conversation-writing')
 	async isWriting(client: Socket, dto: WritingDTO) {
 		client.data.userId = dto.userId
 		client.broadcast.emit('conversation-writing', dto)
 	}
 
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage('conversation-not-writing')
 	async isNotWriting(client: Socket, dto: WritingDTO) {
 		client.data.userId = undefined

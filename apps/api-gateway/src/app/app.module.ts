@@ -7,13 +7,6 @@ import {
 	RmqOptions,
 	Transport,
 } from '@nestjs/microservices'
-import { RolesGuard } from './application/guards/role.guard'
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
-import {
-	CacheInterceptor,
-	CacheModule,
-	CacheModuleOptions,
-} from '@nestjs/cache-manager'
 import { WinstonModule } from 'nest-winston'
 import * as winston from 'winston'
 import { winstonConfig } from '@bookhood/shared'
@@ -123,10 +116,6 @@ import { LibraryController } from './application/controllers/library.controller'
 					},
 				} as RmqOptions)
 			},
-		},
-		{
-			provide: APP_GUARD,
-			useClass: RolesGuard,
 		},
 		/*{
 			provide: APP_INTERCEPTOR,

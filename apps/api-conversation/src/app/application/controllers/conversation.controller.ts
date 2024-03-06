@@ -3,6 +3,7 @@ import {
 	ForbiddenException,
 	HttpStatus,
 	Inject,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'

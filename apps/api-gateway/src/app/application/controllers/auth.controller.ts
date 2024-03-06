@@ -7,6 +7,7 @@ import {
 	HttpStatus,
 	Inject,
 	Post,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -18,19 +19,19 @@ import {
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
 import { Role } from '@bookhood/shared'
-import { Roles } from '../guards/role.guard'
 import { UserNotFoundException } from '../exceptions'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import { SendLinkDTO, SigninDTO } from '../dto/auth.dto'
+import { RoleGuard } from '../guards/role.guard'
 
 @Controller('auth')
 export class AuthController {
 	constructor(
-		@Inject('RabbitUser') private readonly userQueue: ClientProxy
+		@Inject('RabbitUser') private readonly userQueue: ClientProxy,
 	) {}
 
 	@Post('link')
-	@Roles([Role.GUEST])
+	@UseGuards(new RoleGuard([Role.GUEST]))
 	@ApiOperation({ description: 'Sends the login link' })
 	@ApiBody({ type: SendLinkDTO })
 	@ApiOkResponse({ type: Boolean, status: HttpStatus.OK })
@@ -48,7 +49,7 @@ export class AuthController {
 
 	@Post('signin')
 	@HttpCode(HttpStatus.OK)
-	@Roles([Role.GUEST])
+	@UseGuards(new RoleGuard([Role.GUEST]))
 	@ApiOperation({ description: 'Authenticates the user' })
 	@ApiBody({ type: SigninDTO })
 	@ApiOkResponse({ type: Boolean, status: HttpStatus.OK })
@@ -58,6 +59,7 @@ export class AuthController {
 		const verified = await firstValueFrom<
 			MicroserviceResponseFormatter<boolean>
 		>(this.userQueue.send('auth-signin', dto))
+
 		if (!verified.success) {
 			throw new ForbiddenException(verified.message)
 		}

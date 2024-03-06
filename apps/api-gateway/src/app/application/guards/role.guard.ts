@@ -1,49 +1,23 @@
 import { Role } from '@bookhood/shared'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
-import {
-	Injectable,
-	CanActivate,
-	ExecutionContext,
-	SetMetadata,
-	Inject,
-} from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
-import { ClientProxy } from '@nestjs/microservices'
-import { firstValueFrom } from 'rxjs'
+import { CurrentUser } from '@bookhood/shared-api'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 
 @Injectable()
-export class RolesGuard implements CanActivate {
-	constructor(
-		private reflector: Reflector,
-		@Inject('RabbitUser') private readonly userQueue: ClientProxy
-	) {}
+export class RoleGuard implements CanActivate {
+	private roles: Role[]
 
-	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const token = this.extractTokenFromHeader(
-			context.switchToHttp().getRequest()
-		)
-		const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
-			'roles',
-			[context.getHandler(), context.getClass()]
-		)
-		if (!requiredRoles || requiredRoles.includes(Role.GUEST)) {
+	constructor(roles: Role[] = []) {
+		this.roles = roles
+	}
+
+	canActivate(context: ExecutionContext): boolean {
+		if (this.roles.length === 0 || this.roles.includes(Role.GUEST)) {
 			return true
 		}
-		const roles = await firstValueFrom<Role[]>(
-			this.userQueue.send('user-get-role-by-token', token)
-		)
-		return requiredRoles.some((role) => roles?.includes(role))
-	}
 
-	private extractTokenFromHeader(request: Request): string {
-		const token: string[] = request.headers['x-token']?.split('|') || []
+		const request = context.switchToHttp().getRequest()
+		const user: CurrentUser = request.user
 
-		if (token.length === 3) {
-			token.pop()
-		}
-
-		return token.join('|')
+		return this.roles.some((role) => (user?.roles || []).includes(role))
 	}
 }
-
-export const Roles = (roles: Role[]) => SetMetadata('roles', roles)

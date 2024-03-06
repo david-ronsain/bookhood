@@ -3,44 +3,28 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
 import { ForbiddenException, HttpStatus } from '@nestjs/common'
-import { of, Observable } from 'rxjs'
-import { IBooksList, ILibrary, LibraryStatus } from '../../../../../shared/src'
+import {
+	IBooksList,
+	ILibrary,
+	LibraryStatus,
+	Role,
+} from '../../../../../shared/src'
 import ListUseCase from '../../../../src/app/application/usecases/library/list.usecase'
 import PatchUseCase from '../../../../src/app/application/usecases/library/patch.usecase'
-import { ClientProxy } from '@nestjs/microservices'
+import { CurrentUser } from '../../../../../shared-api/src'
 
 describe('LibraryController', () => {
 	let controller: LibraryController
 	let listUseCase: ListUseCase
 	let patchLibraryUseCase: PatchUseCase
-	let userClient: ClientProxy
 
-	const invalidToken: Observable<any> = of(
-		new MicroserviceResponseFormatter(
-			false,
-			HttpStatus.FORBIDDEN,
-			{},
-			{
-				_id: 'mockUserId',
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			},
-		),
-	)
-	const validToken: Observable<any> = of(
-		new MicroserviceResponseFormatter(
-			true,
-			HttpStatus.OK,
-			{},
-			{
-				_id: 'mockUserId',
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			},
-		),
-	)
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
+	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -58,12 +42,10 @@ describe('LibraryController', () => {
 						handler: jest.fn(),
 					},
 				},
-				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 			],
 		}).compile()
 
 		controller = module.get<LibraryController>(LibraryController)
-		userClient = module.get<ClientProxy>('RabbitUser')
 		listUseCase = module.get<ListUseCase>(ListUseCase)
 		patchLibraryUseCase = module.get<PatchUseCase>(PatchUseCase)
 	})
@@ -78,9 +60,7 @@ describe('LibraryController', () => {
 
 	describe('getLibrariesList', () => {
 		it('should return profile books when token is valid', async () => {
-			const body = { token: 'mockToken', page: 1, userId: 'aaaaaaaaaaaa' }
-
-			jest.spyOn(userClient, 'send').mockReturnValue(validToken)
+			const body = { user: currentUser, page: 1, userId: 'aaaaaaaaaaaa' }
 
 			const mockProfileBooks: IBooksList = {
 				results: [
@@ -115,14 +95,15 @@ describe('LibraryController', () => {
 			)
 		})
 
-		it('should return an error response if token is invalid', async () => {
+		it('should throw an error', async () => {
 			const body = {
-				token: 'mock|Token',
+				user: currentUser,
 				page: 1,
 				userId: 'aaaaaaaaaaaa',
 			}
 			const error = new ForbiddenException()
-			jest.spyOn(userClient, 'send').mockReturnValue(invalidToken)
+
+			jest.spyOn(listUseCase, 'handler').mockRejectedValueOnce(error)
 
 			const result = await controller.getLibrariesList(body)
 
@@ -137,15 +118,17 @@ describe('LibraryController', () => {
 
 	describe('patch', () => {
 		const body = {
-			token: 'mock|Token',
+			user: currentUser,
 			status: LibraryStatus.TO_LEND,
 			libraryId: 'aaaaaaaaaaaa',
 		}
 
-		it('should return an error response if token is invalid', async () => {
+		it('should throw an error', async () => {
 			const error = new ForbiddenException()
 
-			jest.spyOn(userClient, 'send').mockReturnValue(invalidToken)
+			jest.spyOn(patchLibraryUseCase, 'handler').mockRejectedValueOnce(
+				error,
+			)
 
 			const result = await controller.patch(body)
 
@@ -159,12 +142,10 @@ describe('LibraryController', () => {
 
 		it('should update the library', async () => {
 			const body = {
-				token: 'mock|Token',
+				user: currentUser,
 				status: LibraryStatus.TO_LEND,
 				libraryId: 'aaaaaaaaaaaa',
 			}
-
-			jest.spyOn(userClient, 'send').mockReturnValue(validToken)
 
 			const mockLibrary: ILibrary = {
 				userId: 'userId',
@@ -190,7 +171,7 @@ describe('LibraryController', () => {
 				),
 			)
 			expect(patchLibraryUseCase.handler).toHaveBeenCalledWith(
-				'mockUserId',
+				currentUser._id,
 				body.libraryId,
 				body.status,
 			)

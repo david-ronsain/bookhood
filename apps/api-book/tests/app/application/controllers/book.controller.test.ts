@@ -2,26 +2,25 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { BookController } from '../../../../src/app/application/controllers/book.controller'
 import AddBookUseCase from '../../../../src/app/application/usecases/book/addBook.usecase'
-import { ClientProxy } from '@nestjs/microservices'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
-import { ForbiddenException, HttpStatus } from '@nestjs/common'
+import { ConflictException, HttpStatus } from '@nestjs/common'
 import BookModel from '../../../../src/app/domain/models/book.model'
 import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/book/createBookIfNew.usecase'
 import SearchBookUseCase from '../../../../src/app/application/usecases/book/searchBook.usecase'
-import { of, Observable } from 'rxjs'
 import {
 	IAddBookDTO,
 	IBook,
 	IBookSearch,
 	ILibraryFull,
 	LibraryStatus,
+	Role,
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
+import { CurrentUser } from '../../../../../shared-api/src'
 
 describe('BookController', () => {
 	let controller: BookController
-	let userClient: ClientProxy
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
 	let addBookUseCase: AddBookUseCase
 	let searchBookUseCase: SearchBookUseCase
@@ -30,6 +29,13 @@ describe('BookController', () => {
 	const mockLogger = {
 		info: jest.fn(),
 		error: jest.fn(),
+	}
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
 	}
 
 	beforeEach(async () => {
@@ -60,7 +66,6 @@ describe('BookController', () => {
 						handler: jest.fn(),
 					},
 				},
-				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
@@ -69,7 +74,6 @@ describe('BookController', () => {
 		}).compile()
 
 		controller = module.get<BookController>(BookController)
-		userClient = module.get<ClientProxy>('RabbitUser')
 		createBookIfNewUseCase = module.get<CreateBookIfNewUseCase>(
 			CreateBookIfNewUseCase,
 		)
@@ -95,30 +99,34 @@ describe('BookController', () => {
 	})
 
 	describe('addBook', () => {
-		it('should add a book and return success', async () => {
-			const mockDTO: IAddBookDTO = {
-				authors: ['author'],
-				description: 'desc',
-				isbn: [
-					{
-						type: 'ISBN_13',
-						identifier: '01234567890123',
-					},
-				],
-				language: 'fr',
-				title: 'title',
-				categories: ['category'],
-				image: { smallThumbnail: '', thumbnail: '' },
-				publishedDate: '2024',
-				publisher: 'publisher',
-				subtitle: 'subtitle',
-				location: {
-					lat: 0,
-					lng: 0,
+		const mockDTO: IAddBookDTO = {
+			authors: ['author'],
+			description: 'desc',
+			isbn: [
+				{
+					type: 'ISBN_13',
+					identifier: '01234567890123',
 				},
-				status: LibraryStatus.TO_LEND,
-				place: 'Some place',
-			} as IAddBookDTO
+			],
+			language: 'fr',
+			title: 'title',
+			categories: ['category'],
+			image: { smallThumbnail: '', thumbnail: '' },
+			publishedDate: '2024',
+			publisher: 'publisher',
+			subtitle: 'subtitle',
+			location: {
+				lat: 0,
+				lng: 0,
+			},
+			status: LibraryStatus.TO_LEND,
+			place: 'Some place',
+		} as IAddBookDTO
+		const body = {
+			book: mockDTO,
+			user: currentUser,
+		}
+		it('should add a book and return success', async () => {
 			const mockBook: BookModel = {
 				authors: ['author'],
 				description: 'desc',
@@ -137,33 +145,25 @@ describe('BookController', () => {
 				subtitle: 'subtitle',
 				status: LibraryStatus.TO_LEND,
 				place: 'Some place',
+				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
 			} as BookModel
-			const mockToken = 'mockToken||'
 
 			jest.spyOn(createBookIfNewUseCase, 'handler').mockResolvedValue(
 				mockBook,
 			)
-			jest.spyOn(userClient, 'send').mockReturnValue(
-				of({ success: true, data: { _id: 'mockUserId' } }),
-			)
+
 			jest.spyOn(addBookUseCase, 'handler').mockResolvedValue(undefined)
 
-			const result = await controller.addBook({
-				token: mockToken,
-				data: { book: mockDTO },
-			})
+			const result = await controller.addBook(body)
 
 			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()
-			expect(userClient.send).toHaveBeenCalledWith(
-				'user-get-by-token',
-				'mockToken|',
-			)
+
 			expect(addBookUseCase.handler).toHaveBeenCalledWith(
 				mockBook._id,
-				'mockUserId',
-				{ lat: 0, lng: 0 },
-				mockDTO.status,
-				mockDTO.place,
+				currentUser._id,
+				body.book.location,
+				body.book.status,
+				body.book.place,
 			)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IBook>(
@@ -173,58 +173,63 @@ describe('BookController', () => {
 					mockBook,
 				),
 			)
-
-			await controller.addBook({
-				token: undefined,
-				data: { book: mockDTO },
-			})
-
-			expect(userClient.send).toHaveBeenCalledWith(
-				'user-get-by-token',
-				'',
-			)
 		})
 
-		it('should handle errors during book addition', async () => {
-			const book = {
-				authors: ['author'],
-				description: 'desc',
-				isbn: [
-					{
-						type: 'ISBN_13',
-						identifier: '01234567890123',
-					},
-				],
-				language: 'fr',
-				title: 'title',
-				categories: ['category'],
-				image: { smallThumbnail: '', thumbnail: '' },
-				publishedDate: '2024',
-				publisher: 'publisher',
-				subtitle: 'subtitle',
-			} as IAddBookDTO
+		it('should handle errors during book creation', async () => {
 			jest.spyOn(createBookIfNewUseCase, 'handler').mockRejectedValue(
 				new Error('Test error'),
 			)
 
 			const result = await controller.addBook({
-				token: 'mockToken',
-				data: {
-					book,
-				},
+				user: currentUser,
+				book: mockDTO,
 			})
 
 			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
 					new Error('Test error'),
-					book,
+					body,
+				),
+			)
+		})
+
+		it('should handle errors during book addition', async () => {
+			jest.spyOn(createBookIfNewUseCase, 'handler').mockResolvedValue(
+				new BookModel({
+					...body.book,
+					_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+				}),
+			)
+
+			jest.spyOn(addBookUseCase, 'handler').mockRejectedValueOnce(
+				new ConflictException(),
+			)
+
+			const result = await controller.addBook({
+				user: currentUser,
+				book: body.book,
+			})
+
+			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()
+			expect(result).toEqual(
+				new MicroserviceResponseFormatter<IAddBookDTO>().buildFromException(
+					new ConflictException(),
+					body,
 				),
 			)
 		})
 	})
 
 	describe('searchBook', () => {
+		const body = {
+			search: 'query',
+			startAt: 0,
+			language: 'en',
+			boundingBox: [0, 0, 0, 0],
+			user: currentUser,
+		}
+
 		it('should search for books and return success', async () => {
 			const mockBookSearch: IBookSearch = {
 				results: [],
@@ -234,47 +239,23 @@ describe('BookController', () => {
 			jest.spyOn(searchBookUseCase, 'handler').mockResolvedValue(
 				mockBookSearch,
 			)
-
-			const result = await controller.searchBook({
-				search: 'query',
-				startAt: 0,
-				language: 'en',
-				boundingBox: [0, 0, 0, 0],
-				token:
-					Buffer.from('first.last@name.test').toString('base64') +
-					'||',
-			})
+			const result = await controller.searchBook(body)
 
 			expect(searchBookUseCase.handler).toHaveBeenCalledWith(
-				'query',
-				0,
-				'en',
-				[0, 0, 0, 0],
-				'first.last@name.test',
+				body.search,
+				body.startAt,
+				body.language,
+				body.boundingBox,
+				body.user.email,
 			)
+
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IBookSearch>(
 					true,
-					HttpStatus.CREATED,
+					HttpStatus.OK,
 					undefined,
 					mockBookSearch,
 				),
-			)
-
-			await controller.searchBook({
-				search: 'query',
-				startAt: 0,
-				language: 'en',
-				boundingBox: [0, 0, 0, 0],
-				token: undefined,
-			})
-
-			expect(searchBookUseCase.handler).toHaveBeenCalledWith(
-				'query',
-				0,
-				'en',
-				[0, 0, 0, 0],
-				undefined,
 			)
 		})
 
@@ -283,23 +264,13 @@ describe('BookController', () => {
 				new Error('Test error'),
 			)
 
-			const result = await controller.searchBook({
-				search: 'query',
-				startAt: 0,
-				language: 'en',
-				boundingBox: [0, 0, 0, 0],
-			})
+			const result = await controller.searchBook(body)
 
 			expect(searchBookUseCase.handler).toHaveBeenCalled()
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IBookSearch>().buildFromException(
 					new Error('Test error'),
-					{
-						search: 'query',
-						startAt: 0,
-						language: 'en',
-						boundingBox: [0, 0, 0, 0],
-					},
+					body,
 				),
 			)
 		})
@@ -307,21 +278,8 @@ describe('BookController', () => {
 
 	describe('getUserBooks', () => {
 		it('should return user books when token is valid', async () => {
-			const body = { token: 'mockToken', page: 1 }
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+			const body = { user: currentUser, page: 1 }
+
 			const mockUserBooks: ILibraryFull[] = [
 				{
 					_id: '123',
@@ -359,33 +317,20 @@ describe('BookController', () => {
 					mockUserBooks,
 				),
 			)
-			expect(userClient.send).toHaveBeenCalledWith(
-				'user-get-by-token',
-				'mockToken',
-			)
+
 			expect(getUserBooksUseCase.handler).toHaveBeenCalledWith(
 				expect.anything(),
 				body.page,
 			)
 		})
 
-		it('should return an error response if token is invalid', async () => {
-			const body = { token: 'mockToken', page: 1 }
-			const error = new ForbiddenException()
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					false,
-					200,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
+		it('should throw an error', async () => {
+			const body = { user: currentUser, page: 1 }
+			const error = new Error()
+
+			jest.spyOn(getUserBooksUseCase, 'handler').mockRejectedValueOnce(
+				error,
 			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
 			const result = await controller.getUserBooks(body)
 
@@ -394,10 +339,6 @@ describe('BookController', () => {
 					error,
 					body,
 				),
-			)
-			expect(userClient.send).toHaveBeenCalledWith(
-				'user-get-by-token',
-				'mockToken',
 			)
 		})
 	})

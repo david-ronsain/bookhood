@@ -3,13 +3,13 @@ import {
 	Body,
 	Controller,
 	Get,
-	Headers,
 	HttpCode,
 	HttpStatus,
 	Inject,
 	Param,
 	Patch,
 	Query,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -22,9 +22,16 @@ import {
 import { firstValueFrom } from 'rxjs'
 import { IBooksList, ILibrary, LibraryStatus, Role } from '@bookhood/shared'
 import { BookNotFoundException, UserNotFoundException } from '../exceptions'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
-import { Roles } from '../guards/role.guard'
+import {
+	CurrentUser,
+	GetLibrariesListMQDTO,
+	MicroserviceResponseFormatter,
+	PatchLibraryMQDTO,
+} from '@bookhood/shared-api'
+import { RoleGuard } from '../guards/role.guard'
 import { BooksList } from '../dto/library.dto'
+import { User } from '../decorators/user.decorator'
+import { AuthUserGuard } from '../guards/authUser.guard'
 
 @Controller('library')
 export class LibraryController {
@@ -33,21 +40,27 @@ export class LibraryController {
 	) {}
 
 	@Get('user/:userId')
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@HttpCode(HttpStatus.OK)
 	@ApiParam({ name: 'page', type: 'Number' })
 	@ApiParam({ name: 'userId', type: 'String' })
 	@ApiOperation({ description: 'Returns the libraries list' })
-	@ApiOkResponse({ type: BooksList, status: HttpStatus.CREATED })
+	@ApiOkResponse({ type: BooksList, status: HttpStatus.OK })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	async getLibraries(
-		@Headers('x-token') token: string,
+		@User() user: CurrentUser,
 		@Param('userId') userId: string,
 		@Query('page') page: number,
 	): Promise<IBooksList> {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<IBooksList>
-		>(this.bookQueue.send('libraries-list', { token, userId, page }))
+		>(
+			this.bookQueue.send('libraries-list', {
+				user,
+				userId,
+				page,
+			} as GetLibrariesListMQDTO),
+		)
 
 		if (!books.success) {
 			throw new UserNotFoundException(books.message)
@@ -56,7 +69,7 @@ export class LibraryController {
 	}
 
 	@Patch(':libraryId')
-	@Roles([Role.USER, Role.ADMIN])
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	@HttpCode(HttpStatus.OK)
 	@ApiParam({ name: 'status', type: 'String', enum: LibraryStatus })
 	@ApiParam({ name: 'libraryId', type: 'String' })
@@ -65,13 +78,19 @@ export class LibraryController {
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	@ApiResponse({ type: BookNotFoundException, status: HttpStatus.NOT_FOUND })
 	async patch(
-		@Headers('x-token') token: string,
+		@User() user: CurrentUser,
 		@Param('libraryId') libraryId: string,
 		@Body('status') status: LibraryStatus,
 	): Promise<ILibrary> {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibrary>
-		>(this.bookQueue.send('library-patch', { token, libraryId, status }))
+		>(
+			this.bookQueue.send('library-patch', {
+				user,
+				libraryId,
+				status,
+			} as PatchLibraryMQDTO),
+		)
 
 		if (!books.success) {
 			throw new BookNotFoundException(books.message)

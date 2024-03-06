@@ -9,13 +9,15 @@ import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	GetProfileMQDTO,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
 import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import GetUserByTokenUseCase from '../usecases/getUserByToken.usecase'
 import RefreshTokenUseCase from '../usecases/refreshToken.usecase'
-import { GetProfileDTO } from '../dto/user.dto'
 import GetUserByIdUseCase from '../usecases/getUserById.usecase'
 
 @Controller()
@@ -127,7 +129,7 @@ export class UserController {
 
 	@MessagePattern('user-get-profile')
 	async getProfile(
-		body: GetProfileDTO,
+		body: GetProfileMQDTO,
 	): Promise<MicroserviceResponseFormatter<IExternalProfile | null>> {
 		try {
 			const user: UserModel = await this.getUserByIdUseCase.handler(

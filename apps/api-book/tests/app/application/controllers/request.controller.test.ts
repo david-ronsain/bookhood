@@ -12,21 +12,23 @@ import GetListByStatusUseCase from '../../../../src/app/application/usecases/req
 import PatchRequestUseCase from '../../../../src/app/application/usecases/request/patchRequest.usecase'
 import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
 import {
-	CreateRequestDTO,
-	GetRequestsDTO,
-} from '../../../../src/app/application/dto/request.dto'
-import {
 	ILibraryFull,
 	IRequest,
 	IRequestInfos,
 	IRequestList,
 	IRequestSimple,
 	RequestStatus,
+	Role,
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { ClientProxy } from '@nestjs/microservices'
 import { Observable, of } from 'rxjs'
-import { PatchRequestMQDTO } from '../../../../../shared-api/src'
+import {
+	CreateRequestMQDTO,
+	CurrentUser,
+	GetRequestsMQDTO,
+	PatchRequestMQDTO,
+} from '../../../../../shared-api/src'
 import GetByIdUseCase from '../../../../src/app/application/usecases/request/getById.usecase'
 
 describe('RequestController', () => {
@@ -36,12 +38,19 @@ describe('RequestController', () => {
 	let getListByStatusUseCase: GetListByStatusUseCase
 	let patchRequestUseCase: PatchRequestUseCase
 	let getByIdUseCase: GetByIdUseCase
-	let userClient: ClientProxy
 	let mailClient: ClientProxy
 
 	const mockLogger = {
 		info: jest.fn(),
 		error: jest.fn(),
+	}
+
+	const currentUser: CurrentUser = {
+		_id: 'userId',
+		token: 'token',
+		email: 'first.last@name.test',
+		roles: [Role.ADMIN],
+		firstName: 'first',
 	}
 
 	beforeEach(async () => {
@@ -52,7 +61,6 @@ describe('RequestController', () => {
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
 				},
-				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{ provide: 'RabbitMail', useValue: { send: jest.fn() } },
 				{
 					provide: CreateRequestUseCase,
@@ -97,7 +105,6 @@ describe('RequestController', () => {
 		patchRequestUseCase =
 			module.get<PatchRequestUseCase>(PatchRequestUseCase)
 		getByIdUseCase = module.get<GetByIdUseCase>(GetByIdUseCase)
-		userClient = module.get<ClientProxy>('RabbitUser')
 		mailClient = module.get<ClientProxy>('RabbitMail')
 	})
 
@@ -110,29 +117,31 @@ describe('RequestController', () => {
 	})
 
 	describe('create', () => {
+		const request: CreateRequestMQDTO = {
+			user: currentUser,
+			libraryId: '123',
+		}
+
+		const lib: ILibraryFull = {
+			book: {
+				title: 'Title',
+				authors: ['author'],
+				isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
+				description: 'desc',
+				language: 'fr',
+			},
+			location: {
+				type: 'Point',
+				coordinates: [0, 0],
+			},
+			user: {
+				firstName: 'first',
+				lastName: 'last',
+				email: 'first.last@name.test',
+			},
+		}
+
 		it('should create a request successfully', async () => {
-			const request: CreateRequestDTO = {
-				token: 'token',
-				libraryId: '123',
-			}
-			const lib: ILibraryFull = {
-				book: {
-					title: 'Title',
-					authors: ['author'],
-					isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
-					description: 'desc',
-					language: 'fr',
-				},
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				user: {
-					firstName: 'first',
-					lastName: 'last',
-					email: 'first.last@name.test',
-				},
-			}
 			const createdRequest: IRequest = {
 				_id: 'requestId',
 				libraryId: '123',
@@ -146,20 +155,7 @@ describe('RequestController', () => {
 				request,
 				createdRequest,
 			)
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
 			jest.spyOn(mailClient, 'send').mockReturnValue(of({}))
 			jest.spyOn(createRequestUseCase, 'handler').mockResolvedValue(
 				createdRequest,
@@ -172,28 +168,6 @@ describe('RequestController', () => {
 		})
 
 		it('should throw not found error', async () => {
-			const request: CreateRequestDTO = {
-				token: 'token',
-				libraryId: '123',
-			}
-			const lib: ILibraryFull = {
-				book: {
-					title: 'Title',
-					authors: ['author'],
-					isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
-					description: 'desc',
-					language: 'fr',
-				},
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				user: {
-					firstName: 'first',
-					lastName: 'last',
-					email: 'first.last@name.test',
-				},
-			}
 			const expectedResult = new MicroserviceResponseFormatter(
 				false,
 				HttpStatus.NOT_FOUND,
@@ -201,20 +175,7 @@ describe('RequestController', () => {
 				undefined,
 				expect.anything(),
 			)
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
 			jest.spyOn(mailClient, 'send').mockReturnValue(of({}))
 			jest.spyOn(createRequestUseCase, 'handler').mockRejectedValue(
 				new NotFoundException(),
@@ -227,28 +188,6 @@ describe('RequestController', () => {
 		})
 
 		it('should throw forbidden error', async () => {
-			const request: CreateRequestDTO = {
-				token: 'token',
-				libraryId: '123',
-			}
-			const lib: ILibraryFull = {
-				book: {
-					title: 'Title',
-					authors: ['author'],
-					isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
-					description: 'desc',
-					language: 'fr',
-				},
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				user: {
-					firstName: 'first',
-					lastName: 'last',
-					email: 'first.last@name.test',
-				},
-			}
 			const expectedResult = new MicroserviceResponseFormatter(
 				false,
 				HttpStatus.FORBIDDEN,
@@ -256,20 +195,7 @@ describe('RequestController', () => {
 				undefined,
 				expect.anything(),
 			)
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
+
 			jest.spyOn(mailClient, 'send').mockReturnValue(of({}))
 			jest.spyOn(createRequestUseCase, 'handler').mockRejectedValue(
 				new ForbiddenException(),
@@ -283,26 +209,27 @@ describe('RequestController', () => {
 	})
 
 	describe('getByListStatus', () => {
+		const mockRequest: IRequestSimple = {
+			_id: 'request_id',
+			userFirstName: 'userFirstName',
+			ownerFirstName: 'ownerFirstName',
+			title: 'title',
+			place: 'Paris',
+			userId: 'user_id',
+			ownerId: 'owner_id',
+			createdAt: new Date().toString(),
+			dueDate: new Date().toString(),
+		}
+		const dto: GetRequestsMQDTO = {
+			user: currentUser,
+			status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
+			startAt: 0,
+		}
+
 		it('should return a list of requests', async () => {
-			const mockRequest: IRequestSimple = {
-				_id: 'request_id',
-				userFirstName: 'userFirstName',
-				ownerFirstName: 'ownerFirstName',
-				title: 'title',
-				place: 'Paris',
-				userId: 'user_id',
-				ownerId: 'owner_id',
-				createdAt: new Date().toString(),
-				dueDate: new Date().toString(),
-			}
 			const mockRequestList: IRequestList = {
 				results: [mockRequest],
 				total: 1,
-			}
-			const dto: GetRequestsDTO = {
-				token: 'token',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				startAt: 0,
 			}
 			const expectedResult =
 				new MicroserviceResponseFormatter<IRequestList>(
@@ -311,21 +238,6 @@ describe('RequestController', () => {
 					dto,
 					mockRequestList,
 				)
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
 			jest.spyOn(getListByStatusUseCase, 'handler').mockResolvedValue(
 				mockRequestList,
@@ -336,51 +248,16 @@ describe('RequestController', () => {
 			expect(result).toMatchObject(expectedResult)
 		})
 
-		it('should return error when user token is invalid', async () => {
-			const mockRequest: IRequestSimple = {
-				_id: 'request_id',
-				userFirstName: 'userFirstName',
-				ownerFirstName: 'ownerFirstName',
-				title: 'title',
-				place: 'Paris',
-				userId: 'user_id',
-				ownerId: 'owner_id',
-				createdAt: new Date().toString(),
-				dueDate: new Date().toString(),
-			}
-			const mockRequestList: IRequestList = {
-				results: [mockRequest],
-				total: 1,
-			}
-			const dto: GetRequestsDTO = {
-				token: undefined as unknown as string,
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				startAt: 0,
-			}
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					false,
-					200,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
-			jest.spyOn(getListByStatusUseCase, 'handler').mockResolvedValue(
-				mockRequestList,
+		it('should throw an error', async () => {
+			jest.spyOn(getListByStatusUseCase, 'handler').mockRejectedValue(
+				new Error(),
 			)
 
 			const result = await controller.getByListStatus(dto)
 
 			expect(result).toMatchObject(
 				new MicroserviceResponseFormatter().buildFromException(
-					new ForbiddenException(),
+					new Error(),
 					expect.anything(),
 				),
 			)
@@ -388,6 +265,12 @@ describe('RequestController', () => {
 	})
 
 	describe('update', () => {
+		const patchRequestDTO: PatchRequestMQDTO = {
+			user: currentUser,
+			requestId: 'request_id',
+			status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
+		}
+
 		it('should update request status', async () => {
 			const mockPatchedRequest: IRequest = {
 				_id: '012',
@@ -396,27 +279,6 @@ describe('RequestController', () => {
 				ownerId: '456',
 				userId: '789',
 			}
-			const patchRequestDTO: PatchRequestMQDTO = {
-				token: 'token',
-				requestId: 'request_id',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			}
-
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
 			jest.spyOn(patchRequestUseCase, 'handler').mockResolvedValue(
 				mockPatchedRequest,
@@ -435,27 +297,9 @@ describe('RequestController', () => {
 		})
 
 		it('should return error when user token is invalid', async () => {
-			const patchRequestDTO: PatchRequestMQDTO = {
-				token: 'token',
-				requestId: 'request_id',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			}
-
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					false,
-					403,
-					{},
-					{
-						_id: 'mockUserId',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
+			jest.spyOn(patchRequestUseCase, 'handler').mockRejectedValue(
+				new ForbiddenException(),
 			)
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
 			const result = await controller.update(patchRequestDTO)
 
 			expect(result).toMatchObject(
@@ -467,28 +311,6 @@ describe('RequestController', () => {
 		})
 
 		it('should throw not found exception', async () => {
-			const patchRequestDTO: PatchRequestMQDTO = {
-				token: 'token',
-				requestId: 'request_id',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			}
-
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
 			jest.spyOn(patchRequestUseCase, 'handler').mockRejectedValue(
 				new NotFoundException(),
 			)
@@ -504,28 +326,6 @@ describe('RequestController', () => {
 		})
 
 		it('should throw forbidden exception', async () => {
-			const patchRequestDTO: PatchRequestMQDTO = {
-				token: 'token||',
-				requestId: 'request_id',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			}
-
-			const mockObservable: Observable<any> = of(
-				new MicroserviceResponseFormatter(
-					true,
-					200,
-					{},
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						firstName: 'first',
-						lastName: 'last',
-						email: 'first.last@name.test',
-					},
-				),
-			)
-
-			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
-
 			jest.spyOn(patchRequestUseCase, 'handler').mockRejectedValue(
 				new ForbiddenException(),
 			)

@@ -4,6 +4,9 @@ import {
 	IISBN,
 	type ICoords,
 	LibraryStatus,
+	type IBookSearch,
+	IBookSearchResult,
+	IBook,
 } from '@bookhood/shared'
 import { ApiProperty } from '@nestjs/swagger'
 import {
@@ -13,6 +16,7 @@ import {
 	IsOptional,
 	ArrayMinSize,
 	IsEnum,
+	IsNumber,
 } from 'class-validator'
 
 export class AddBookDTO implements IAddBookDTO {
@@ -75,4 +79,50 @@ export class AddBookDTO implements IAddBookDTO {
 	@ApiProperty()
 	@IsNotEmpty()
 	place: string
+}
+
+export class BookSearchDTO {
+	@ApiProperty()
+	@IsString()
+	q: string
+
+	@ApiProperty()
+	@IsNumber()
+	startIndex: number
+
+	@ApiProperty()
+	@IsArray()
+	boundingBox: number[]
+}
+
+export class BookSearch implements IBookSearch {
+	results: IBookSearchResult[]
+
+	total: number
+}
+
+export class Book implements IBook {
+	_id?: string
+
+	title: string
+
+	authors: string[]
+
+	categories?: string[]
+
+	description: string
+
+	image?: IBookImageLinks
+
+	isbn: IISBN[]
+
+	language: string
+
+	subtitle?: string
+
+	publisher?: string
+
+	publishedDate?: string
+
+	status?: LibraryStatus
 }
