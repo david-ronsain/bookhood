@@ -9,6 +9,7 @@ import {
 } from '../../../../../../shared/src'
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
+import { of } from 'rxjs'
 import {
 	CurrentUser,
 	PatchRequestMQDTO,
