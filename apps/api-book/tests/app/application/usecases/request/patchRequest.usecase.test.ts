@@ -9,12 +9,11 @@ import {
 } from '../../../../../../shared/src'
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import RequestModel from '../../../../../src/app/domain/models/request.model'
-import { of } from 'rxjs'
 import {
 	CurrentUser,
 	PatchRequestMQDTO,
 } from '../../../../../../shared-api/src'
+import RequestModel from '../../../../../src/app/domain/models/request.model'
 
 describe('PatchRequestUseCase', () => {
 	let patchRequestUseCase: PatchRequestUseCase

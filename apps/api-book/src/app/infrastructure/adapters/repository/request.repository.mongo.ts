@@ -11,7 +11,6 @@ import {
 } from '@bookhood/shared'
 import RequestMapper from '../../../application/mappers/request.mapper'
 import { RequestEntity } from './entities/request.entity'
-import { cp } from 'fs'
 
 @Injectable()
 export default class RequestRepositoryMongo implements RequestRepository {
