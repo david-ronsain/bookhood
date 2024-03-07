@@ -16,25 +16,27 @@
 		loading?: boolean
 		icon?: BhPrimaryButtonIcon
 		disabled?: boolean
+		color?: string
 	}
 	const props = withDefaults(defineProps<BhPrimaryButtonProps>(), {
 		text: 'Submit',
 		noBackground: false,
 		loading: false,
 		icon: undefined,
+		color: 'primary',
 	})
 	const capitalizedText = computed<string>(
 		() =>
 			new String(props.text).charAt(0).toUpperCase() +
-			new String(props.text).slice(1).toLowerCase()
+			new String(props.text).slice(1).toLowerCase(),
 	)
 	const prependIcon = computed(() =>
-		props.icon && props.icon.prepend ? props.icon.icon : null
+		props.icon && props.icon.prepend ? props.icon.icon : null,
 	)
 	const appendIcon = computed(() =>
 		props.icon && props.icon.icon && props.icon.append
 			? props.icon.icon
-			: null
+			: null,
 	)
 	const icon = computed(() =>
 		props.icon &&
@@ -42,13 +44,14 @@
 		!props.icon.prepend &&
 		!props.icon.append
 			? props.icon.icon
-			: null
+			: null,
 	)
 </script>
 
 <template>
 	<v-btn
-		color="primary"
+		:density="icon ? 'compact' : 'default'"
+		:color="color"
 		:to="to"
 		:text="capitalizedText"
 		:loading="loading ?? false"

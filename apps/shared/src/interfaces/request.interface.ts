@@ -23,6 +23,14 @@ export interface IRequestEvent {
 
 	currentStatus: RequestStatus
 
+	oldStartDate?: string
+
+	currentStartDate?: string
+
+	oldEndDate?: string
+
+	currentEndDate?: string
+
 	date: string
 
 	userId: string

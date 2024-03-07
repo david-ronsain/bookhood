@@ -55,7 +55,7 @@ describe('PatchRequestUseCase', () => {
 			user: {
 				_id: request.userId,
 			} as unknown as CurrentUser,
-			dates: ['0000-00-00', '0000-00-00'],
+			dates: ['2024-03-07', '2024-03-07'],
 		}
 
 		let foundRequest = new RequestModel(request)
@@ -103,10 +103,11 @@ describe('PatchRequestUseCase', () => {
 			expect(requestRepository.getById).toHaveBeenCalledWith(request._id)
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith(request.userId, [
-				expect.any(String),
-				expect.any(String),
-			])
+			).toHaveBeenCalledWith(
+				request.userId,
+				[expect.any(String), expect.any(String)],
+				request._id,
+			)
 			expect(requestRepository.patch).toHaveBeenCalledWith(
 				request._id,
 				newStatus,
@@ -145,10 +146,11 @@ describe('PatchRequestUseCase', () => {
 			)
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith(request.userId, [
-				expect.any(String),
-				expect.any(String),
-			])
+			).toHaveBeenCalledWith(
+				request.userId,
+				[expect.any(String), expect.any(String)],
+				request._id,
+			)
 		})
 
 		it('should throw ForbiddenException when the transition is not allowed', async () => {

@@ -37,7 +37,10 @@ export default class PatchRequestUseCase {
 			)
 		}
 
-		if (!this.statusAllowed(request.status, body.status)) {
+		if (
+			request.status !== body.status &&
+			!this.statusAllowed(request.status, body.status)
+		) {
 			throw new ForbiddenException(
 				`The request can not go from "${request.status}" to "${body.status}`,
 			)
@@ -46,6 +49,14 @@ export default class PatchRequestUseCase {
 		const event: IRequestEvent = {
 			oldStatus: request.status,
 			currentStatus: body.status,
+			oldStartDate: request.startDate
+				? format(request.startDate, 'yyyy-MM-dd')
+				: undefined,
+			currentStartDate: body.dates[0] ?? request.startDate,
+			oldEndDate: request.endDate
+				? format(request.endDate, 'yyyy-MM-dd')
+				: undefined,
+			currentEndDate: body.dates[1] ?? request.endDate,
 			date: new Date().toString(),
 			userId: body.user._id,
 		}
@@ -61,18 +72,22 @@ export default class PatchRequestUseCase {
 			body.requestId,
 		)
 
-		if (body.status === RequestStatus.REFUSED) {
-			this.mailClient.send('mail-request-refused', infos).subscribe()
-		} else if (body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
-			this.mailClient.send('mail-request-accepted', infos).subscribe()
-		} else if (body.status === RequestStatus.NEVER_RECEIVED) {
-			this.mailClient
-				.send('mail-request-never-received', infos)
-				.subscribe()
-		} else if (body.status === RequestStatus.RETURNED_WITH_ISSUE) {
-			this.mailClient
-				.send('mail-request-returned-with-issue', infos)
-				.subscribe()
+		if (request.status !== body.status) {
+			if (body.status === RequestStatus.REFUSED) {
+				this.mailClient.send('mail-request-refused', infos).subscribe()
+			} else if (
+				body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY
+			) {
+				this.mailClient.send('mail-request-accepted', infos).subscribe()
+			} else if (body.status === RequestStatus.NEVER_RECEIVED) {
+				this.mailClient
+					.send('mail-request-never-received', infos)
+					.subscribe()
+			} else if (body.status === RequestStatus.RETURNED_WITH_ISSUE) {
+				this.mailClient
+					.send('mail-request-returned-with-issue', infos)
+					.subscribe()
+			}
 		}
 
 		return RequestMapper.modelObjectIdToString(updated)

@@ -57,7 +57,6 @@ const router = createRouter({
 					name: 'signinLink',
 					component: Signin,
 					beforeEnter: async (to, from, next) => {
-						console.log('####')
 						const userStore = useUserStore()
 						const mainStore = useMainStore()
 

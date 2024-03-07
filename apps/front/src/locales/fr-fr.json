@@ -180,15 +180,16 @@
 		"headers": {
 			"book": "Livre",
 			"firstName": "Prénom",
-			"startDate": "Début",
-			"endDate": "Fin",
+			"dates": "Période",
 			"status": "Statut",
 			"actions": "Actions"
 		},
 		"loading": "Récupération des données en cours",
 		"noData": "Pas de demande pour le moment !",
 		"outgoing": {
-			"title": "Demandes envoyées"
+			"title": "Demandes envoyées",
+			"datesUpdated": "Les dates ont été mises à jour",
+			"datesNotUpdated": "Impossible de changer les dates"
 		},
 		"incoming": {
 			"title": "Demandes reçues"

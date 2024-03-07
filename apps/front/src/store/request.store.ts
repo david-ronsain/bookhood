@@ -49,10 +49,13 @@ export const useRequestStore = defineStore('requestStore', () => {
 	const issueFixed = (requestId: string) =>
 		updateStatus(requestId, RequestStatus.ISSUE_FIXED)
 
+	const changeDates = (requestId: string, dates: string[]) =>
+		updateStatus(requestId, RequestStatus.PENDING_VALIDATION, dates)
+
 	const updateStatus = (
 		requestId: string,
 		status: RequestStatus,
-		dates?: Date[],
+		dates?: string[],
 	) =>
 		axios.patch(
 			EnvConfig.api.base + EnvConfig.api.url.request + requestId,
@@ -116,5 +119,6 @@ export const useRequestStore = defineStore('requestStore', () => {
 		incomingRequests,
 		outgoingRequestPage,
 		outgoingRequests,
+		changeDates,
 	}
 })

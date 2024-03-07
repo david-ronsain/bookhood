@@ -44,6 +44,8 @@ export default class CreateRequestUseCase {
 			events: [
 				{
 					currentStatus: RequestStatus.PENDING_VALIDATION,
+					currentStartDate: dates[0],
+					currentEndDate: dates[1],
 					date: new Date().toString(),
 					userId,
 				},

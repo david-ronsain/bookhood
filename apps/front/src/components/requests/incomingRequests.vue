@@ -23,6 +23,7 @@
 	import { computed } from 'vue'
 	import { watch } from 'vue'
 	import { statusColor } from '../../composables/statusColor.composable'
+	import { displayKeyboardDates } from '../../composables/dates.composable'
 	import { useDate } from 'vuetify'
 
 	const date = useDate()
@@ -62,13 +63,7 @@
 		{
 			align: 'center',
 			sortable: false,
-			title: t('request.headers.startDate'),
-			key: 'startDate',
-		},
-		{
-			align: 'center',
-			sortable: false,
-			title: t('request.headers.endDate'),
+			title: t('request.headers.dates'),
 			key: 'endDate',
 		},
 		{
@@ -216,9 +211,15 @@
 							>
 						</td>
 						<td>
-							{{ date.format(item.startDate, 'keyboardDate') }}
+							<span
+								v-text="
+									displayKeyboardDates(
+										date,
+										item.startDate,
+										item.endDate,
+									)
+								" />
 						</td>
-						<td>{{ date.format(item.endDate, 'keyboardDate') }}</td>
 						<td>
 							<div class="d-flex align-center justify-center">
 								<btn-validate-status

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, computed, defineEmits, onMounted } from 'vue'
+	import { ref, computed, defineEmits, onMounted, watch } from 'vue'
 	import BhDatePicker from '../classic/bhDatePicker.vue'
 	import BhTextField from '../../textField/bhTextField.vue'
 	import { mdiCalendar } from '@mdi/js'
@@ -16,11 +16,13 @@
 		maxDate?: Date
 		multiple?: boolean | 'range'
 		currentDates?: Date[]
+		clearable?: boolean
 	}
 
 	const properties = withDefaults(defineProps<BhDatePickerMenuProps>(), {
 		readonly: false,
 		multiple: false,
+		clearable: true,
 	})
 
 	const model = ref<Date[]>([])
@@ -66,6 +68,12 @@
 			model.value = properties.currentDates
 		}
 	})
+
+	watch(properties, () => {
+		if (properties.currentDates && properties.currentDates.length) {
+			model.value = properties.currentDates
+		}
+	})
 </script>
 
 <template>
@@ -75,7 +83,8 @@
 		<template v-slot:activator="{ props }">
 			<bh-text-field
 				v-bind="props"
-				clearable
+				class="datepicker-editor"
+				:clearable="clearable"
 				density="compact"
 				:icon="{
 					appendInner: true,
@@ -84,7 +93,7 @@
 				:label="label"
 				:placeholder="placeholder"
 				:readonly="readonly"
-				variant="outlined"
+				:variant="clearable ? 'outlined' : 'underlined'"
 				v-model="model"
 				:value="displayDates"
 				@click:clear="clear" />
@@ -99,4 +108,8 @@
 	</v-menu>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+	.datepicker-editor {
+		min-width: 200px;
+	}
+</style>

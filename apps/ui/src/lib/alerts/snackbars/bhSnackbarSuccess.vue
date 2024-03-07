@@ -6,11 +6,13 @@
 	export interface BhSnackbarSuccessProps {
 		text?: string
 		opened?: boolean
+		timeout?: number
 	}
 
 	const props = withDefaults(defineProps<BhSnackbarSuccessProps>(), {
 		text: 'Ok',
 		opened: false,
+		number: 7000,
 	})
 	const isOpened = ref(props.opened)
 
@@ -40,7 +42,7 @@
 		location="top"
 		width="100%"
 		:close-on-back="false"
-		timeout="-1"
+		:timeout="timeout"
 		rounded="0"
 		multi-line
 		v-model="isOpened"

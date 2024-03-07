@@ -12,6 +12,22 @@ const RequestEventSchema = new Schema(
 			enum: RequestStatus,
 			required: true,
 		},
+		oldStartDate: {
+			type: String,
+		},
+		currentStartDate: {
+			type: String,
+			enum: RequestStatus,
+			required: true,
+		},
+		oldEndDate: {
+			type: String,
+		},
+		currentEndDate: {
+			type: String,
+			enum: RequestStatus,
+			required: true,
+		},
 		date: {
 			type: Date,
 			required: true,

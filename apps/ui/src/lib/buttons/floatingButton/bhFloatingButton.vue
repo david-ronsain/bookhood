@@ -1,6 +1,7 @@
 <script setup lang="ts">
-	import { type IBhFloatingButtonProps } from '../../../interfaces/bhFloatingButton.interface'
-
+	export interface IBhFloatingButtonProps {
+		icon: string
+	}
 	defineProps<IBhFloatingButtonProps>()
 </script>
 
