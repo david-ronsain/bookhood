@@ -11,6 +11,10 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import RequestModel from '../../../../../src/app/domain/models/request.model'
 import { of } from 'rxjs'
+import {
+	CurrentUser,
+	PatchRequestMQDTO,
+} from '../../../../../../shared-api/src'
 
 describe('PatchRequestUseCase', () => {
 	let patchRequestUseCase: PatchRequestUseCase
@@ -36,17 +40,51 @@ describe('PatchRequestUseCase', () => {
 	})
 
 	describe('handler', () => {
+		const request: IRequest = {
+			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
+			libraryId: 'cccccccccccccccccccccccc',
+			ownerId: 'dddddddddddddddddddddddd',
+			status: RequestStatus.RETURN_PENDING,
+			events: [] as IRequestEvent[],
+		}
+
+		const body: PatchRequestMQDTO = {
+			status: RequestStatus.RETURNED_WITH_ISSUE,
+			requestId: request._id ?? '',
+			user: {
+				_id: request.userId,
+			} as unknown as CurrentUser,
+			dates: ['0000-00-00', '0000-00-00'],
+		}
+
+		let foundRequest = new RequestModel(request)
+		const infos: IRequestInfos = {
+			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+			createdAt: new Date().toString(),
+			emitter: {
+				firstName: 'first1',
+				lastName: 'last1',
+				email: 'first1.last1@name.test',
+			},
+			owner: {
+				firstName: 'first2',
+				lastName: 'last2',
+				email: 'first2.last2@name.test',
+			},
+			book: {
+				title: 'Title',
+			},
+		}
+
 		it('should patch the request status and return the updated request', async () => {
-			const request: IRequest = {
-				_id: 'dddddddddddddddddddddddd',
-				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				libraryId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				ownerId: 'cccccccccccccccccccccccc',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.PENDING_VALIDATION,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
+			body.status = RequestStatus.ACCEPTED_PENDING_DELIVERY
 			const newStatus = RequestStatus.ACCEPTED_PENDING_DELIVERY
+
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -59,49 +97,41 @@ describe('PatchRequestUseCase', () => {
 				status: newStatus,
 			})
 
-			const result = await patchRequestUseCase.handler(
-				request.userId,
-				request._id ?? '',
-				newStatus,
-			)
+			const result = await patchRequestUseCase.handler(body)
 
 			expect(result).toEqual({ ...request, status: newStatus })
 			expect(requestRepository.getById).toHaveBeenCalledWith(request._id)
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith(request.userId)
+			).toHaveBeenCalledWith(request.userId, [
+				expect.any(String),
+				expect.any(String),
+			])
 			expect(requestRepository.patch).toHaveBeenCalledWith(
 				request._id,
 				newStatus,
-				expect.any(Array),
+				expect.anything(),
+				expect.any(String),
+				expect.any(String),
 			)
 		})
 
 		it('should throw NotFoundException when request is not found', async () => {
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(null)
 
-			await expect(
-				patchRequestUseCase.handler(
-					'aaaaaaaaaaaaaaaaaaaaaaaa',
-					'bbbbbbbbbbbbbbbbbbbbbbbb',
-					RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				),
-			).rejects.toThrow(NotFoundException)
-			expect(requestRepository.getById).toHaveBeenCalledWith(
-				'bbbbbbbbbbbbbbbbbbbbbbbb',
+			await expect(patchRequestUseCase.handler(body)).rejects.toThrow(
+				NotFoundException,
 			)
+			expect(requestRepository.getById).toHaveBeenCalledWith(request._id)
 		})
 
 		it('should throw ForbiddenException when user has an active request and tries to accept a new one', async () => {
-			const request: IRequest = {
-				_id: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.PENDING_VALIDATION,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
+			body.status = RequestStatus.ACCEPTED_PENDING_DELIVERY
+
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -110,67 +140,39 @@ describe('PatchRequestUseCase', () => {
 				'countActiveRequestsForUser',
 			).mockResolvedValueOnce(1)
 
-			await expect(
-				patchRequestUseCase.handler(
-					request.userId,
-					request._id ?? '',
-					RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				),
-			).rejects.toThrow(ForbiddenException)
+			await expect(patchRequestUseCase.handler(body)).rejects.toThrow(
+				ForbiddenException,
+			)
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith(request.userId)
+			).toHaveBeenCalledWith(request.userId, [
+				expect.any(String),
+				expect.any(String),
+			])
 		})
 
 		it('should throw ForbiddenException when the transition is not allowed', async () => {
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.RETURN_PENDING,
-				events: [] as IRequestEvent[],
 			}
-			;(requestRepository.getById as jest.Mock).mockResolvedValueOnce(
-				request,
+			body.status = RequestStatus.PENDING_VALIDATION
+			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
+				foundRequest,
 			)
 
-			await expect(
-				patchRequestUseCase.handler(
-					request.userId,
-					request._id ?? '',
-					RequestStatus.PENDING_VALIDATION,
-				),
-			).rejects.toThrow(ForbiddenException)
+			await expect(patchRequestUseCase.handler(body)).rejects.toThrow(
+				ForbiddenException,
+			)
 		})
 
 		it('should update the status to ACCEPTED_PENDING_DELIVERY and send the mail', async () => {
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.PENDING_VALIDATION,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
-			const infos: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				emitter: {
-					firstName: 'first1',
-					lastName: 'last1',
-					email: 'first1.last1@name.test',
-				},
-				owner: {
-					firstName: 'first2',
-					lastName: 'last2',
-					email: 'first2.last2@name.test',
-				},
-				book: {
-					title: 'Title',
-				},
-			}
+			body.status = RequestStatus.ACCEPTED_PENDING_DELIVERY
+
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -187,11 +189,7 @@ describe('PatchRequestUseCase', () => {
 				'getRequestInfos',
 			).mockResolvedValueOnce(infos)
 
-			await patchRequestUseCase.handler(
-				request.userId,
-				request._id ?? '',
-				RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			)
+			await patchRequestUseCase.handler(body)
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-accepted',
@@ -200,32 +198,11 @@ describe('PatchRequestUseCase', () => {
 		})
 
 		it('should update the status to NEVER_RECEIVED and send the mail', async () => {
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
-			const infos: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				emitter: {
-					firstName: 'first1',
-					lastName: 'last1',
-					email: 'first1.last1@name.test',
-				},
-				owner: {
-					firstName: 'first2',
-					lastName: 'last2',
-					email: 'first2.last2@name.test',
-				},
-				book: {
-					title: 'Title',
-				},
-			}
+			body.status = RequestStatus.NEVER_RECEIVED
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -242,11 +219,7 @@ describe('PatchRequestUseCase', () => {
 				'getRequestInfos',
 			).mockResolvedValueOnce(infos)
 
-			await patchRequestUseCase.handler(
-				request.userId,
-				request._id ?? '',
-				RequestStatus.NEVER_RECEIVED,
-			)
+			await patchRequestUseCase.handler(body)
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-never-received',
@@ -255,32 +228,11 @@ describe('PatchRequestUseCase', () => {
 		})
 
 		it('should update the status to REFUSED and send the mail', async () => {
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.PENDING_VALIDATION,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
-			const infos: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				emitter: {
-					firstName: 'first1',
-					lastName: 'last1',
-					email: 'first1.last1@name.test',
-				},
-				owner: {
-					firstName: 'first2',
-					lastName: 'last2',
-					email: 'first2.last2@name.test',
-				},
-				book: {
-					title: 'Title',
-				},
-			}
+			body.status = RequestStatus.REFUSED
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -297,11 +249,7 @@ describe('PatchRequestUseCase', () => {
 				'getRequestInfos',
 			).mockResolvedValueOnce(infos)
 
-			await patchRequestUseCase.handler(
-				request.userId,
-				request._id ?? '',
-				RequestStatus.REFUSED,
-			)
+			await patchRequestUseCase.handler(body)
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-refused',
@@ -310,32 +258,12 @@ describe('PatchRequestUseCase', () => {
 		})
 
 		it('should update the status to RETURNED_WITH_ISSUE and send the mail', async () => {
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				libraryId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
+			foundRequest = {
+				...foundRequest,
 				status: RequestStatus.RETURN_PENDING,
-				events: [] as IRequestEvent[],
 			}
-			const foundRequest = new RequestModel(request)
-			const infos: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				emitter: {
-					firstName: 'first1',
-					lastName: 'last1',
-					email: 'first1.last1@name.test',
-				},
-				owner: {
-					firstName: 'first2',
-					lastName: 'last2',
-					email: 'first2.last2@name.test',
-				},
-				book: {
-					title: 'Title',
-				},
-			}
+			body.status = RequestStatus.RETURNED_WITH_ISSUE
+
 			jest.spyOn(requestRepository, 'getById').mockResolvedValueOnce(
 				foundRequest,
 			)
@@ -352,11 +280,7 @@ describe('PatchRequestUseCase', () => {
 				'getRequestInfos',
 			).mockResolvedValueOnce(infos)
 
-			await patchRequestUseCase.handler(
-				request.userId,
-				request._id ?? '',
-				RequestStatus.RETURNED_WITH_ISSUE,
-			)
+			await patchRequestUseCase.handler(body)
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-returned-with-issue',

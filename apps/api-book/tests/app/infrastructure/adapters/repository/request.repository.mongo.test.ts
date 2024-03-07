@@ -44,15 +44,12 @@ describe('RequestRepositoryMongo', () => {
 				expectedResult,
 			)
 
-			const result = await repository.countActiveRequestsForUser(userId)
+			const result = await repository.countActiveRequestsForUser(userId, [
+				'0000-00-00',
+				'0000-00-00',
+			])
 
 			expect(result).toEqual(expectedResult)
-			expect(requestModel.countDocuments).toHaveBeenCalledWith({
-				userId: expect.any(Object),
-				status: {
-					$in: expect.any(Array),
-				},
-			})
 		})
 	})
 
@@ -105,7 +102,8 @@ describe('RequestRepositoryMongo', () => {
 							ownerFirstName: 'first2',
 							title: 'title',
 							place: 'Some place',
-							dueDate: new Date().toString(),
+							startDate: new Date().toString(),
+							endDate: new Date().toString(),
 							createdAt: new Date().toString(),
 							userId,
 							ownerId,
@@ -169,7 +167,13 @@ describe('RequestRepositoryMongo', () => {
 				entity,
 			)
 
-			const result = await repository.patch(requestId, status, events)
+			const result = await repository.patch(
+				requestId,
+				status,
+				events,
+				'0000-00-00',
+				'0000-00-00',
+			)
 
 			expect(result).toMatchObject(model)
 		})

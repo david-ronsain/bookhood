@@ -13,14 +13,21 @@ export default class CreateRequestUseCase {
 		private readonly libraryRepository: LibraryRepository,
 	) {}
 
-	async handler(userId: string, libraryId: string): Promise<IRequest> {
+	async handler(
+		userId: string,
+		libraryId: string,
+		dates: string[],
+	): Promise<IRequest> {
 		const library = await this.libraryRepository.getById(libraryId)
 		if (!library) {
 			throw new NotFoundException('We could not find this book')
 		}
 
 		const currentlyBorrowed =
-			await this.requestRepository.countActiveRequestsForUser(userId)
+			await this.requestRepository.countActiveRequestsForUser(
+				userId,
+				dates,
+			)
 		if (currentlyBorrowed > 0) {
 			throw new ForbiddenException(
 				'You can not borrow multiple books at the same time',
@@ -32,6 +39,8 @@ export default class CreateRequestUseCase {
 			ownerId: library.userId.toString(),
 			userId,
 			status: RequestStatus.PENDING_VALIDATION,
+			startDate: dates[0].toString(),
+			endDate: dates[1].toString(),
 			events: [
 				{
 					currentStatus: RequestStatus.PENDING_VALIDATION,

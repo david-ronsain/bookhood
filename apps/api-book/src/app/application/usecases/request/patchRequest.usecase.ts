@@ -3,6 +3,8 @@ import { RequestRepository } from '../../../domain/ports/request.repository'
 import { IRequest, IRequestEvent, RequestStatus } from '@bookhood/shared'
 import RequestMapper from '../../mappers/request.mapper'
 import { ClientProxy } from '@nestjs/microservices'
+import { format } from 'date-fns'
+import { PatchRequestMQDTO } from '@bookhood/shared-api'
 
 export default class PatchRequestUseCase {
 	constructor(
@@ -11,12 +13,8 @@ export default class PatchRequestUseCase {
 		@Inject('RabbitMail') private readonly mailClient: ClientProxy,
 	) {}
 
-	async handler(
-		userId: string,
-		requestId: string,
-		status: RequestStatus,
-	): Promise<IRequest> {
-		const request = await this.requestRepository.getById(requestId)
+	async handler(body: PatchRequestMQDTO): Promise<IRequest> {
+		const request = await this.requestRepository.getById(body.requestId)
 		if (!request) {
 			throw new NotFoundException('Request not found')
 		}
@@ -24,44 +22,54 @@ export default class PatchRequestUseCase {
 		const currentlyBorrowed =
 			await this.requestRepository.countActiveRequestsForUser(
 				request.userId.toString(),
+				body.dates ?? [
+					format(new Date(), 'yyyy-MM-dd'),
+					format(new Date(), 'yyyy-MM-dd'),
+				],
+				request._id,
 			)
 		if (
 			currentlyBorrowed > 0 &&
-			status === RequestStatus.ACCEPTED_PENDING_DELIVERY
+			body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY
 		) {
 			throw new ForbiddenException(
 				'This user has already a loan in progress, you can not load him your book',
 			)
 		}
 
-		if (!this.statusAllowed(request.status, status)) {
+		if (!this.statusAllowed(request.status, body.status)) {
 			throw new ForbiddenException(
-				`The request can not go from "${request.status}" to "${status}`,
+				`The request can not go from "${request.status}" to "${body.status}`,
 			)
 		}
 
 		const event: IRequestEvent = {
 			oldStatus: request.status,
-			currentStatus: status,
+			currentStatus: body.status,
 			date: new Date().toString(),
-			userId,
+			userId: body.user._id,
 		}
-		const updated = await this.requestRepository.patch(requestId, status, [
-			event,
-			...request.events,
-		])
+		const updated = await this.requestRepository.patch(
+			body.requestId,
+			body.status,
+			[event, ...request.events],
+			body.dates ? body.dates[0] : undefined,
+			body.dates ? body.dates[1] : undefined,
+		)
 
-		const infos = await this.requestRepository.getRequestInfos(requestId)
+		const infos = await this.requestRepository.getRequestInfos(
+			body.requestId,
+		)
 
-		if (status === RequestStatus.REFUSED) {
+		if (body.status === RequestStatus.REFUSED) {
 			this.mailClient.send('mail-request-refused', infos).subscribe()
-		} else if (status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
+		} else if (body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
 			this.mailClient.send('mail-request-accepted', infos).subscribe()
-		} else if (status === RequestStatus.NEVER_RECEIVED) {
+		} else if (body.status === RequestStatus.NEVER_RECEIVED) {
 			this.mailClient
 				.send('mail-request-never-received', infos)
 				.subscribe()
-		} else if (status === RequestStatus.RETURNED_WITH_ISSUE) {
+		} else if (body.status === RequestStatus.RETURNED_WITH_ISSUE) {
 			this.mailClient
 				.send('mail-request-returned-with-issue', infos)
 				.subscribe()

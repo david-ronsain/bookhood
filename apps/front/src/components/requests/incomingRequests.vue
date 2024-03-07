@@ -1,6 +1,10 @@
 <script setup lang="ts">
 	import { BhCard, BhDatatable } from '@bookhood/ui'
-	import { type IRequestList, RequestStatus } from '@bookhood/shared'
+	import {
+		type IRequestList,
+		RequestStatus,
+		type IRequestSimple,
+	} from '@bookhood/shared'
 	import { useRequestStore, useMainStore } from '../../store'
 	import { onMounted } from 'vue'
 	import { ref } from 'vue'
@@ -12,7 +16,6 @@
 	import BtnValidateStatus from './actions/btnValidateStatus.vue'
 	import BtnRefuseStatus from './actions/btnRefuseStatus.vue'
 	import BtnOtherAction from './actions/btnOtherAction.vue'
-
 	import { useRouter } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
 	import { mdiChat } from '@mdi/js'
@@ -20,7 +23,9 @@
 	import { computed } from 'vue'
 	import { watch } from 'vue'
 	import { statusColor } from '../../composables/statusColor.composable'
+	import { useDate } from 'vuetify'
 
+	const date = useDate()
 	const router = useRouter()
 	const { t } = useI18n({})
 	const requestStore = useRequestStore()
@@ -57,8 +62,14 @@
 		{
 			align: 'center',
 			sortable: false,
-			title: t('request.headers.date'),
-			key: 'createdAt',
+			title: t('request.headers.startDate'),
+			key: 'startDate',
+		},
+		{
+			align: 'center',
+			sortable: false,
+			title: t('request.headers.endDate'),
+			key: 'endDate',
 		},
 		{
 			align: 'center',
@@ -81,7 +92,7 @@
 	onUnmounted(() => {
 		requestStore.$patch({
 			incomingRequests: { total: 0, results: [] } as IRequestList,
-			incomingRequestPage: 0,
+			incomingRequestPage: 1,
 		})
 	})
 
@@ -98,8 +109,8 @@
 		}
 	}
 
-	const accept = (requestId: string) => {
-		acceptRequestDialog.value.open(requestId)
+	const accept = (requestId: string, startDate: string, endDate: string) => {
+		acceptRequestDialog.value.open(requestId, startDate, endDate)
 	}
 
 	const refuse = (requestId: string) => {
@@ -124,6 +135,55 @@
 			params: { id: requestId },
 		})
 	}
+
+	const validateStatus = (item: IRequestSimple) => {
+		if (item.status === RequestStatus.PENDING_VALIDATION) {
+			accept(item._id, item.startDate, item.endDate)
+		} else if (item.status === RequestStatus.RETURN_PENDING) {
+			acceptReturn(item._id)
+		} else if (item.status === RequestStatus.RETURNED_WITH_ISSUE) {
+			issueFixed(item._id)
+		}
+	}
+
+	const validateBtnText = (status: RequestStatus): string => {
+		if (status === RequestStatus.PENDING_VALIDATION) {
+			return t('request.tooltips.accept')
+		} else if (status === RequestStatus.RETURN_PENDING) {
+			return t('request.tooltips.acceptReturn')
+		} else if (status === RequestStatus.RETURNED_WITH_ISSUE) {
+			return t('request.tooltips.issueFixed')
+		}
+		return ''
+	}
+	const showValidateBtn = (status: RequestStatus): boolean =>
+		[
+			RequestStatus.PENDING_VALIDATION,
+			RequestStatus.RETURN_PENDING,
+			RequestStatus.RETURNED_WITH_ISSUE,
+		].includes(status)
+
+	const refuseStatus = (id: string, status: RequestStatus) => {
+		if (status === RequestStatus.PENDING_VALIDATION) {
+			refuse(id)
+		} else if (status === RequestStatus.RETURN_PENDING) {
+			refuseReturn(id)
+		}
+	}
+
+	const refuseBtnText = (status: RequestStatus): string => {
+		if (status === RequestStatus.PENDING_VALIDATION) {
+			return t('request.tooltips.refuse')
+		} else if (status === RequestStatus.RETURN_PENDING) {
+			return t('request.tooltips.refuseReturn')
+		}
+		return ''
+	}
+	const showRefuseBtn = (status: RequestStatus): boolean =>
+		[
+			RequestStatus.PENDING_VALIDATION,
+			RequestStatus.RETURN_PENDING,
+		].includes(status)
 </script>
 
 <template>
@@ -155,53 +215,23 @@
 								}}</v-chip
 							>
 						</td>
-						<td>{{ item.createdAt }}</td>
+						<td>
+							{{ date.format(item.startDate, 'keyboardDate') }}
+						</td>
+						<td>{{ date.format(item.endDate, 'keyboardDate') }}</td>
 						<td>
 							<div class="d-flex align-center justify-center">
 								<btn-validate-status
-									v-if="
-										item.status ===
-										RequestStatus.PENDING_VALIDATION
-									"
-									:tooltip="$t('request.tooltips.received')"
-									@status:validated="accept(item._id)" />
-								<btn-validate-status
-									v-else-if="
-										item.status ===
-										RequestStatus.RETURN_PENDING
-									"
-									:tooltip="
-										$t('request.tooltips.acceptReturn')
-									"
-									@status:validated="
-										acceptReturn(item._id)
-									" />
-								<btn-validate-status
-									v-else-if="
-										item.status ===
-										RequestStatus.RETURNED_WITH_ISSUE
-									"
-									:tooltip="$t('request.tooltips.issueFixed')"
-									@status:validated="issueFixed(item._id)" />
+									v-if="showValidateBtn(item.status)"
+									:tooltip="validateBtnText(item.status)"
+									@status:validated="validateStatus(item)" />
 
 								<btn-refuse-status
-									v-if="
-										item.status ===
-										RequestStatus.PENDING_VALIDATION
-									"
-									:tooltip="
-										$t('request.tooltips.neverReceived')
-									"
-									@status:refused="refuse(item._id)" />
-								<btn-refuse-status
-									v-if="
-										item.status ===
-										RequestStatus.RETURN_PENDING
-									"
-									:tooltip="
-										$t('request.tooltips.refuseReturn')
-									"
-									@status:refused="refuseReturn(item._id)" />
+									v-if="showRefuseBtn(item.status)"
+									:tooltip="refuseBtnText(item.status)"
+									@status:refused="
+										refuseStatus(item.id, item.status)
+									" />
 
 								<btn-other-action
 									:tooltip="$t('request.tooltips.chat')"

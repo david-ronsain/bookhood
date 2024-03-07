@@ -11,7 +11,9 @@ export interface IRequest {
 
 	status: RequestStatus
 
-	dueDate?: string
+	startDate?: string
+
+	endDate?: string
 
 	events?: IRequestEvent[]
 }
@@ -35,7 +37,9 @@ export interface IRequestSimple {
 
 	title: string
 
-	dueDate?: string
+	startDate?: string
+
+	endDate?: string
 
 	place: string
 
@@ -54,6 +58,8 @@ export interface IRequestList {
 
 export interface IPatchRequestDTO {
 	status: RequestStatus
+
+	dates?: string[]
 }
 
 interface IRequestInfosUser {

@@ -42,7 +42,10 @@ const RequestSchema = new Schema(
 			enum: RequestStatus,
 			default: RequestStatus.PENDING_VALIDATION,
 		},
-		dueDate: {
+		startDate: {
+			type: Date,
+		},
+		endDate: {
 			type: Date,
 		},
 		events: [RequestEventSchema],

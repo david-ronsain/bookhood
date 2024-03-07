@@ -45,6 +45,7 @@ export class RequestController {
 			const request = await this.createRequestUseCase.handler(
 				body.user._id,
 				body.libraryId,
+				body.dates,
 			)
 
 			this.mailClient
@@ -106,11 +107,7 @@ export class RequestController {
 		body: PatchRequestMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequest>> {
 		try {
-			const request = await this.patchRequestUseCase.handler(
-				body.user._id,
-				body.requestId,
-				body.status,
-			)
+			const request = await this.patchRequestUseCase.handler(body)
 
 			return new MicroserviceResponseFormatter<IRequest>(
 				true,

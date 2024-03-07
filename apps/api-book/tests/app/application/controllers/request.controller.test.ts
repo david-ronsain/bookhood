@@ -120,6 +120,7 @@ describe('RequestController', () => {
 		const request: CreateRequestMQDTO = {
 			user: currentUser,
 			libraryId: '123',
+			dates: ['0000-00-00', '0000-00-00'],
 		}
 
 		const lib: ILibraryFull = {
@@ -218,7 +219,8 @@ describe('RequestController', () => {
 			userId: 'user_id',
 			ownerId: 'owner_id',
 			createdAt: new Date().toString(),
-			dueDate: new Date().toString(),
+			startDate: new Date().toString(),
+			endDate: new Date().toString(),
 		}
 		const dto: GetRequestsMQDTO = {
 			user: currentUser,

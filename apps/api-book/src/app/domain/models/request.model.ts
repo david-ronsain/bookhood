@@ -8,7 +8,8 @@ export default class RequestModel {
 			this.libraryId = new mongoose.Types.ObjectId(request.libraryId)
 			this.userId = new mongoose.Types.ObjectId(request.userId)
 			this.ownerId = new mongoose.Types.ObjectId(request.ownerId)
-			this.dueDate = request.dueDate
+			this.startDate = request.startDate
+			this.endDate = request.endDate
 			this.status = request.status
 			this.events = request.events
 		}
@@ -24,7 +25,9 @@ export default class RequestModel {
 
 	readonly status: RequestStatus
 
-	readonly dueDate?: string
+	readonly startDate?: string
+
+	readonly endDate?: string
 
 	readonly events: IRequestEvent[]
 }

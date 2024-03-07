@@ -63,6 +63,7 @@ describe('RequestController', () => {
 	describe('create', () => {
 		it('should create a request', async () => {
 			const libraryId = 'id'
+			const dates = ['0000-00-00', '0000-00-00']
 
 			const response = new MicroserviceResponseFormatter<IRequest>(
 				true,
@@ -81,13 +82,16 @@ describe('RequestController', () => {
 				of(response),
 			)
 
-			const result = await controller.create(currentUser, libraryId)
+			const result = await controller.create(currentUser, libraryId, {
+				dates,
+			})
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				'request-create',
 				{
 					libraryId,
 					user: currentUser,
+					dates,
 				},
 			)
 
@@ -96,6 +100,7 @@ describe('RequestController', () => {
 
 		it('should throw an error if the microservice returns an error', async () => {
 			const libraryId = 'id'
+			const dates = ['0000-00-00', '0000-00-00']
 
 			const response = new MicroserviceResponseFormatter<IRequest>(
 				false,
@@ -107,7 +112,9 @@ describe('RequestController', () => {
 			)
 
 			await expect(
-				controller.create(currentUser, libraryId),
+				controller.create(currentUser, libraryId, {
+					dates: dates,
+				}),
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -115,6 +122,7 @@ describe('RequestController', () => {
 				{
 					libraryId,
 					user: currentUser,
+					dates,
 				},
 			)
 		})

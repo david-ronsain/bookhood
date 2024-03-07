@@ -132,7 +132,7 @@
 		},
 		"acceptDialog": {
 			"title": "Accepter le prêt",
-			"text": "Etes-vous sûr de vouloir prêter ce livre ?",
+			"text": "Les dates vous conviennent-elles ?",
 			"success": "La demande a été acceptée"
 		},
 		"refuseDialog": {
@@ -168,7 +168,9 @@
 		"createDialog": {
 			"title": "Emprunter un livre",
 			"text": "Voulez-vous emprunter le livre \"{book}\" ?",
-			"success": "La demande a été envoyée"
+			"success": "La demande a été envoyée",
+			"fromTo": "Du {date1} au {date2}",
+			"dates": "Précisez la période d'emprunt du livre"
 		},
 		"issueFixedDialog": {
 			"title": "Problème résolu",
@@ -178,7 +180,8 @@
 		"headers": {
 			"book": "Livre",
 			"firstName": "Prénom",
-			"date": "Date",
+			"startDate": "Début",
+			"endDate": "Fin",
 			"status": "Statut",
 			"actions": "Actions"
 		},
@@ -191,6 +194,8 @@
 			"title": "Demandes reçues"
 		},
 		"tooltips": {
+			"accept": "Accepter",
+			"refuse": "Refuser",
 			"received": "Je l'ai reçu",
 			"neverReceived": "Je ne l'ai jamais reçu",
 			"returned": "Je l'ai rendu",

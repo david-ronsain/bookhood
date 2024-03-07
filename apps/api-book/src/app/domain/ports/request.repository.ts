@@ -16,7 +16,11 @@ export interface RequestRepository {
 
 	create(request: RequestModel): Promise<RequestModel>
 
-	countActiveRequestsForUser(userId: string): Promise<number>
+	countActiveRequestsForUser(
+		userId: string,
+		dates: string[],
+		requestId?: string,
+	): Promise<number>
 
 	getById(requestId: string): Promise<RequestModel | null>
 
@@ -24,6 +28,8 @@ export interface RequestRepository {
 		requestId: string,
 		status: RequestStatus,
 		events: IRequestEvent[],
+		startDate?: string,
+		endDate?: string,
 	): Promise<RequestModel>
 
 	getRequestInfos(requestId: string): Promise<IRequestInfos | null>

@@ -33,6 +33,7 @@ describe('CreateRequestUseCase', () => {
 
 	describe('handler', () => {
 		it('should create a request when conditions are met', async () => {
+			const dates = ['0000-00-00', '0000-00-00']
 			const request: IRequest = {
 				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
 				libraryId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
@@ -70,6 +71,7 @@ describe('CreateRequestUseCase', () => {
 			const result = await createRequestUseCase.handler(
 				request.userId,
 				request.libraryId,
+				dates,
 			)
 
 			expect(result).toEqual(expectedRequest)
@@ -78,7 +80,7 @@ describe('CreateRequestUseCase', () => {
 			)
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith(request.userId)
+			).toHaveBeenCalledWith(request.userId, dates)
 			expect(requestRepository.create).toHaveBeenCalledWith(
 				expect.any(RequestModel),
 			)
@@ -88,7 +90,10 @@ describe('CreateRequestUseCase', () => {
 			jest.spyOn(libraryRepository, 'getById').mockResolvedValueOnce(null)
 
 			await expect(
-				createRequestUseCase.handler('userId', 'libraryId'),
+				createRequestUseCase.handler('userId', 'libraryId', [
+					'0000-00-00',
+					'0000-00-00',
+				]),
 			).rejects.toThrow(NotFoundException)
 
 			expect(libraryRepository.getById).toHaveBeenCalledWith('libraryId')
@@ -99,6 +104,7 @@ describe('CreateRequestUseCase', () => {
 		})
 
 		it('should throw ForbiddenException when user has active requests', async () => {
+			const dates = ['0000-00-00', '0000-00-00']
 			const library: LibraryModel = {
 				userId: new mongoose.Types.ObjectId(),
 				bookId: new mongoose.Types.ObjectId(),
@@ -118,12 +124,12 @@ describe('CreateRequestUseCase', () => {
 			).mockResolvedValueOnce(1)
 
 			await expect(
-				createRequestUseCase.handler('userId', 'libraryId'),
+				createRequestUseCase.handler('userId', 'libraryId', dates),
 			).rejects.toThrow(ForbiddenException)
 			expect(libraryRepository.getById).toHaveBeenCalledWith('libraryId')
 			expect(
 				requestRepository.countActiveRequestsForUser,
-			).toHaveBeenCalledWith('userId')
+			).toHaveBeenCalledWith('userId', dates)
 			expect(requestRepository.create).not.toHaveBeenCalled()
 		})
 	})

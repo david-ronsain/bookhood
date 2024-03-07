@@ -15,7 +15,9 @@
 	import { mdiChat } from '@mdi/js'
 	import { computed, watch } from 'vue'
 	import { statusColor } from '../../composables/statusColor.composable'
+	import { useDate } from 'vuetify'
 
+	const date = useDate()
 	const router = useRouter()
 	const { t } = useI18n({})
 	const mainStore = useMainStore()
@@ -48,8 +50,14 @@
 		{
 			align: 'center',
 			sortable: false,
-			title: t('request.headers.date'),
-			key: 'createdAt',
+			title: t('request.headers.startDate'),
+			key: 'startDate',
+		},
+		{
+			align: 'center',
+			sortable: false,
+			title: t('request.headers.endDate'),
+			key: 'endDate',
 		},
 		{
 			align: 'center',
@@ -72,7 +80,7 @@
 	onUnmounted(() => {
 		requestStore.$patch({
 			outgoingRequests: { total: 0, results: [] } as IRequestList,
-			outgoingRequestPage: 0,
+			outgoingRequestPage: 1,
 		})
 	})
 
@@ -105,6 +113,51 @@
 			params: { id: requestId },
 		})
 	}
+
+	const validateStatus = (id: string, status: RequestStatus) => {
+		if (
+			status === RequestStatus.ACCEPTED_PENDING_DELIVERY ||
+			status === RequestStatus.NEVER_RECEIVED
+		) {
+			received(id)
+		} else if (status === RequestStatus.RECEIVED) {
+			returned(id)
+		}
+	}
+
+	const validateBtnText = (status: RequestStatus): string => {
+		if (
+			status === RequestStatus.ACCEPTED_PENDING_DELIVERY ||
+			status === RequestStatus.NEVER_RECEIVED
+		) {
+			return t('request.tooltips.received')
+		} else if (status === RequestStatus.RECEIVED) {
+			return t('request.tooltips.returned')
+		}
+		return ''
+	}
+
+	const showValidateBtn = (status: RequestStatus): boolean =>
+		[
+			RequestStatus.ACCEPTED_PENDING_DELIVERY,
+			RequestStatus.NEVER_RECEIVED,
+			RequestStatus.RECEIVED,
+		].includes(status)
+
+	const refuseStatus = (id: string, status: RequestStatus) => {
+		if (status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
+			neverReceived(id)
+		}
+	}
+
+	const refuseBtnText = (status: RequestStatus): string => {
+		if (status === RequestStatus.ACCEPTED_PENDING_DELIVERY) {
+			return t('request.tooltips.neverReceived')
+		}
+		return ''
+	}
+	const showRefuseBtn = (status: RequestStatus): boolean =>
+		[RequestStatus.ACCEPTED_PENDING_DELIVERY].includes(status)
 </script>
 
 <template>
@@ -136,35 +189,25 @@
 								}}</v-chip
 							>
 						</td>
-						<td>{{ item.createdAt }}</td>
+						<td>
+							{{ date.format(item.startDate, 'keyboardDate') }}
+						</td>
+						<td>{{ date.format(item.endDate, 'keyboardDate') }}</td>
 						<td>
 							<div class="d-flex align-center justify-center">
 								<btn-validate-status
-									v-if="
-										item.status ===
-											RequestStatus.ACCEPTED_PENDING_DELIVERY ||
-										item.status ===
-											RequestStatus.NEVER_RECEIVED
-									"
-									:tooltip="$t('request.tooltips.received')"
-									@status:validated="received(item._id)" />
-
-								<btn-validate-status
-									v-else-if="
-										item.status === RequestStatus.RECEIVED
-									"
-									:tooltip="$t('request.tooltips.returned')"
-									@status:validated="returned(item._id)" />
+									v-if="showValidateBtn(item.status)"
+									:tooltip="validateBtnText(item.status)"
+									@status:validated="
+										validateStatus(item.id, item.status)
+									" />
 
 								<btn-refuse-status
-									v-if="
-										item.status ===
-										RequestStatus.ACCEPTED_PENDING_DELIVERY
-									"
-									:tooltip="
-										$t('request.tooltips.neverReceived')
-									"
-									@status:refused="neverReceived(item._id)" />
+									v-if="showRefuseBtn(item.status)"
+									:tooltip="refuseBtnText(item.status)"
+									@status:refused="
+										refuseStatus(item.id, item.status)
+									" />
 
 								<btn-other-action
 									:tooltip="$t('request.tooltips.chat')"

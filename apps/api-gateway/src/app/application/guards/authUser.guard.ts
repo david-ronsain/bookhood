@@ -24,7 +24,7 @@ export class AuthUserGuard implements CanActivate {
 		const token = this.extractTokenFromHeader(
 			context.switchToHttp().getRequest(),
 		)
-		console.log(request)
+
 		if (token) {
 			const user = await firstValueFrom<
 				MicroserviceResponseFormatter<IUser | null>

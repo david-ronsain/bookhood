@@ -40,7 +40,7 @@ import {
 	PatchRequestDTO,
 	PatchRequestMQDTO,
 } from '@bookhood/shared-api'
-import { GetRequestsDTO } from '../dto/request.dto'
+import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import { AuthUserGuard } from '../guards/authUser.guard'
 import { User } from '../decorators/user.decorator'
 
@@ -53,12 +53,14 @@ export class RequestController {
 	@Post(':libraryId')
 	@HttpCode(HttpStatus.CREATED)
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
+	@ApiBody({ type: CreateRequestDTO })
 	@ApiOperation({ description: 'Creates a request for a book' })
 	@ApiParam({ name: 'libraryId', type: 'string' })
 	@ApiResponse({ type: BadRequestException, status: HttpStatus.BAD_REQUEST })
 	async create(
 		@User() user: CurrentUser,
 		@Param('libraryId') libraryId: string,
+		@Body() body: CreateRequestDTO,
 	): Promise<IRequest> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
@@ -66,6 +68,7 @@ export class RequestController {
 			this.bookQueue.send('request-create', {
 				libraryId,
 				user,
+				...body,
 			} as CreateRequestMQDTO),
 		)
 		if (!response.success) {

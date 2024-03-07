@@ -14,10 +14,10 @@ export const useRequestStore = defineStore('requestStore', () => {
 	const outgoingRequestPage = ref<number>(1)
 	const outgoingRequests = ref<IRequestList>({ total: 0, results: [] })
 
-	const create = (libraryId: string) =>
+	const create = (libraryId: string, dates: string[]) =>
 		axios.post(
 			EnvConfig.api.base + EnvConfig.api.url.request + libraryId,
-			{},
+			{ dates },
 			{
 				headers: {
 					'x-token': localStorage.getItem('user'),
@@ -37,8 +37,8 @@ export const useRequestStore = defineStore('requestStore', () => {
 	const neverReceived = (requestId: string) =>
 		updateStatus(requestId, RequestStatus.NEVER_RECEIVED)
 
-	const accept = (requestId: string) =>
-		updateStatus(requestId, RequestStatus.ACCEPTED_PENDING_DELIVERY)
+	const accept = (requestId: string, dates: string[]) =>
+		updateStatus(requestId, RequestStatus.ACCEPTED_PENDING_DELIVERY, dates)
 
 	const acceptReturn = (requestId: string) =>
 		updateStatus(requestId, RequestStatus.RETURN_ACCEPTED)
@@ -49,10 +49,14 @@ export const useRequestStore = defineStore('requestStore', () => {
 	const issueFixed = (requestId: string) =>
 		updateStatus(requestId, RequestStatus.ISSUE_FIXED)
 
-	const updateStatus = (requestId: string, status: RequestStatus) =>
+	const updateStatus = (
+		requestId: string,
+		status: RequestStatus,
+		dates?: Date[],
+	) =>
 		axios.patch(
 			EnvConfig.api.base + EnvConfig.api.url.request + requestId,
-			{ status },
+			{ status, dates },
 			{
 				headers: {
 					'x-token': localStorage.getItem('user'),

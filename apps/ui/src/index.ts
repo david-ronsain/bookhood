@@ -10,4 +10,6 @@ export { default as BhSnackbarSuccess } from './lib/alerts/snackbars/bhSnackbarS
 export { default as BhCheckBox } from './lib/inputs/checkbox/bhCheckBox.vue'
 export { default as BhTextField } from './lib/inputs/textField/bhTextField.vue'
 export { default as BhPrimaryButton } from './lib/buttons/primaryButton/bhPrimaryButton.vue'
+export { default as BhDatePicker } from './lib/inputs/datepicker/classic/bhDatePicker.vue'
+export { default as BhDatePickerMenu } from './lib/inputs/datepicker/menu/bhDatePickerMenu.vue'
 export * from './interfaces/searchBar.interface'

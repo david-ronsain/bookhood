@@ -13,9 +13,11 @@
 	export interface BhTextFieldProps {
 		autofocus?: boolean
 		clear?: boolean
+		density?: 'compact' | 'default' | 'comfortable'
 		icon?: BhTextFieldIconProp
 		label?: string
 		placeholder?: string
+		readonly?: boolean
 		type?: string
 		variant?:
 			| 'underlined'
@@ -33,6 +35,8 @@
 		clear: false,
 		type: 'text',
 		variant: 'underlined',
+		density: 'default',
+		readonly: false,
 	})
 
 	const prependIcon = computed(() =>
@@ -78,11 +82,13 @@
 		"
 		:clearable="clear"
 		:clear-icon="mdiCloseCircleOutline"
+		:density="density"
 		hide-details="auto"
 		:label="capitalizedLabel"
 		:placeholder="capitalizedPlaceholder"
 		:prepend-icon="prependIcon"
 		:prepend-inner-icon="prependInnerIcon"
+		:readonly="readonly"
 		:type="type"
 		:variant="variant" />
 </template>

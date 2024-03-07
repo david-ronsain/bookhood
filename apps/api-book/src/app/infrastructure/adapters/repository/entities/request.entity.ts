@@ -12,7 +12,9 @@ export interface RequestEntity extends Document, IRequest {
 
 	readonly status: RequestStatus
 
-	readonly dueDate?: string
+	readonly startDate?: string
+
+	readonly endDate?: string
 
 	readonly events: IRequestEvent[]
 

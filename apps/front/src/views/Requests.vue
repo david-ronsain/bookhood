@@ -5,14 +5,10 @@
 
 <template>
 	<v-row>
-		<v-col
-			cols="12"
-			md="6">
+		<v-col cols="12">
 			<incoming-requests />
 		</v-col>
-		<v-col
-			cols="12"
-			md="6">
+		<v-col cols="12">
 			<outgoing-requests />
 		</v-col>
 	</v-row>

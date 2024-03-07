@@ -13,7 +13,8 @@ export default class RequestMapper {
 			ownerId: requestEntity.ownerId,
 			status: requestEntity.status,
 			events: requestEntity.events,
-			dueDate: requestEntity.dueDate,
+			startDate: requestEntity.startDate,
+			endDate: requestEntity.endDate,
 		})
 	}
 

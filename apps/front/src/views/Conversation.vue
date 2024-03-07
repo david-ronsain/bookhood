@@ -10,7 +10,7 @@
 		WritingDTO,
 	} from '@bookhood/shared'
 	import { BhCard, BhTextField } from '@bookhood/ui'
-	import { mdiCheck, mdiCheckBold, mdiLoading, mdiSendOutline } from '@mdi/js'
+	import { mdiCheckBold, mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { ref } from 'vue'
 	const route = useRoute()
 	const mainStore = useMainStore()
@@ -77,6 +77,10 @@
 
 	onMounted(() => {
 		socket.connect()
+
+		if (socketConnected.value) {
+			emitEvent('conversation-connect', { requestId: route.params.id })
+		}
 
 		socket.on(
 			'conversation-message',

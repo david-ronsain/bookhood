@@ -11,6 +11,7 @@ import {
 } from '@bookhood/shared'
 import RequestMapper from '../../../application/mappers/request.mapper'
 import { RequestEntity } from './entities/request.entity'
+import { cp } from 'fs'
 
 @Injectable()
 export default class RequestRepositoryMongo implements RequestRepository {
@@ -19,18 +20,52 @@ export default class RequestRepositoryMongo implements RequestRepository {
 		private readonly requestModel: Model<RequestEntity>,
 	) {}
 
-	async countActiveRequestsForUser(userId: string): Promise<number> {
-		return this.requestModel.countDocuments({
+	async countActiveRequestsForUser(
+		userId: string,
+		dates: string[],
+		requestId?: string,
+	): Promise<number> {
+		const filters = {
 			userId: new mongoose.Types.ObjectId(userId),
-			status: {
-				$in: [
-					RequestStatus.ACCEPTED_PENDING_DELIVERY,
-					RequestStatus.RECEIVED,
-					RequestStatus.RETURN_PENDING,
-					RequestStatus.RETURNED_WITH_ISSUE,
-				],
-			},
-		})
+			$or: [
+				{
+					status: {
+						$in: [
+							RequestStatus.ACCEPTED_PENDING_DELIVERY,
+							RequestStatus.RECEIVED,
+							RequestStatus.RETURN_PENDING,
+							RequestStatus.RETURNED_WITH_ISSUE,
+						],
+					},
+				},
+				{
+					$and: [
+						{ startDate: { $gte: dates[0] } },
+						{ endDate: { $lte: dates[0] } },
+					],
+				},
+				{
+					$and: [
+						{ startDate: { $gte: dates[1] } },
+						{ endDate: { $lte: dates[1] } },
+					],
+				},
+				{
+					$and: [
+						{ startDate: { $lte: dates[0] } },
+						{ endDate: { $gte: dates[1] } },
+					],
+				},
+			],
+		}
+
+		if (requestId) {
+			filters['_id'] = {
+				$ne: new mongoose.Types.ObjectId(requestId),
+			}
+		}
+
+		return this.requestModel.countDocuments(filters)
 	}
 
 	async create(request: RequestModel): Promise<RequestModel> {
@@ -124,7 +159,8 @@ export default class RequestRepositoryMongo implements RequestRepository {
 					$project: {
 						_id: true,
 						createdAt: true,
-						dueDate: true,
+						startDate: true,
+						endDate: true,
 						status: true,
 						userFirstName: '$user.firstName',
 						ownerFirstName: '$owner.firstName',
@@ -172,10 +208,20 @@ export default class RequestRepositoryMongo implements RequestRepository {
 		requestId: string,
 		status: RequestStatus,
 		events: IRequestEvent[],
+		startDate?: string,
+		endDate?: string,
 	): Promise<RequestModel> {
+		const dataToUpdate = { status, events }
+		if (startDate) {
+			dataToUpdate['startDate'] = startDate
+		}
+		if (endDate) {
+			dataToUpdate['endDate'] = endDate
+		}
+
 		const updated = await this.requestModel.findByIdAndUpdate(
 			new mongoose.Types.ObjectId(requestId),
-			{ status, events },
+			dataToUpdate,
 			{ new: true },
 		)
 
