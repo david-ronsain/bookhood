@@ -56,6 +56,8 @@ export interface IRequestSimple {
 	userId: string
 
 	ownerId: string
+
+	requests?: IRequestSimple[]
 }
 
 export interface IRequestList {

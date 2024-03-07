@@ -17,6 +17,7 @@
 		multiple?: boolean | 'range'
 		currentDates?: Date[]
 		clearable?: boolean
+		availableDates?: string[]
 	}
 
 	const properties = withDefaults(defineProps<BhDatePickerMenuProps>(), {
@@ -104,6 +105,7 @@
 			:max-date="maxDate"
 			:multiple="multiple"
 			:dates="model"
+			:availableDates="availableDates"
 			@dateSelected="selectDate" />
 	</v-menu>
 </template>

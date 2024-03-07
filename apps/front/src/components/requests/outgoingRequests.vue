@@ -259,6 +259,7 @@
 											? new Date(item.startDate)
 											: new Date()
 									"
+									:item="item"
 									@datesSelected="
 										(dates) => datesSelected(item, dates)
 									" />

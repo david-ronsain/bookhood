@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose'
 import { Injectable } from '@nestjs/common'
-import mongoose, { Model } from 'mongoose'
+import mongoose, { Model, PipelineStage } from 'mongoose'
 import { RequestRepository } from '../../../domain/ports/request.repository'
 import RequestModel from '../../../domain/models/request.model'
 import {
@@ -94,105 +94,145 @@ export default class RequestRepositoryMongo implements RequestRepository {
 			filters['status'] = status
 		}
 
+		const stages: PipelineStage[] = [
+			{
+				$match: filters,
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'userId',
+					foreignField: '_id',
+					as: 'user',
+				},
+			},
+			{
+				$unwind: {
+					path: '$user',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'ownerId',
+					foreignField: '_id',
+					as: 'owner',
+				},
+			},
+			{
+				$unwind: {
+					path: '$owner',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$lookup: {
+					from: 'libraries',
+					localField: 'libraryId',
+					foreignField: '_id',
+					as: 'library',
+				},
+			},
+			{
+				$unwind: {
+					path: '$library',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+			{
+				$lookup: {
+					from: 'books',
+					localField: 'library.bookId',
+					foreignField: '_id',
+					as: 'book',
+				},
+			},
+			{
+				$unwind: {
+					path: '$book',
+					preserveNullAndEmptyArrays: false,
+				},
+			},
+		]
+
+		if (userId) {
+			stages.push({
+				$lookup: {
+					from: 'requests',
+					localField: 'library._id',
+					foreignField: 'libraryId',
+					as: 'requests',
+					pipeline: [
+						{
+							$match: {
+								userId: {
+									$ne: new mongoose.Types.ObjectId(userId),
+								},
+								status: {
+									$nin: [
+										RequestStatus.PENDING_VALIDATION,
+										RequestStatus.RETURN_ACCEPTED,
+									],
+								},
+								endDate: { $gte: new Date() },
+							},
+						},
+						{
+							$project: {
+								_id: true,
+								startDate: true,
+								endDate: true,
+							},
+						},
+					],
+				},
+			})
+		}
+
+		stages.push(
+			{
+				$project: {
+					_id: true,
+					createdAt: true,
+					startDate: true,
+					endDate: true,
+					status: true,
+					userFirstName: '$user.firstName',
+					ownerFirstName: '$owner.firstName',
+					title: '$book.title',
+					place: '$library.place',
+					userId: '$user._id',
+					ownerId: '$owner._id',
+					requests: true,
+				},
+			},
+			{
+				$skip: parseInt(startAt.toString()),
+			},
+			{
+				$limit: 10,
+			},
+			{
+				$group: {
+					_id: null,
+					results: {
+						$push: '$$ROOT',
+					},
+					total: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: false,
+				},
+			},
+		)
+
 		return this.requestModel
-			.aggregate([
-				{
-					$match: filters,
-				},
-				{
-					$lookup: {
-						from: 'users',
-						localField: 'userId',
-						foreignField: '_id',
-						as: 'user',
-					},
-				},
-				{
-					$unwind: {
-						path: '$user',
-						preserveNullAndEmptyArrays: false,
-					},
-				},
-				{
-					$lookup: {
-						from: 'users',
-						localField: 'ownerId',
-						foreignField: '_id',
-						as: 'owner',
-					},
-				},
-				{
-					$unwind: {
-						path: '$owner',
-						preserveNullAndEmptyArrays: false,
-					},
-				},
-				{
-					$lookup: {
-						from: 'libraries',
-						localField: 'libraryId',
-						foreignField: '_id',
-						as: 'library',
-					},
-				},
-				{
-					$unwind: {
-						path: '$library',
-						preserveNullAndEmptyArrays: false,
-					},
-				},
-				{
-					$lookup: {
-						from: 'books',
-						localField: 'library.bookId',
-						foreignField: '_id',
-						as: 'book',
-					},
-				},
-				{
-					$unwind: {
-						path: '$book',
-						preserveNullAndEmptyArrays: false,
-					},
-				},
-				{
-					$project: {
-						_id: true,
-						createdAt: true,
-						startDate: true,
-						endDate: true,
-						status: true,
-						userFirstName: '$user.firstName',
-						ownerFirstName: '$owner.firstName',
-						title: '$book.title',
-						place: '$library.place',
-						userId: '$user._id',
-						ownerId: '$owner._id',
-					},
-				},
-				{
-					$skip: parseInt(startAt.toString()),
-				},
-				{
-					$limit: 10,
-				},
-				{
-					$group: {
-						_id: null,
-						results: {
-							$push: '$$ROOT',
-						},
-						total: {
-							$sum: 1,
-						},
-					},
-				},
-				{
-					$project: {
-						_id: false,
-					},
-				},
-			])
+			.aggregate(stages)
 			.then((results: IRequestList[]) =>
 				results.length ? results[0] : { results: [], total: 0 },
 			)
