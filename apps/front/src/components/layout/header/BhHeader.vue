@@ -18,11 +18,13 @@
 		<template v-slot:prepend>
 			<v-app-bar-nav-icon
 				v-if="profile"
+				class="profilepic"
 				:icon="mdiAccountCircle"
 				:size="30"
 				@click.stop="events('changeDrawerStatus')" />
 			<span
 				v-if="profile"
+				class="profile-name"
 				v-text="$t('common.hello', { firstName: profile.firstName })" />
 		</template>
 

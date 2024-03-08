@@ -3,6 +3,8 @@ import { VueWrapper, mount, config } from '@vue/test-utils'
 import SignupForm from '../../../src/components/signup/signupForm.vue'
 import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
+import { h } from 'vue'
+import { VApp } from 'vuetify/components'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -11,23 +13,23 @@ vi.mock('vue-i18n', () => ({
 	}),
 }))
 
+vi.mock('vue-router')
+
 config.global.mocks = {
 	$t: (tKey) => tKey,
 }
+
+global.ResizeObserver = require('resize-observer-polyfill')
 
 describe('Testing the signup form', () => {
 	let wrapper: VueWrapper
 
 	beforeEach(() => {
-		const div = document.createElement('div')
-		document.body.appendChild(div)
-		wrapper = mount(SignupForm, {
-			template: '<v-app><signup-form /></v-app>',
-			attachTo: div,
+		wrapper = mount(VApp, {
+			slots: {
+				default: h(SignupForm),
+			},
 			global: {
-				components: {
-					SignupForm,
-				},
 				plugins: [
 					vuetify,
 					createTestingPinia({
@@ -41,73 +43,73 @@ describe('Testing the signup form', () => {
 	it('should display the form', async () => {
 		expect(wrapper.findComponent({ name: 'SignupForm' })).toBeTruthy()
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 	})
 
 	it('should not validate the firstName field', async () => {
-		await wrapper.findComponent({ ref: 'firstName' }).setValue('')
-		await wrapper.findComponent({ ref: 'lastName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'email' }).setValue('test@test.test')
-		await wrapper.findComponent({ ref: 'terms' }).setValue(true)
+		await wrapper.findComponent('.signup-firstName').setValue('')
+		await wrapper.findComponent('.signup-lastName').setValue('test')
+		await wrapper.findComponent('.signup-email').setValue('test@test.test')
+		await wrapper.findComponent('.signup-terms').setValue(true)
 		await wrapper.vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBeNull()
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 	})
 
 	it('should not validate the lastName field', async () => {
-		await wrapper.findComponent({ ref: 'firstName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'lastName' }).setValue('')
-		await wrapper.findComponent({ ref: 'email' }).setValue('test@test.test')
-		await wrapper.findComponent({ ref: 'terms' }).setValue(true)
+		await wrapper.findComponent('.signup-firstName').setValue('test')
+		await wrapper.findComponent('.signup-lastName').setValue('')
+		await wrapper.findComponent('.signup-email').setValue('test@test.test')
+		await wrapper.findComponent('.signup-terms').setValue(true)
 		await wrapper.vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBeNull()
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 	})
 
 	it('should not validate the email field', async () => {
-		await wrapper.findComponent({ ref: 'firstName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'lastName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'email' }).setValue('')
-		await wrapper.findComponent({ ref: 'terms' }).setValue(true)
+		await wrapper.findComponent('.signup-firstName').setValue('test')
+		await wrapper.findComponent('.signup-lastName').setValue('test')
+		await wrapper.findComponent('.signup-email').setValue('')
+		await wrapper.findComponent('.signup-terms').setValue(true)
 		await wrapper.vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBeNull()
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 
-		await wrapper.findComponent({ ref: 'email' }).setValue('test@test')
+		await wrapper.findComponent('.signup-email').setValue('test@test')
 		await wrapper.vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBeNull()
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 	})
 
 	it('should not validate the temrs checkbox', async () => {
-		await wrapper.findComponent({ ref: 'firstName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'lastName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'email' }).setValue('test@test.test')
+		await wrapper.findComponent('.signup-firstName').setValue('test')
+		await wrapper.findComponent('.signup-lastName').setValue('test')
+		await wrapper.findComponent('.signup-email').setValue('test@test.test')
 		await wrapper.vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBeNull()
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).not.toBeUndefined()
 	})
 
 	it('should validate the form', async () => {
-		await wrapper.findComponent({ ref: 'firstName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'lastName' }).setValue('test')
-		await wrapper.findComponent({ ref: 'email' }).setValue('test@test.test')
-		await wrapper.findComponent({ ref: 'terms' }).setValue(true)
+		await wrapper.findComponent('.signup-firstName').setValue('test')
+		await wrapper.findComponent('.signup-lastName').setValue('test')
+		await wrapper.findComponent('.signup-email').setValue('test@test.test')
+		await wrapper.findComponent('.signup-terms').setValue(true)
 		await wrapper.findComponent({ name: 'SignupForm' }).vm.$nextTick()
-		expect(wrapper.vm.$refs?.form?.isValid).toBe(true)
+
 		expect(
-			wrapper.findComponent({ ref: 'submit' }).attributes().disabled
+			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).toBeUndefined()
 	})
 })

@@ -54,7 +54,7 @@
 
 <template>
 	<v-form
-		ref="form"
+		class="signup-form"
 		v-model="formValid"
 		validate-on="input lazy">
 		<v-row>
@@ -62,7 +62,7 @@
 				cols="12"
 				md="6">
 				<bh-text-field
-					ref="firstName"
+					class="signup-firstName"
 					v-model.trim="data.firstName"
 					autofocus
 					:label="$t('signup.form.firstName.label')"
@@ -74,7 +74,7 @@
 				cols="12"
 				md="6">
 				<bh-text-field
-					ref="lastName"
+					class="signup-lastName"
 					v-model.trim="data.lastName"
 					:label="$t('signup.form.lastName.label')"
 					:placeholder="$t('signup.form.lastName.placeholder')"
@@ -85,7 +85,7 @@
 		<v-row>
 			<v-col cols="12">
 				<bh-text-field
-					ref="email"
+					class="signup-email"
 					v-model.trim="data.email"
 					:label="$t('signup.form.email.label')"
 					:placeholder="$t('signup.form.email.placeholder')"
@@ -97,7 +97,7 @@
 		<v-row>
 			<v-col cols="12">
 				<bh-check-box
-					ref="terms"
+					class="signup-terms"
 					v-model="data.checked"
 					:label="$t('signup.form.terms_read')"
 					:rules="termRules" />
@@ -109,7 +109,7 @@
 				class="text-center"
 				cols="12">
 				<bh-primary-button
-					ref="submit"
+					class="signup-submit"
 					@click.stop="signup"
 					:disabled="!formValid || loading || disabled"
 					:loading="formValid && loading"
