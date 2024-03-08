@@ -1,13 +1,13 @@
 import { it, describe, beforeEach, expect, vi } from 'vitest'
-import { VueWrapper, mount, config } from '@vue/test-utils'
+import { VueWrapper, mount, config, shallowMount } from '@vue/test-utils'
 import YourBooks from '../../../../src/components/account/books/yourBooks/yourBooks.vue'
-import CreateBookDialog from '../../../../src/components/dialogs/request/createRequestDialog.vue'
 import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { h } from 'vue'
 import { VApp } from 'vuetify/components'
 import { useAccountStore, useMainStore } from '../../../../src/store'
 import { LibraryStatus } from '../../../../../shared/src'
+import CreateBookDialog from '../../../../src/components/dialogs/book/createBookDialog.vue'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -32,6 +32,7 @@ describe('Testing the component YourBooks', () => {
 	let wrapper: VueWrapper
 	let accountStore
 	let mainStore
+
 	const books = [
 		{
 			_id: 'bookId',
@@ -45,10 +46,10 @@ describe('Testing the component YourBooks', () => {
 	]
 
 	beforeEach(() => {
-		wrapper = mount(VApp, {
-			slots: {
+		wrapper = mount(YourBooks, {
+			/*slots: {
 				default: h(YourBooks),
-			},
+			},*/
 			global: {
 				plugins: [
 					vuetify,
@@ -57,9 +58,14 @@ describe('Testing the component YourBooks', () => {
 					}),
 				],
 				stubs: {
-					VDialog: {
-						name: 'VDialog',
-						template: '<div class="v-dialog-stub"><slot /></div>',
+					CreateBookDialog: {
+						name: 'CreateBookDialog',
+						template:
+							'<div class="v-dialog-stub" @bookCreated="() => loadBooks()"></div>',
+						emits: ['bookCreated'],
+						methods: {
+							open: () => vi.fn(),
+						},
 					},
 				},
 			},
@@ -73,7 +79,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should show the button to add a book', async () => {
-		expect(wrapper.find('.add-book').exists).toBeTruthy()
+		expect(wrapper.find('.add-book').exists()).toBeTruthy()
 		await wrapper.find('.add-book').trigger('click')
 		await wrapper.vm.$nextTick()
 
@@ -164,18 +170,23 @@ describe('Testing the component YourBooks', () => {
 
 	it('should reload the list if a book has been created', async () => {
 		accountStore.books = books
-		accountStore.updateBookStatus = () => Promise.reject()
+		accountStore.loadBooks = () => {
+			accountStore.books = []
+		}
+		mainStore.profile = { _id: 'id' }
+
 		await wrapper.vm.$nextTick()
 
-		await wrapper.find('.add-book').trigger('click')
-		await wrapper.vm.$nextTick()
+		expect(wrapper.findComponent(CreateBookDialog).exists()).toBe(true)
+
+		wrapper.vm.$forceUpdate()
+
+		wrapper.findComponent(CreateBookDialog).vm.$emit('bookCreated')
+		wrapper.vm.$nextTick()
 
 		expect(
-			wrapper
-				.findComponent({
-					name: 'VDialog',
-				})
-				.exists(),
-		).toBe(true)
+			wrapper.findComponent(CreateBookDialog).emitted(),
+		).toHaveProperty('bookCreated')
+		expect(accountStore.books).toMatchObject([])
 	})
 })

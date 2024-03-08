@@ -15,8 +15,7 @@
 		libraryStatusColor,
 		statusColor,
 	} from '../../../../composables/statusColor.composable'
-	import { computed } from 'vue'
-	import { watch } from 'vue'
+	import { computed, watch, defineExpose } from 'vue'
 
 	const { t } = useI18n({})
 	const mainStore = useMainStore()
@@ -144,9 +143,7 @@
 		}
 	}
 
-	onMounted(async () => {
-		loadBooks()
-	})
+	defineExpose({ loadBooks })
 </script>
 
 <template>
