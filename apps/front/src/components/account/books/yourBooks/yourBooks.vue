@@ -153,6 +153,7 @@
 	<div>
 		<div class="d-flex align-center justify-end">
 			<bh-primary-button
+				class="add-book"
 				:text="$t('account.books.yourBooks.add')"
 				:icon="{ icon: mdiPlusCircleOutline, prepend: true }"
 				@click="addDialog.open()" />
@@ -169,6 +170,7 @@
 					:title="$t('account.books.yourBooks.list.title')">
 					<template v-slot:text>
 						<bh-datatable
+							class="your-books-list"
 							:headers="headers"
 							:items="books"
 							:loading="loading"
@@ -185,7 +187,12 @@
 									<td>{{ item.title }}</td>
 									<td>{{ item.authors.join(', ') }}</td>
 									<td>{{ item.categories.join(', ') }}</td>
-									<td @dblclick="edit(item)">
+									<td
+										@dblclick="
+											edit(
+												item.editing ? undefined : item,
+											)
+										">
 										<div
 											v-if="!!item.editing"
 											class="d-flex">
@@ -246,7 +253,8 @@
 		</v-row>
 
 		<create-book-dialog
+			class="add-book-dialog"
 			ref="addDialog"
-			@book-created="loadBooks" />
+			@bookCreated="loadBooks" />
 	</div>
 </template>

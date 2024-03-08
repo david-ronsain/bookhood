@@ -109,6 +109,7 @@
 				)
 				addDialog.value.close()
 				book.value = null
+				events('bookCreated')
 			})
 			.catch((err) => {
 				mainStore.error = t(err.response.data.message, {
@@ -138,7 +139,7 @@
 		place.value = name
 	}
 
-	defineEmits(['bookCreated'])
+	const events = defineEmits(['bookCreated'])
 
 	defineExpose({
 		open,
@@ -166,7 +167,7 @@
 					<div class="mx-auto form">
 						<bh-text-field
 							style="max-width: 400px"
-							class="mx-auto mb-4"
+							class="mx-auto mb-4 create-book-isbn-search"
 							ref="isbnSearch"
 							:label="
 								$t('account.books.yourBooks.addForm.searchISBN')
@@ -230,6 +231,7 @@
 				@click.prevent="addDialog.close()" />
 
 			<bh-primary-button
+				class="create-book"
 				:text="$t('account.books.yourBooks.addForm.add')"
 				:loading="saveButtonLoading"
 				:disabled="saveButtonDisabled"
