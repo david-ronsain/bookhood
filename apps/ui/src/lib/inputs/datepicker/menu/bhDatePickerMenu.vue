@@ -4,20 +4,24 @@
 	import BhTextField from '../../textField/bhTextField.vue'
 	import { mdiCalendar } from '@mdi/js'
 	import { useDate } from 'vuetify'
-	import { useI18n } from 'vue-i18n'
 
-	const { t } = useI18n({})
 	const date = useDate()
+
+	interface BhDatePickerMenuLocale {
+		dateLabel: string
+	}
+
 	export interface BhDatePickerMenuProps {
 		label?: string
 		placeholder?: string
 		readonly?: boolean
 		minDate?: Date
 		maxDate?: Date
-		multiple?: boolean | 'range'
+		multiple?: boolean
 		currentDates?: Date[]
 		clearable?: boolean
 		availableDates?: string[]
+		locales: BhDatePickerMenuLocale
 	}
 
 	const properties = withDefaults(defineProps<BhDatePickerMenuProps>(), {
@@ -33,13 +37,18 @@
 		model.value.length === 0
 			? ''
 			: properties.multiple
-				? t('request.createDialog.fromTo', {
-						date1: date.format(model.value[0], 'keyboardDate'),
-						date2: date.format(
-							model.value[model.value.length - 1],
-							'keyboardDate',
-						),
-					})
+				? properties.locales.dateLabel
+						.replace(
+							'{date1}',
+							date.format(model.value[0], 'keyboardDate'),
+						)
+						.replace(
+							'{date2}',
+							date.format(
+								model.value[model.value.length - 1],
+								'keyboardDate',
+							),
+						)
 				: date.format(model.value[0], 'keyboardDate'),
 	)
 

@@ -72,11 +72,17 @@
 
 <template>
 	<bh-date-picker-menu
+		:locales="{
+			dateLabel: $t('request.createDialog.fromTo', {
+				date1: '{date1}',
+				date2: '{date2}',
+			}),
+		}"
 		:availableDates="availableDates"
 		:clearable="false"
 		:currentDates="currentDates"
 		readonly
 		:minDate="minDate"
-		multiple="range"
+		multiple
 		@datesSelected="(dates) => events('datesSelected', dates)" />
 </template>

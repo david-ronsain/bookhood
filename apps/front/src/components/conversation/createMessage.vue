@@ -2,7 +2,6 @@
 	import { BhTextField } from '@bookhood/ui'
 	import { mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { computed, ref, onMounted, watch } from 'vue'
-	import { Fragment } from 'vue/jsx-runtime'
 	import type { WritingDTO, IConversationMessage } from '@bookhood/shared'
 	import { state, emitEvent, socket } from '../../composables/socket'
 	import { useMainStore } from '../../store'

@@ -86,10 +86,16 @@
 			<div v-text="$t('request.acceptDialog.text')" />
 
 			<bh-date-picker-menu
+				:locales="{
+					dateLabel: $t('request.createDialog.fromTo', {
+						date1: '{date1}',
+						date2: '{date2}',
+					}),
+				}"
 				:currentDates="currentDates"
 				readonly
 				:minDate="new Date()"
-				multiple="range"
+				multiple
 				@datesSelected="datesSelected" />
 		</template>
 		<template v-slot:actions>

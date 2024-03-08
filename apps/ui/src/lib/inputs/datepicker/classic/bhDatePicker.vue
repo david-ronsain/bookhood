@@ -5,7 +5,7 @@
 	export interface BhDatePickerProps {
 		minDate?: Date
 		maxDate?: Date
-		multiple?: boolean | 'range'
+		multiple?: boolean
 		dates?: Date[]
 		availableDates?: string[]
 	}
@@ -48,7 +48,7 @@
 		:max="maxDate"
 		:min="minDate"
 		v-model="model"
-		:multiple="multiple"
+		:multiple="multiple ? 'range' : false"
 		show-adjacent-months
 		@update:modelValue="selectDate"></v-date-picker>
 </template>
