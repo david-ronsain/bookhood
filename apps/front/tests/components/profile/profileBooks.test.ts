@@ -21,13 +21,6 @@ vi.mock('vue-router', () => ({
 	}),
 }))
 
-/*vi.mock('../../../src/store/profile.store.ts', () => ({
-	useProfileStore: vi.fn().mockReturnValue({
-		loadBooks: vi.fn(),
-		booksList: [],
-	}),
-}))*/
-
 config.global.mocks = {
 	$t: (tKey) => tKey,
 }
