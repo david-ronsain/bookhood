@@ -70,7 +70,7 @@ export class BookController {
 	@Get('google/:id')
 	@ApiExcludeEndpoint()
 	@HttpCode(HttpStatus.OK)
-	@UseGuards(new RoleGuard([Role.USER, Role.ADMIN]))
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	async getGoogleBookByISBN(@Param('id') isbn: string): Promise<unknown> {
 		return google
 			.books('v1')
@@ -84,7 +84,7 @@ export class BookController {
 	@Post('google/search')
 	@ApiExcludeEndpoint()
 	@HttpCode(HttpStatus.OK)
-	@UseGuards(new RoleGuard([Role.USER, Role.ADMIN]))
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
 	async getGoogleBooks(
 		@Body('q') q: string,
 		@Body('startIndex') startAt: number,
