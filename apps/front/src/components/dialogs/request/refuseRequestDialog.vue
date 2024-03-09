@@ -10,17 +10,20 @@
 	const mainStore = useMainStore()
 	const refuseDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => request.value.toString().length === 0 || loading.value,
+	)
 
 	const refuse = (): void => {
+		loading.value = true
+
 		requestStore
 			.refuse(request.value)
 			.then(() => {
 				close()
-				loading.value = false
 				mainStore.success = t('request.refuseDialog.success')
 				requestStore.getIncomingRequests({
 					ownerId: profile.value?._id,
@@ -28,18 +31,19 @@
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
+			})
+			.finally(() => {
 				loading.value = false
-				disabled.value = false
 			})
 	}
 
 	const open = (requestId: string): void => {
-		refuseDialog.value.open()
+		if ('open' in refuseDialog.value) refuseDialog.value.open()
 		request.value = requestId
 	}
 
 	const close = (): void => {
-		refuseDialog.value.close()
+		if ('close' in refuseDialog.value) refuseDialog.value.close()
 		request.value = ''
 	}
 
@@ -57,10 +61,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-refuse"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="confirm-refuse"
 				:text="$t('common.yes')"
 				@click="refuse"
 				:disabled="disabled"
