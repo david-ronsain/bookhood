@@ -10,34 +10,38 @@
 	const mainStore = useMainStore()
 	const receivedDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => request.value.toString().length === 0 || loading.value,
+	)
 
 	const received = (): void => {
+		loading.value = true
+
 		requestStore
 			.received(request.value)
 			.then(() => {
 				close()
-				loading.value = false
 				mainStore.success = t('request.receivedDialog.success')
 				requestStore.getOutgoingRequests({ userId: profile.value?._id })
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
+			})
+			.finally(() => {
 				loading.value = false
-				disabled.value = false
 			})
 	}
 
 	const open = (requestId: string): void => {
-		receivedDialog.value.open()
+		if ('open' in receivedDialog.value) receivedDialog.value.open()
 		request.value = requestId
 	}
 
 	const close = (): void => {
-		receivedDialog.value.close()
+		if ('close' in receivedDialog.value) receivedDialog.value.close()
 		request.value = ''
 	}
 
@@ -55,10 +59,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-received"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="confirm-received"
 				:text="$t('common.yes')"
 				@click="received"
 				:disabled="disabled"
