@@ -10,34 +10,40 @@
 	const mainStore = useMainStore()
 	const neverReceivedDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => request.value.toString().length === 0 || loading.value,
+	)
 
 	const accept = (): void => {
+		loading.value = true
+
 		requestStore
 			.neverReceived(request.value)
 			.then(() => {
 				close()
-				loading.value = false
 				mainStore.success = t('request.neverReceivedDialog.success')
 				requestStore.getOutgoingRequests({ userId: profile.value?._id })
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
+			})
+			.finally(() => {
 				loading.value = false
-				disabled.value = false
 			})
 	}
 
 	const open = (requestId: string): void => {
-		neverReceivedDialog.value.open()
+		if ('open' in neverReceivedDialog.value)
+			neverReceivedDialog.value.open()
 		request.value = requestId
 	}
 
 	const close = (): void => {
-		neverReceivedDialog.value.close()
+		if ('close' in neverReceivedDialog.value)
+			neverReceivedDialog.value.close()
 		request.value = ''
 	}
 
@@ -55,10 +61,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-never-received"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="never-received"
 				:text="$t('common.yes')"
 				@click="accept"
 				:disabled="disabled"
