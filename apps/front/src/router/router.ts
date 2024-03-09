@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-const Home = () => import('../views/Home.vue')
+import Home from '../views/Home.vue'
 const Signup = () => import('../views/Signup.vue')
 const Signin = () => import('../views/Signin.vue')
 const Account = () => import('../views/Account.vue')
 const Logout = () => import('../views/Logout.vue')
-const YourBooks = () => import('../views/YourBooks.vue')
-const Requests = () => import('../views/Requests.vue')
+import YourBooks from '../views/YourBooks.vue'
+import Requests from '../views/Requests.vue'
 const Profile = () => import('../views/Profile.vue')
 const Conversation = () => import('../views/Conversation.vue')
 import { useUserStore, useMainStore } from '../store'

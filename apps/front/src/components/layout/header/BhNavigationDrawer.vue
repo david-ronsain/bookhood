@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { ref, watch } from 'vue'
+	import { isProxy, ref, toRaw, watch } from 'vue'
 	import { useDisplay } from 'vuetify'
 	import { useRoute } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
@@ -14,7 +14,7 @@
 	import { computed } from 'vue'
 
 	const mainStore = useMainStore()
-	const route = useRoute()
+	let route = useRoute()
 	const { t } = useI18n({})
 	const { lgAndUp, mdAndDown } = useDisplay()
 	const drawerOpened = ref(false)
