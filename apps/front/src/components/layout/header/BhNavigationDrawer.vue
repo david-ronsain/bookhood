@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { isProxy, ref, toRaw, watch } from 'vue'
+	import { ref, watch } from 'vue'
 	import { useDisplay } from 'vuetify'
 	import { useRoute } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
@@ -74,7 +74,7 @@
 	<v-navigation-drawer
 		v-if="profile"
 		color="primary"
-		class="mobile-menu"
+		class="menu"
 		:elevation="2"
 		:model-value="mdAndDown ? drawerOpened : true"
 		:permanent="lgAndUp"
