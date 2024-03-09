@@ -12,24 +12,25 @@
 	const mainStore = useMainStore()
 	const borrowDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const dates = ref<Date[]>([])
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(() => dates.value.length < 2 || loading.value)
 
 	const borrow = (libraryId: string): void => {
+		loading.value = true
+
 		requestStore
 			.create(libraryId, [
 				format(dates.value[0], 'yyyy-MM-dd'),
 				format(dates.value[1], 'yyyy-MM-dd'),
 			])
 			.then(() => {
-				borrowDialog.value.close()
+				if ('close' in borrowDialog.value) borrowDialog.value.close()
 				mainStore.success = t('request.createDialog.success')
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
-				disabled.value = false
 			})
 			.finally(() => {
 				loading.value = false
@@ -39,7 +40,7 @@
 
 	const open = (markerPicked: google.maps.Marker): void => {
 		marker.value = markerPicked
-		borrowDialog.value.open()
+		if ('open' in borrowDialog.value) borrowDialog.value.open()
 	}
 
 	const datesSelected = (values: Date[]) => {
@@ -80,10 +81,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-request"
 				:text="$t('common.no')"
 				no-background
 				@click="borrowDialog?.close()" />
 			<bh-primary-button
+				class="create-request"
 				:text="$t('common.yes')"
 				@click="borrow(marker?.['book']?.libraryId)"
 				:disabled="
