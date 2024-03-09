@@ -13,14 +13,18 @@
 	const mainStore = useMainStore()
 	const acceptDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 	const dates = ref<Date[]>([])
 	const currentDates = ref<Date[]>([])
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => currentDates.value.length === 0 || loading.value,
+	)
 
 	const accept = (): void => {
+		loading.value = true
+
 		requestStore
 			.accept(request.value, [
 				format(dates.value[0], 'yyyy-MM-dd'),
@@ -35,7 +39,6 @@
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
-				disabled.value = false
 			})
 			.finally(() => {
 				loading.value = false
@@ -49,7 +52,8 @@
 		startDate: string,
 		endDate: string,
 	): void => {
-		acceptDialog.value.open()
+		if ('open' in acceptDialog.value) acceptDialog.value.open()
+
 		request.value = requestId
 		dates.value = [new Date(startDate), new Date(endDate)]
 
@@ -63,7 +67,7 @@
 	}
 
 	const close = (): void => {
-		acceptDialog.value.close()
+		if ('close' in acceptDialog.value) acceptDialog.value.close()
 		request.value = ''
 		dates.value = []
 		currentDates.value = []
@@ -100,10 +104,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="not-accept-request"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="accept-request"
 				:text="$t('common.yes')"
 				@click="accept"
 				:disabled="disabled"

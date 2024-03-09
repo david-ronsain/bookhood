@@ -80,7 +80,7 @@
 	})
 
 	watch(properties, () => {
-		if (properties.currentDates && properties.currentDates.length) {
+		if (Array.isArray(properties.currentDates)) {
 			model.value = properties.currentDates
 		}
 	})
