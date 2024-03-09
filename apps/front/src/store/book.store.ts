@@ -25,6 +25,11 @@ export const useBookStore = defineStore('bookStore', () => {
 					q: `${search.type}:${search.text.replace(/ /, '+')}`,
 					startIndex: startAt,
 				},
+				{
+					headers: {
+						'x-token': localStorage.getItem('user'),
+					},
+				},
 			)
 			.then((results) => {
 				searchMaxResults.value = parseInt(results.data.totalItems)
@@ -65,7 +70,14 @@ export const useBookStore = defineStore('bookStore', () => {
 
 	const searchGoogleByISBN = async (isbn: string): Promise<IBook | null> =>
 		axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.book + 'google/' + isbn)
+			.get(
+				EnvConfig.api.base + EnvConfig.api.url.book + 'google/' + isbn,
+				{
+					headers: {
+						'x-token': localStorage.getItem('user'),
+					},
+				},
+			)
 			.then((results) =>
 				results.data.totalItems > 0
 					? mapBook(results.data.items[0])

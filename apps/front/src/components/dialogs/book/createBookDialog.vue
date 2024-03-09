@@ -81,7 +81,7 @@
 	}, 750)
 
 	const startSearch = () => {
-		if (search.value.length > 0 && search.value !== lastSearch.value) {
+		if (search.value?.length > 0 && search.value !== lastSearch.value) {
 			loading.value = true
 			displayBookNotFound.value = false
 			debouncedSearch()
@@ -100,6 +100,7 @@
 	const save = () => {
 		saveButtonDisabled.value = true
 		saveButtonLoading.value = true
+
 		bookStore
 			.add(book.value, status.value, location.value, place.value)
 			.then(() => {
@@ -107,7 +108,9 @@
 					'account.books.yourBooks.addForm.success',
 					{ title: book.value.title },
 				)
-				addDialog.value.close()
+				if ('close' in addDialog.value) {
+					addDialog.value.close()
+				}
 				book.value = null
 				events('bookCreated')
 			})
@@ -124,8 +127,9 @@
 	}
 
 	const reset = () => {
+		search.value = ''
 		book.value = null
-		lastSearch.value = null
+		lastSearch.value = ''
 	}
 
 	const centerUpdated = (center: number[]) => {
@@ -181,7 +185,7 @@
 							@update:modelValue="startSearch" />
 
 						<v-radio-group
-							class="mb-4 mx-auto"
+							class="mb-4 mx-auto book-status"
 							inline
 							v-model="status"
 							hide-details>
@@ -209,7 +213,7 @@
 
 				<div class="v-col v-col-12 v-col-md-6">
 					<bh-book-article
-						class="px-4 py-8 ma-auto"
+						class="px-4 py-8 ma-auto book-article"
 						v-if="book"
 						:book="book" />
 					<v-alert
