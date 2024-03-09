@@ -1,13 +1,12 @@
 import { it, describe, beforeEach, expect, vi } from 'vitest'
-import { VueWrapper, mount, config, shallowMount } from '@vue/test-utils'
+import { VueWrapper, mount, config } from '@vue/test-utils'
 import YourBooks from '../../../../src/components/account/books/yourBooks/yourBooks.vue'
 import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
-import { h } from 'vue'
-import { VApp } from 'vuetify/components'
 import { useAccountStore, useMainStore } from '../../../../src/store'
 import { LibraryStatus } from '../../../../../shared/src'
 import CreateBookDialog from '../../../../src/components/dialogs/book/createBookDialog.vue'
+import { VSelect } from 'vuetify/lib/components/index.mjs'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -47,9 +46,6 @@ describe('Testing the component YourBooks', () => {
 
 	beforeEach(() => {
 		wrapper = mount(YourBooks, {
-			/*slots: {
-				default: h(YourBooks),
-			},*/
 			global: {
 				plugins: [
 					vuetify,
@@ -75,7 +71,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should mount the component', () => {
-		expect(wrapper.findComponent({ name: 'YourBooks' })).toBeTruthy()
+		expect(wrapper.findComponent(YourBooks)).toBeTruthy()
 	})
 
 	it('should show the button to add a book', async () => {
@@ -134,7 +130,7 @@ describe('Testing the component YourBooks', () => {
 
 		await wrapper
 			.find('.your-books-list tbody tr td:nth-of-type(4)')
-			.findComponent({ name: 'VSelect' })
+			.findComponent(VSelect)
 			.setValue(LibraryStatus.TO_GIVE)
 		await wrapper.vm.$nextTick()
 
@@ -157,7 +153,7 @@ describe('Testing the component YourBooks', () => {
 
 		await wrapper
 			.find('.your-books-list tbody tr td:nth-of-type(4)')
-			.findComponent({ name: 'VSelect' })
+			.findComponent(VSelect)
 			.setValue(LibraryStatus.TO_GIVE)
 		await wrapper.vm.$nextTick()
 

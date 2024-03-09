@@ -67,7 +67,8 @@
 		"serve-static": {
 			"executor": "@nx/web:file-server",
 			"options": {
-				"buildTarget": "front:build"
+				"buildTarget": "front:build:production",
+				"gzip": true
 			}
 		}
 	}

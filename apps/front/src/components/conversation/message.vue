@@ -4,13 +4,14 @@
 	import type { IConversationMessage } from '@bookhood/shared'
 	import { computed } from 'vue'
 	import { useMainStore } from '../../store'
-	import { emitEvent } from '../../composables/socket'
+	import { useSocket } from '../../composables/socket'
 
 	interface MessageProps {
 		message: IConversationMessage
 		conversationId: string
 	}
 
+	const { emitEvent } = useSocket()
 	const mainStore = useMainStore()
 	const props = defineProps<MessageProps>()
 
@@ -44,6 +45,7 @@
 
 <template>
 	<bh-card
+		v-if="me"
 		border
 		flat
 		:hover="false"

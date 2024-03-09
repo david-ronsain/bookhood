@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Signup from '../views/Signup.vue'
-import Signin from '../views/Signin.vue'
-import Account from '../views/Account.vue'
-import Logout from '../views/Logout.vue'
-import YourBooks from '../views/YourBooks.vue'
-import Requests from '../views/Requests.vue'
-import Profile from '../views/Profile.vue'
-import Conversation from '../views/Conversation.vue'
+const Home = () => import('../views/Home.vue')
+const Signup = () => import('../views/Signup.vue')
+const Signin = () => import('../views/Signin.vue')
+const Account = () => import('../views/Account.vue')
+const Logout = () => import('../views/Logout.vue')
+const YourBooks = () => import('../views/YourBooks.vue')
+const Requests = () => import('../views/Requests.vue')
+const Profile = () => import('../views/Profile.vue')
+const Conversation = () => import('../views/Conversation.vue')
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
 import { isAccessGranted, isAuthenticated } from '../plugins/authentication'

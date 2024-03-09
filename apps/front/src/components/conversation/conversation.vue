@@ -2,12 +2,13 @@
 	import { BhCard } from '@bookhood/ui'
 	import { computed } from 'vue'
 	import type { IUser, IConversationFull } from '@bookhood/shared'
-	import { state } from '../../composables/socket'
+	import { useSocket } from '../../composables/socket'
 	import { useMainStore } from '../../store'
 	import Message from './message.vue'
 	import createMessage from './createMessage.vue'
 
 	const mainStore = useMainStore()
+	const { state } = useSocket()
 
 	const me = computed(() => mainStore.profile)
 	const conversation = computed<IConversationFull>(
@@ -29,13 +30,15 @@
 		id="conversation"
 		:title="
 			$t('conversation.title', {
-				firstName: other.firstName,
-				lastName: other.lastName,
+				firstName: other?.firstName,
+				lastName: other?.lastName,
 				book: conversation?.request?.book?.title,
 			})
 		">
 		<template v-slot:text>
-			<div class="d-flex flex-column">
+			<div
+				v-if="conversation"
+				class="d-flex flex-column">
 				<message
 					v-for="message in conversation.messages"
 					:key="message._id"
@@ -46,6 +49,7 @@
 
 		<template v-slot:actions>
 			<createMessage
+				v-if="conversation"
 				:conversationId="conversation._id"
 				:requestId="conversation.request?._id"
 				:roomId="conversation.roomId" />

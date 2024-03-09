@@ -3,7 +3,7 @@
 	import { mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { computed, ref, onMounted, watch } from 'vue'
 	import type { WritingDTO, IConversationMessage } from '@bookhood/shared'
-	import { state, emitEvent, socket } from '../../composables/socket'
+	import { useSocket } from '../../composables/socket'
 	import { useMainStore } from '../../store'
 	import { useI18n } from 'vue-i18n'
 
@@ -16,6 +16,7 @@
 	}
 
 	const mainStore = useMainStore()
+	const { state, emitEvent, socket } = useSocket()
 	const { t } = useI18n({})
 	const props = defineProps<CreateMessageProps>()
 
@@ -96,6 +97,7 @@
 			" />
 		<bh-text-field
 			autofocus
+			class="write-msg"
 			clear
 			density="compact"
 			:icon="{
