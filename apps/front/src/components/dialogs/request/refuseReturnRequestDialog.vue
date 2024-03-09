@@ -10,17 +10,20 @@
 	const mainStore = useMainStore()
 	const refuseReturnDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => request.value.toString().length === 0 || loading.value,
+	)
 
 	const refuse = (): void => {
+		loading.value = true
+
 		requestStore
 			.refuseReturn(request.value)
 			.then(() => {
 				close()
-				loading.value = false
 				mainStore.success = t('request.refuseReturnDialog.success')
 				requestStore.getIncomingRequests({
 					ownerId: profile.value?._id,
@@ -28,18 +31,20 @@
 			})
 			.catch((err) => {
 				mainStore.error = err.response.data.message
+			})
+			.finally(() => {
 				loading.value = false
-				disabled.value = false
 			})
 	}
 
 	const open = (requestId: string): void => {
-		refuseReturnDialog.value.open()
+		if ('open' in refuseReturnDialog.value) refuseReturnDialog.value.open()
 		request.value = requestId
 	}
 
 	const close = (): void => {
-		refuseReturnDialog.value.close()
+		if ('close' in refuseReturnDialog.value)
+			refuseReturnDialog.value.close()
 		request.value = ''
 	}
 
@@ -57,10 +62,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-refuse-return"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="confirm-refuse-return"
 				:text="$t('common.yes')"
 				@click="refuse"
 				:disabled="disabled"
