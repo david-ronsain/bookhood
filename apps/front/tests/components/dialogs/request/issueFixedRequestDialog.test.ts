@@ -1,6 +1,6 @@
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
-import AcceptReturnRequestDialog from '../../../../src/components/dialogs/request/acceptReturnRequestDialog.vue'
+import IssueFixedRequestDialog from '../../../../src/components/dialogs/request/issueFixedRequestDialog.vue'
 import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useMainStore, useRequestStore } from '../../../../src/store'
@@ -18,13 +18,13 @@ config.global.mocks = {
 
 global.ResizeObserver = require('resize-observer-polyfill')
 
-describe('Testing the component AcceptReturnRequestDialog', () => {
+describe('Testing the component IssueFixedRequestDialog', () => {
 	let wrapper: VueWrapper
 	let requestStore
 	let mainStore
 
 	beforeEach(() => {
-		wrapper = mount(AcceptReturnRequestDialog, {
+		wrapper = mount(IssueFixedRequestDialog, {
 			global: {
 				plugins: [
 					vuetify,
@@ -36,7 +36,7 @@ describe('Testing the component AcceptReturnRequestDialog', () => {
 					BhDialog: {
 						name: 'BhDialog',
 						template:
-							'<div class="accept-request-dialog"><slot /><slot name="actions"/></div>',
+							'<div class="issue-fixed-request-dialog"><slot /><slot name="actions"/></div>',
 						props: { attach: true },
 					},
 				},
@@ -48,58 +48,58 @@ describe('Testing the component AcceptReturnRequestDialog', () => {
 	})
 
 	it('should mount the component', () => {
-		expect(wrapper.findComponent(AcceptReturnRequestDialog).exists()).toBe(
+		expect(wrapper.findComponent(IssueFixedRequestDialog).exists()).toBe(
 			true,
 		)
 		expect(
-			wrapper.findComponent('.accept-return').attributes(),
+			wrapper.findComponent('.accept-issue-fixed').attributes(),
 		).toHaveProperty('disabled')
 	})
 
 	it('should open the dialog', async () => {
-		wrapper.findComponent(AcceptReturnRequestDialog).vm.open('requestId')
+		wrapper.findComponent(IssueFixedRequestDialog).vm.open('requestId')
 		await wrapper.vm.$nextTick()
 
 		expect(
-			wrapper.findComponent('.accept-return').attributes(),
+			wrapper.findComponent('.accept-issue-fixed').attributes(),
 		).not.toHaveProperty('disabled')
 	})
 
 	it('should close the dialog', async () => {
-		wrapper.findComponent(AcceptReturnRequestDialog).vm.open('requestId')
+		wrapper.findComponent(IssueFixedRequestDialog).vm.open('requestId')
 		await wrapper.vm.$nextTick()
 
-		wrapper.findComponent('.refuse-return').trigger('click')
+		wrapper.findComponent('.refuse-issue-fixed').trigger('click')
 		await wrapper.vm.$nextTick()
 
 		expect(
-			wrapper.findComponent('.accept-return').attributes(),
+			wrapper.findComponent('.accept-issue-fixed').attributes(),
 		).toHaveProperty('disabled')
 	})
 
-	it('should accept the return', async () => {
-		wrapper.findComponent(AcceptReturnRequestDialog).vm.open('requestId')
+	it('should flag the issue as fixed', async () => {
+		wrapper.findComponent(IssueFixedRequestDialog).vm.open('requestId')
 		await wrapper.vm.$nextTick()
 
 		mainStore.profile = {
 			_id: 'userId',
 		}
-		requestStore.acceptReturn = () => Promise.resolve()
+		requestStore.issueFixed = () => Promise.resolve()
 
-		wrapper.findComponent('.accept-return').trigger('click')
+		wrapper.findComponent('.accept-issue-fixed').trigger('click')
 		await wrapper.vm.$nextTick()
 
 		expect(mainStore.success.length).toBeGreaterThan(0)
 	})
 
-	it('should fail accepting the return', async () => {
-		wrapper.findComponent(AcceptReturnRequestDialog).vm.open('requestId')
+	it('should fail flagging the issue as fixed', async () => {
+		wrapper.findComponent(IssueFixedRequestDialog).vm.open('requestId')
 		await wrapper.vm.$nextTick()
 
 		mainStore.profile = {
 			_id: 'userId',
 		}
-		requestStore.acceptReturn = () =>
+		requestStore.issueFixed = () =>
 			Promise.reject({
 				response: {
 					data: {
@@ -108,7 +108,7 @@ describe('Testing the component AcceptReturnRequestDialog', () => {
 				},
 			})
 
-		wrapper.findComponent('.accept-return').trigger('click')
+		wrapper.findComponent('.accept-issue-fixed').trigger('click')
 		await wrapper.vm.$nextTick()
 		await wrapper.vm.$nextTick()
 
