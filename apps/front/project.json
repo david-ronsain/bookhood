@@ -61,6 +61,7 @@
 			"executor": "@nx/vite:test",
 			"outputs": ["{options.reportsDirectory}"],
 			"options": {
+                "config": "apps/front/vite.config.ts",
 				"reportsDirectory": "../../coverage/apps/front"
 			}
 		},

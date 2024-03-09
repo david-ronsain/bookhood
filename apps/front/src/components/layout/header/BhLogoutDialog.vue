@@ -31,11 +31,13 @@
 
 		<template v-slot:actions>
 			<bh-primary-button
+				class="cancel-logout"
 				:text="$t('logout.dialog.cancel')"
 				no-background
 				@click.prevent="logoutDialog = false" />
 
 			<bh-primary-button
+				class="confirm-logout"
 				:text="$t('logout.dialog.confirm')"
 				@click.prevent="logout" />
 		</template>

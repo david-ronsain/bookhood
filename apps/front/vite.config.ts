@@ -73,10 +73,11 @@ export default defineConfig((mode: ConfigEnv) => {
 			include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
 
 			reporters: ['default'],
-			/*coverage: {
-        reportsDirectory: '../../coverage/apps/front',
-        provider: 'v8',
-      },*/
+			coverage: {
+				reportsDirectory: '../../coverage/apps/front',
+				provider: 'v8',
+				reporter: ['text'],
+			},
 			server: {
 				deps: {
 					inline: ['vuetify'],
