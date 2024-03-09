@@ -10,12 +10,16 @@
 	const mainStore = useMainStore()
 	const acceptReturnDialog = ref<BhDialog>(null)
 	const loading = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const request = ref<string>('')
 
 	const profile = computed(() => mainStore.profile)
+	const disabled = computed(
+		() => loading.value || request.value.toString().length === 0,
+	)
 
 	const accept = (): void => {
+		loading.value = true
+
 		requestStore
 			.acceptReturn(request.value)
 			.then(() => {
@@ -29,17 +33,17 @@
 			.catch((err) => {
 				mainStore.error = err.response.data.message
 				loading.value = false
-				disabled.value = false
 			})
 	}
 
 	const open = (requestId: string): void => {
-		acceptReturnDialog.value.open()
+		if ('open' in acceptReturnDialog.value) acceptReturnDialog.value.open()
 		request.value = requestId
 	}
 
 	const close = (): void => {
-		acceptReturnDialog.value.close()
+		if ('close' in acceptReturnDialog.value)
+			acceptReturnDialog.value.close()
 		request.value = ''
 	}
 
@@ -57,10 +61,12 @@
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
+				class="refuse-return"
 				:text="$t('common.no')"
 				no-background
 				@click="close" />
 			<bh-primary-button
+				class="accept-return"
 				:text="$t('common.yes')"
 				@click="accept"
 				:disabled="disabled"
