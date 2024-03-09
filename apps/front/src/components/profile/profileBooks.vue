@@ -44,7 +44,6 @@
 
 	const items = computed(() => profileStore.booksList)
 	const loading = computed(() => profileStore.booksListLoading)
-	const total = computed(() => profileStore.booksListTotal)
 	const page = computed({
 		get() {
 			return profileStore.booksListPage
@@ -80,6 +79,7 @@
 		:title="$t('profile.books.list.title')">
 		<template v-slot:text>
 			<bh-datatable
+				class="books-datatable"
 				:headers="headers"
 				:items="items"
 				:loading="loading"
