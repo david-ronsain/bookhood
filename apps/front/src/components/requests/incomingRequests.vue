@@ -77,11 +77,11 @@
 	const profile = computed(() => mainStore.profile)
 
 	watch(profile, () => {
-		loadPendingRequests()
+		loadIncomingRequests()
 	})
 
 	onMounted(() => {
-		loadPendingRequests()
+		loadIncomingRequests()
 	})
 
 	onUnmounted(() => {
@@ -91,7 +91,7 @@
 		})
 	})
 
-	const loadPendingRequests = () => {
+	const loadIncomingRequests = () => {
 		if (profile.value) {
 			loading.value = true
 			requestStore
@@ -189,13 +189,14 @@
 		:title="$t('request.incoming.title')">
 		<template v-slot:text>
 			<bh-datatable
+				class="incoming-requests-datatable"
 				:headers="pendingRequestsHeaders"
 				:items="requestStore.incomingRequests.results"
 				:loading="loading"
 				:loading-text="$t('request.loading')"
 				:no-data-text="$t('request.noData')"
 				:page="requestStore.incomingRequestPage"
-				@update:page="loadPendingRequests">
+				@update:page="loadIncomingRequests">
 				<template v-slot:item="{ item }">
 					<tr>
 						<td>{{ item.title }}</td>
@@ -223,11 +224,13 @@
 						<td>
 							<div class="d-flex align-center justify-center">
 								<btn-validate-status
+									class="validate-status"
 									v-if="showValidateBtn(item.status)"
 									:tooltip="validateBtnText(item.status)"
 									@status:validated="validateStatus(item)" />
 
 								<btn-refuse-status
+									class="refuse-status"
 									v-if="showRefuseBtn(item.status)"
 									:tooltip="refuseBtnText(item.status)"
 									@status:refused="
@@ -235,6 +238,7 @@
 									" />
 
 								<btn-other-action
+									class="chat"
 									:tooltip="$t('request.tooltips.chat')"
 									:icon="mdiChat"
 									@clicked="chat(item._id)" />

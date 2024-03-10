@@ -58,6 +58,8 @@ export interface IRequestSimple {
 	ownerId: string
 
 	requests?: IRequestSimple[]
+
+	status?: RequestStatus
 }
 
 export interface IRequestList {
