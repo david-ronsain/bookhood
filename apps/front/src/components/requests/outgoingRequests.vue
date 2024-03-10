@@ -1,10 +1,5 @@
 <script setup lang="ts">
-	import {
-		BhCard,
-		BhDatatable,
-		BhDatePickerMenu,
-		BhPrimaryButton,
-	} from '@bookhood/ui'
+	import { BhCard, BhDatatable, BhPrimaryButton } from '@bookhood/ui'
 	import { type IRequestList, RequestStatus } from '@bookhood/shared'
 	import { useRequestStore, useMainStore } from '../../store'
 	import { onMounted, onUnmounted } from 'vue'
@@ -209,6 +204,7 @@
 		:title="$t('request.outgoing.title')">
 		<template v-slot:text>
 			<bh-datatable
+				class="outgoing-requests-datatable"
 				:headers="headers"
 				:items="requestStore.outgoingRequests.results"
 				:loading="loading"
@@ -265,12 +261,12 @@
 									" />
 								<bh-primary-button
 									v-if="datesToSave.length"
-									class="ml-2"
+									class="ml-2 cancel-dates"
 									:icon="{ icon: mdiClose }"
 									@click="cancelDates(item)" />
 								<bh-primary-button
 									v-if="datesToSave.length"
-									class="ml-2"
+									class="ml-2 save-dates"
 									:icon="{ icon: mdiCheck }"
 									@click="saveDates(item._id)" />
 							</div>
@@ -292,6 +288,7 @@
 									" />
 
 								<btn-other-action
+									class="chat"
 									:tooltip="$t('request.tooltips.chat')"
 									:icon="mdiChat"
 									@clicked="chat(item._id)" />

@@ -14,7 +14,7 @@
 
 	const profile = computed(() => mainStore.profile)
 	const disabled = computed(
-		() => request.value.toString().length === 0 || loading.value,
+		() => request.value?.toString().length === 0 || loading.value,
 	)
 
 	const accept = (): void => {

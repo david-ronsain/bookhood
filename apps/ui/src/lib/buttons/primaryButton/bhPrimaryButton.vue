@@ -11,7 +11,7 @@
 	}
 	export interface BhPrimaryButtonProps {
 		to?: BhPrimaryButtonToProp
-		text: string
+		text?: string
 		noBackground?: boolean
 		loading?: boolean
 		icon?: BhPrimaryButtonIcon
