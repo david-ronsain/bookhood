@@ -32,7 +32,7 @@
 	}
 
 	const setAvailableDates = () => {
-		const datesNotAvailable: Date[] = []
+		const datesNotAvailable: string[] = []
 		availableDates.value = []
 		props.item?.requests.forEach((req: IRequestSimple) => {
 			const diff = date.getDiff(req.endDate, req.startDate, 'days')
