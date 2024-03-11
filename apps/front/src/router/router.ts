@@ -10,9 +10,10 @@ const Profile = () => import('../views/Profile.vue')
 const Conversation = () => import('../views/Conversation.vue')
 import { useUserStore, useMainStore } from '../store'
 import { RequiresAuth } from '../enums/requiresAuth.enum'
-import { isAccessGranted, isAuthenticated } from '../plugins/authentication'
+import { useAuthentication } from '../composables/authentication.composable'
 import { EnvConfig } from '../../config/env'
 
+const auth = useAuthentication()
 const router = createRouter({
 	history: createWebHistory(),
 	routes: [
@@ -23,7 +24,7 @@ const router = createRouter({
 			component: Home,
 			meta: {
 				requiresAuth: RequiresAuth.BOTH,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -32,7 +33,7 @@ const router = createRouter({
 			component: Signup,
 			meta: {
 				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -49,7 +50,7 @@ const router = createRouter({
 			component: Signin,
 			meta: {
 				requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 			children: [
 				{
@@ -89,7 +90,7 @@ const router = createRouter({
 					},
 					meta: {
 						requiresAuth: RequiresAuth.NOT_AUTHENTICATED,
-						authenticated: isAuthenticated(),
+						authenticated: auth.isAuthenticated(),
 					},
 				},
 			],
@@ -103,7 +104,7 @@ const router = createRouter({
 					component: Account,
 					meta: {
 						requiresAuth: RequiresAuth.AUTHENTICATED,
-						authenticated: isAuthenticated(),
+						authenticated: auth.isAuthenticated(),
 					},
 				},
 				{
@@ -115,7 +116,7 @@ const router = createRouter({
 							component: YourBooks,
 							meta: {
 								requiresAuth: RequiresAuth.AUTHENTICATED,
-								authenticated: isAuthenticated(),
+								authenticated: auth.isAuthenticated(),
 							},
 						},
 					],
@@ -128,7 +129,7 @@ const router = createRouter({
 			component: Requests,
 			meta: {
 				requiresAuth: RequiresAuth.AUTHENTICATED,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -137,7 +138,7 @@ const router = createRouter({
 			component: Home,
 			meta: {
 				requiresAuth: RequiresAuth.BOTH,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -146,7 +147,7 @@ const router = createRouter({
 			component: Home,
 			meta: {
 				requiresAuth: RequiresAuth.BOTH,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -155,7 +156,7 @@ const router = createRouter({
 			component: Profile,
 			meta: {
 				requiresAuth: RequiresAuth.AUTHENTICATED,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 			},
 		},
 		{
@@ -164,7 +165,7 @@ const router = createRouter({
 			component: Conversation,
 			meta: {
 				requiresAuth: RequiresAuth.AUTHENTICATED,
-				authenticated: isAuthenticated(),
+				authenticated: auth.isAuthenticated(),
 				fullHeight: true,
 			},
 		},
@@ -172,7 +173,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-	if (!isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
+	if (!auth.isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
 		localStorage.removeItem('user')
 		next({ name: to.meta.requiresAuth ? 'signin' : 'home' })
 	} else {
