@@ -9,7 +9,6 @@
 	const userStore = useUserStore()
 	const { t } = useI18n()
 	const formValid = ref<boolean>(false)
-	const disabled = ref<boolean>(false)
 	const form = ref(null)
 	const email = ref<string>('')
 	const loading = ref<boolean>(false)
@@ -22,19 +21,18 @@
 
 	async function sendSigninLink() {
 		loading.value = true
-		disabled.value = true
 
 		if (formValid.value) {
 			userStore
 				.sendSigninLink(email.value)
 				.then(() => {
-					loading.value = false
 					mainStore.success = 'Le lien vous a été envoyé'
 				})
 				.catch((err) => {
 					mainStore.error = err.message
+				})
+				.finally(() => {
 					loading.value = false
-					disabled.value = false
 				})
 		}
 	}
@@ -69,7 +67,7 @@
 					ref="submit"
 					:icon="{ icon: mdiSendOutline, prepend: true }"
 					@click.stop="sendSigninLink"
-					:disabled="!formValid || loading || disabled"
+					:disabled="!formValid || loading"
 					:loading="formValid && loading"
 					:text="$t('signin.sendLink.send')" />
 			</v-col>
