@@ -44,6 +44,7 @@
 				startAt,
 				boundingBox.value,
 			)
+
 			nbResults.value = parseInt(results.data.total)
 			books.value = results.data.results.map(
 				(book: IBookSearchResult) => ({
@@ -51,6 +52,7 @@
 					value: book._id,
 				}),
 			)
+
 			pickedBook.value = map.value?.markerPicked
 				? [map.value?.markerPicked?.book._id]
 				: []
@@ -58,6 +60,7 @@
 			loading.value = false
 			map.value?.setMarkers(books.value)
 		}
+
 		loading.value = false
 	}, 750)
 
@@ -80,6 +83,8 @@
 	onMounted(() => {
 		search()
 	})
+
+	defineExpose({ pickedBook })
 </script>
 
 <template>
@@ -103,6 +108,7 @@
 				class="d-md-flex d-none">
 				<search-map
 					v-if="mdAndUp"
+					class="search-map"
 					@search="search"
 					@book:picked="(e) => (pickedBook = e)"
 					ref="map" />
@@ -121,17 +127,20 @@
 				</div>
 				<search-list
 					v-else-if="books?.length"
+					class="search-list"
 					:books="books"
 					:picked-book="pickedBook"
 					:highlighted-marker="map?.highlightedMarker"
 					@click:marker="(book) => map?.pickMarker(book)"
 					@mouseover:marker="(book) => map?.highlightMarker(book)"
-					@mouseout:marker="map?.unhighlightMarkers"
+					@mouseout:marker="map?.unhighlightMarkers()"
 					@click:borrow="(book) => wantToBorrow(book)" />
 				<div v-else>
 					{{ $t('search.noResult') }}
 				</div>
-				<create-request-dialog ref="borrowDialog" />
+				<create-request-dialog
+					class="create-request-dialog"
+					ref="borrowDialog" />
 			</v-col>
 		</v-row>
 	</div>
