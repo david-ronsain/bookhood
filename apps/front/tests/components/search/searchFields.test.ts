@@ -26,12 +26,7 @@ describe('Testing the component SearchFields', () => {
 		wrapper = mount(SearchFields, {
 			attachTo: document.body,
 			global: {
-				plugins: [
-					vuetify,
-					createTestingPinia({
-						createSpy: vi.fn,
-					}),
-				],
+				plugins: [vuetify],
 				stubs: {
 					VBtnToggle: {
 						name: 'VBtnToggle',

@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import Search from '../../../src/components/search/search.vue'
 import vuetify from '../../../src/plugins/vuetify'

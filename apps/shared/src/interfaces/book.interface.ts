@@ -91,7 +91,7 @@ export interface IBookSearchResult {
 
 	isbn: IISBN[]
 
-	owner: IBookSearchResultOwner
+	owner: IBookSearchResultOwner[]
 }
 
 export interface IBookSearchResultOwner {
@@ -116,6 +116,8 @@ export interface IBookSearchResultOwnerUser {
 	lastName: string
 
 	email: string
+
+	place?: string
 }
 
 export interface IBooksList {

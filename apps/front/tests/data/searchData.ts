@@ -7,7 +7,7 @@ export const emptySearchResults: IBookSearch = {
 }
 
 export const searchResults: IBookSearch = {
-	total: 11,
+	total: 15,
 	results: Array.from({ length: 15 }, (value: unknown, index: number) => ({
 		_id: `bookId#${index}`,
 		libraryId: `libraryId#${index}`,
@@ -24,18 +24,21 @@ export const searchResults: IBookSearch = {
 				identifier: `000#${index}`,
 			},
 		],
-		owner: {
-			_id: `ownerId#${index}`,
-			coords: {
-				lat: 0,
-				lng: 0,
+		owner: [
+			{
+				_id: `ownerId#${index}`,
+				coords: {
+					lat: 0,
+					lng: 0,
+				},
+				user: {
+					_id: `userId#${index}`,
+					firstName: `first#${index}`,
+					lastName: `last#${index}`,
+					email: `email${index}@mail.com`,
+					place: `place${index}`,
+				},
 			},
-			user: {
-				_id: `userId#${index}`,
-				firstName: `first#${index}`,
-				lastName: `last#${index}`,
-				email: `email${index}@mail.com`,
-			},
-		},
+		],
 	})),
 }

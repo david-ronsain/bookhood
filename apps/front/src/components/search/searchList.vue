@@ -3,16 +3,18 @@
 	import { useDisplay } from 'vuetify'
 	import { BhPrimaryButton } from '@bookhood/ui'
 	import { type IBookSearchResult } from '@bookhood/shared'
-	import { shortenText } from '../../composables/shortenText.composable'
+	import { useText } from '../../composables/text.composable'
 	import { mdiAccountOutline, mdiMapMarkerOutline } from '@mdi/js'
 	import { useMainStore } from '../../store'
 	import { computed } from 'vue'
 
-	const props = defineProps<{
-		books: IBookSearchResult[]
-		pickedBook: string[]
+	interface SearchListProps {
+		books: Array<IBookSearchResult>
+		pickedBook: Array<string>
 		highlightedMarker?: any
-	}>()
+	}
+
+	const props = defineProps<SearchListProps>()
 
 	const events = defineEmits([
 		'click:marker',
@@ -21,6 +23,7 @@
 		'click:borrow',
 	])
 
+	const text = useText()
 	const mainStore = useMainStore()
 	const { sm, mobile } = useDisplay()
 	const bookSelected = ref<string[]>([])
@@ -47,7 +50,7 @@
 					? 'highlighted'
 					: ''
 			"
-			class="mb-2"
+			class="mb-2 list"
 			v-for="book in books"
 			:key="book._id"
 			border
@@ -75,7 +78,7 @@
 							highlightedMarker.book._id === book._id)
 					">
 					<div class="mb-4">
-						{{ shortenText(book.description, 100) }}
+						{{ text.shorten(book.description, 100) }}
 					</div>
 					<div class="d-flex align-center justify-space-between">
 						<div>
@@ -136,3 +139,4 @@
 		);
 	}
 </style>
+../../composables/text.composable
