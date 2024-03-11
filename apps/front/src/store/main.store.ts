@@ -9,9 +9,9 @@ export const useMainStore = defineStore('mainStore', () => {
 	const success = ref<string>('')
 	const profile = ref<IUser>(null)
 
-	const getProfile = (): void => {
+	const getProfile = async (): Promise<void> => {
 		if (localStorage.getItem('user')) {
-			axios
+			await axios
 				.get(EnvConfig.api.base + EnvConfig.api.url.user + 'me', {
 					headers: {
 						'x-token': localStorage.getItem('user'),
@@ -19,6 +19,9 @@ export const useMainStore = defineStore('mainStore', () => {
 				})
 				.then((response) => {
 					profile.value = response.data
+				})
+				.catch(() => {
+					profile.value = null
 				})
 		}
 	}

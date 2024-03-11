@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { describe, vi } from 'vitest'
 import { useBookStore } from '../../src/store/book.store'
 import { createPinia, setActivePinia } from 'pinia'
