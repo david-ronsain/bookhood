@@ -2,17 +2,21 @@ import { EnvConfig } from '../../config/env'
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { IBooksList, IBook, RequestStatus } from '@bookhood/shared'
+import type {
+	IBooksList,
+	IBook,
+	LibraryStatus,
+	IBooksListResult,
+} from '@bookhood/shared'
 
 export const useAccountStore = defineStore('accountStore', () => {
 	const booksPage = ref<number>(1)
-	const booksNb = ref<number>(0)
 	const booksLoading = ref<boolean>(false)
-	const books = ref<IBook[]>([])
+	const books = ref<IBooksListResult[]>([])
 
-	const loadBooks = (userId: string): void => {
+	const loadBooks = (userId: string): Promise<any> => {
 		booksLoading.value = true
-		axios
+		return axios
 			.get(
 				EnvConfig.api.base +
 					EnvConfig.api.url.library +
@@ -29,7 +33,9 @@ export const useAccountStore = defineStore('accountStore', () => {
 			)
 			.then((response: { data: IBooksList }) => {
 				books.value = response.data.results
-				booksNb.value = response.data.total
+			})
+			.catch(() => {
+				books.value = []
 			})
 			.finally(() => {
 				booksLoading.value = false
@@ -38,19 +44,30 @@ export const useAccountStore = defineStore('accountStore', () => {
 
 	const updateBookStatus = (
 		libraryId: string,
-		status: RequestStatus,
+		status: LibraryStatus,
 	): Promise<any> =>
-		axios.patch(
-			EnvConfig.api.base + EnvConfig.api.url.library + libraryId,
-			{
-				status,
-			},
-			{
-				headers: {
-					'x-token': localStorage.getItem('user'),
+		axios
+			.patch(
+				EnvConfig.api.base + EnvConfig.api.url.library + libraryId,
+				{
+					status,
 				},
-			},
-		)
+				{
+					headers: {
+						'x-token': localStorage.getItem('user'),
+					},
+				},
+			)
+			.then(() => {
+				const index = books.value.findIndex(
+					(lib: IBooksListResult) => lib._id === libraryId,
+				)
+
+				if (index >= 0) {
+					books.value[index].status = status
+				}
+			})
+			.catch(() => {})
 
 	return {
 		booksPage,

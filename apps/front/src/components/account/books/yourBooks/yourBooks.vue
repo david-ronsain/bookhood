@@ -110,7 +110,7 @@
 	}
 
 	const saveStatus = (item: IBooksListResult, value: RequestStatus) => {
-		books.value.forEach((book: IBooksListResult, index: number) => {
+		books.value.forEach((book: IBooksListResult) => {
 			if (item._id === book._id) {
 				accountStore
 					.updateBookStatus(item._id, value)
@@ -120,7 +120,7 @@
 								'account.books.yourBooks.list.patch.success',
 							),
 						})
-						books.value[index].status = value
+						//books.value[index].status = value
 					})
 					.catch(() => {
 						mainStore.$patch({

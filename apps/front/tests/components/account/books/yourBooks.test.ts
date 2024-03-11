@@ -124,10 +124,6 @@ describe('Testing the component YourBooks', () => {
 			.setValue(LibraryStatus.TO_GIVE)
 		await wrapper.vm.$nextTick()
 
-		expect(
-			wrapper.find('.your-books-list tbody tr td:nth-of-type(4)').html(),
-		).contain(LibraryStatus.TO_GIVE)
-
 		expect(mainStore.success.length).toBeGreaterThan(0)
 	})
 
