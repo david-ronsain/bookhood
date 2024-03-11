@@ -5,6 +5,7 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { BhDatatable } from '@bookhood/ui'
 import { useProfileStore } from '../../../src/store'
+import { booksResults } from '../../data/bookData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -65,16 +66,7 @@ describe('Testing the component ProfileBooks', () => {
 	})
 
 	it('should display one book', async () => {
-		profileStore.booksList = [
-			{
-				_id: 'bookId',
-				title: 'title',
-				authors: ['author'],
-				description: 'desc',
-				isbn: [{ type: 'ISBN_13', identifier: '0000' }],
-				language: 'fr',
-			},
-		]
+		profileStore.booksList = booksResults.results
 		await wrapper.vm.$nextTick()
 
 		expect(wrapper.find('.books-datatable tbody tr').text()).toContain(

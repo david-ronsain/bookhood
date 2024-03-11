@@ -6,11 +6,13 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { BhDatatable } from '@bookhood/ui'
 import { useRequestStore, useMainStore } from '../../../src/store'
-import { RequestStatus } from '../../../../shared/src'
+import { IRequestSimple, RequestStatus } from '../../../../shared/src'
 import BtnValidateStatus from '../../../src/components/requests/actions/btnValidateStatus.vue'
 import BtnRefuseStatus from '../../../src/components/requests/actions/btnRefuseStatus.vue'
 import BtnOtherAction from '../../../src/components/requests/actions/btnOtherAction.vue'
 import { useRouter } from 'vue-router'
+import { myProfile } from '../../data/profileData'
+import { requestsList } from '../../data/requestData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -202,25 +204,16 @@ describe('Testing the component IncomingRequests', () => {
 	const loadRequests = async (
 		status: RequestStatus = RequestStatus.PENDING_VALIDATION,
 	) => {
-		requestStore.incomingRequests = {
-			total: 1,
-			results: [
-				{
-					_id: 'reqId',
-					userFirstName: 'first',
-					ownerFirstName: 'last',
-					title: 'title',
-					place: 'place',
-					createdAt: new Date().toISOString(),
-					userId: 'userId',
-					ownerId: 'ownerId',
-					status,
-				},
-			],
+		const list = {
+			...requestsList,
+			results: requestsList.results.map((res: IRequestSimple) => ({
+				...res,
+				status,
+			})),
 		}
-		mainStore.profile = {
-			_id: 'userId',
-		}
+		requestStore.incomingRequests = list
+
+		mainStore.profile = myProfile
 		requestStore.getIncomingRequests.mockReturnValue(Promise.resolve())
 		await wrapper.vm.$nextTick()
 

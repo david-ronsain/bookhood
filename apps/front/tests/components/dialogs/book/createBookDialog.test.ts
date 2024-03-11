@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 import CreateBookDialog from '../../../../src/components/dialogs/book/createBookDialog.vue'
@@ -6,6 +7,7 @@ import { createTestingPinia } from '@pinia/testing'
 import { useBookStore, useMainStore } from '../../../../src/store'
 import { IBook, LibraryStatus } from '../../../../../shared/src'
 import { BhAddressAutocomplete, BhTextField } from '@bookhood/ui'
+import { bookToAdd } from '../../../data/bookData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -32,16 +34,6 @@ describe('Testing the component CreateBookDialog', () => {
 	let wrapper: VueWrapper
 	let bookStore
 	let mainStore
-
-	const book = {
-		_id: 'bookId',
-		title: 'title',
-		authors: ['authors'],
-		categories: ['category'],
-		description: 'desc',
-		isbn: [{ type: 'ISBN_13', identifier: '0000' }],
-		language: 'fr',
-	}
 
 	beforeEach(() => {
 		wrapper = mount(CreateBookDialog, {
@@ -136,7 +128,7 @@ describe('Testing the component CreateBookDialog', () => {
 	})
 
 	const completeForm = async () => {
-		bookStore.searchGoogleByISBN = (): IBook => book
+		bookStore.searchGoogleByISBN = (): IBook => bookToAdd
 
 		wrapper.findComponent(BhTextField).vm.$emit('update:modelValue', '0000')
 		vi.advanceTimersByTime(3000)

@@ -9,7 +9,7 @@ import SearchMap from '../../../src/components/search/searchMap.vue'
 import CreateRequestDialog from '../../../src/components/dialogs/request/createRequestDialog.vue'
 import SearchList from '../../../src/components/search/searchList.vue'
 import { useBookStore } from '../../../src/store'
-import { emptySearchResults, searchResults } from '../../data/searchData'
+import { emptySearchResults, searchResults } from '../../data/bookData'
 import { IBookSearch, IBookSearchResult } from '../../../../shared/src'
 
 vi.mock('vue-i18n', () => ({

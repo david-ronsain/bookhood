@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { it, describe, beforeEach, expect, vi } from 'vitest'
 import { VueWrapper, mount, config } from '@vue/test-utils'
 import YourBooks from '../../../../src/components/account/books/yourBooks/yourBooks.vue'
@@ -7,6 +8,7 @@ import { useAccountStore, useMainStore } from '../../../../src/store'
 import { LibraryStatus } from '../../../../../shared/src'
 import CreateBookDialog from '../../../../src/components/dialogs/book/createBookDialog.vue'
 import { VSelect } from 'vuetify/lib/components/index.mjs'
+import { booksResults } from '../../../data/bookData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -31,18 +33,6 @@ describe('Testing the component YourBooks', () => {
 	let wrapper: VueWrapper
 	let accountStore
 	let mainStore
-
-	const books = [
-		{
-			_id: 'bookId',
-			title: 'title',
-			authors: ['author'],
-			description: 'desc',
-			place: 'place',
-			status: LibraryStatus.TO_LEND,
-			categories: ['category'],
-		},
-	]
 
 	beforeEach(() => {
 		wrapper = mount(YourBooks, {
@@ -91,7 +81,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should list one book in the table', async () => {
-		accountStore.books = books
+		accountStore.books = booksResults.results
 		await wrapper.vm.$nextTick()
 
 		expect(
@@ -100,7 +90,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should put the status in edit mode and quit it', async () => {
-		accountStore.books = books
+		accountStore.books = booksResults.results
 		await wrapper.vm.$nextTick()
 
 		await wrapper
@@ -119,7 +109,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should enter edit mode and succeed to change status', async () => {
-		accountStore.books = books
+		accountStore.books = booksResults.results
 		accountStore.updateBookStatus = () => Promise.resolve()
 		await wrapper.vm.$nextTick()
 
@@ -142,7 +132,7 @@ describe('Testing the component YourBooks', () => {
 	})
 
 	it('should enter edit mode and fail to change status', async () => {
-		accountStore.books = books
+		accountStore.books = booksResults.results
 		accountStore.updateBookStatus = () => Promise.reject()
 		await wrapper.vm.$nextTick()
 
@@ -159,13 +149,13 @@ describe('Testing the component YourBooks', () => {
 
 		expect(
 			wrapper.find('.your-books-list tbody tr td:nth-of-type(4)').html(),
-		).contain(books[0].status)
+		).contain(accountStore.books[0].status)
 
 		expect(mainStore.error.length).toBeGreaterThan(0)
 	})
 
 	it('should reload the list if a book has been created', async () => {
-		accountStore.books = books
+		accountStore.books = booksResults.results
 		accountStore.loadBooks = () => {
 			accountStore.books = []
 		}

@@ -6,12 +6,14 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { BhDatatable } from '@bookhood/ui'
 import { useRequestStore, useMainStore } from '../../../src/store'
-import { RequestStatus } from '../../../../shared/src'
+import { IRequestSimple, RequestStatus } from '../../../../shared/src'
 import BtnValidateStatus from '../../../src/components/requests/actions/btnValidateStatus.vue'
 import BtnRefuseStatus from '../../../src/components/requests/actions/btnRefuseStatus.vue'
 import BtnOtherAction from '../../../src/components/requests/actions/btnOtherAction.vue'
 import { useRouter } from 'vue-router'
 import OutgoingRequestsDatepicker from '../../../src/components/requests/outgoingRequestsDatepicker.vue'
+import { requestsList } from '../../data/requestData'
+import { myProfile } from '../../data/profileData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -99,9 +101,7 @@ describe('Testing the component OutgoingRequests', () => {
 		expect(requestStore.getOutgoingRequests).toHaveBeenCalledTimes(0)
 
 		requestStore.getOutgoingRequests.mockReturnValue(Promise.resolve())
-		mainStore.profile = {
-			_id: 'userId',
-		}
+		mainStore.profile = myProfile
 		await wrapper.vm.$nextTick()
 		expect(requestStore.getOutgoingRequests).toHaveBeenCalledTimes(1)
 	})
@@ -268,7 +268,6 @@ describe('Testing the component OutgoingRequests', () => {
 		const endDate = new Date('2024-03-18')
 
 		requestStore.changeDates = () => Promise.reject()
-
 		expect(
 			wrapper
 				.findComponent(OutgoingRequestsDatepicker)
@@ -286,27 +285,16 @@ describe('Testing the component OutgoingRequests', () => {
 	const loadRequests = async (
 		status: RequestStatus = RequestStatus.ACCEPTED_PENDING_DELIVERY,
 	) => {
-		requestStore.outgoingRequests = {
-			total: 1,
-			results: [
-				{
-					_id: 'reqId',
-					userFirstName: 'first',
-					ownerFirstName: 'last',
-					title: 'title',
-					place: 'place',
-					createdAt: new Date().toISOString(),
-					userId: 'userId',
-					ownerId: 'ownerId',
-					status,
-					startDate: '2024-03-12',
-					endDate: '2024-03-20',
-				},
-			],
+		const list = {
+			...requestsList,
+			results: requestsList.results.map((res: IRequestSimple) => ({
+				...res,
+				status,
+			})),
 		}
-		mainStore.profile = {
-			_id: 'userId',
-		}
+		requestStore.outgoingRequests = list
+
+		mainStore.profile = myProfile
 		requestStore.getOutgoingRequests.mockReturnValue(Promise.resolve())
 		await wrapper.vm.$nextTick()
 

@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import BtnRefuseStatus from '../../../../src/components/requests/actions/btnRefuseStatus.vue'
 import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
-import { mdiClose } from '@mdi/js'
+import { VBtn } from 'vuetify/lib/components/index.mjs'
 
 describe('Testing the component BtnRefuseStatus', () => {
 	let wrapper: VueWrapper
@@ -13,7 +13,6 @@ describe('Testing the component BtnRefuseStatus', () => {
 			attachTo: document.body,
 			props: {
 				tooltip: 'cancel',
-				icon: mdiClose,
 			},
 			global: {
 				plugins: [
@@ -25,10 +24,16 @@ describe('Testing the component BtnRefuseStatus', () => {
 				stubs: {
 					VTooltip: {
 						name: 'VTooltip',
-						template: '<div class="tooltip"><slot/></div>',
+						template:
+							'<div class="tooltip"><slot name="activator"/></div>',
 						props: {
 							attach: true,
 						},
+					},
+					VBtn: {
+						name: 'VBtn',
+						template: '<div class="btn"><slot/></div>',
+						emits: ['click'],
 					},
 				},
 			},
@@ -41,5 +46,10 @@ describe('Testing the component BtnRefuseStatus', () => {
 		expect(wrapper.findComponent(BtnRefuseStatus).html()).toContain(
 			'cancel',
 		)
+	})
+
+	it('should emit the status:refused event', () => {
+		wrapper.findComponent(VBtn).vm.$emit('click')
+		expect(wrapper.emitted('status:refused')).toBeDefined()
 	})
 })

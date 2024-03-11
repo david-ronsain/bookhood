@@ -4,6 +4,7 @@ import Message from '../../../src/components/conversation/message.vue'
 import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useMainStore } from '../../../src/store'
+import message from '../../../src/components/conversation/message.vue'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -21,12 +22,7 @@ global.ResizeObserver = require('resize-observer-polyfill')
 describe('Testing the component Message', () => {
 	let wrapper: VueWrapper
 	let mainStore
-	const message = {
-		_id: 'msg1',
-		from: 'userId1',
-		message: 'message',
-		seenBy: [],
-	}
+
 	const conversationId = 'convId'
 
 	beforeEach(async () => {

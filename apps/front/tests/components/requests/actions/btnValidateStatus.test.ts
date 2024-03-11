@@ -4,6 +4,7 @@ import BtnValidateStatus from '../../../../src/components/requests/actions/btnVa
 import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { mdiCheck } from '@mdi/js'
+import { VBtn } from 'vuetify/lib/components/index.mjs'
 
 describe('Testing the component BtnValidateStatus', () => {
 	let wrapper: VueWrapper
@@ -25,10 +26,16 @@ describe('Testing the component BtnValidateStatus', () => {
 				stubs: {
 					VTooltip: {
 						name: 'VTooltip',
-						template: '<div class="tooltip"><slot/></div>',
+						template:
+							'<div class="tooltip"><slot name="activator"/></div>',
 						props: {
 							attach: true,
 						},
+					},
+					VBtn: {
+						name: 'VBtn',
+						template: '<div class="btn"><slot/></div>',
+						emits: ['click'],
 					},
 				},
 			},
@@ -41,5 +48,10 @@ describe('Testing the component BtnValidateStatus', () => {
 		expect(wrapper.findComponent(BtnValidateStatus).html()).toContain(
 			'confirm',
 		)
+	})
+
+	it('should emit the status:validated event', () => {
+		wrapper.findComponent(VBtn).vm.$emit('click')
+		expect(wrapper.emitted('status:validated')).toBeDefined()
 	})
 })

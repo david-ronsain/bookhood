@@ -4,6 +4,7 @@ import ProfileCard from '../../../src/components/profile/profileCard.vue'
 import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useProfileStore } from '../../../src/store'
+import { externalProfile } from '../../data/profileData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -53,10 +54,7 @@ describe('Testing the component ProfileCard', () => {
 	})
 
 	it('should mount the component with a profile', async () => {
-		profileStore.profile = {
-			firstName: 'first',
-			lastName: 'last',
-		}
+		profileStore.profile = externalProfile
 		await wrapper.vm.$nextTick()
 
 		expect(wrapper.findComponent(ProfileCard).text()).toContain(
