@@ -11,12 +11,10 @@
 	import { useMainStore, useAccountStore } from '../../../../store'
 	import { onMounted } from 'vue'
 	import { useI18n } from 'vue-i18n'
-	import {
-		libraryStatusColor,
-		statusColor,
-	} from '../../../../composables/statusColor.composable'
+	import { useStatusColor } from '../../../../composables/statusColor.composable'
 	import { computed, watch, defineExpose } from 'vue'
 
+	const statusColor = useStatusColor()
 	const { t } = useI18n({})
 	const mainStore = useMainStore()
 	const accountStore = useAccountStore()
@@ -210,7 +208,7 @@
 											density="compact"
 											pill
 											:color="
-												libraryStatusColor(item.status)
+												statusColor.library(item.status)
 											"
 											>{{
 												$t(
@@ -226,7 +224,9 @@
 											density="compact"
 											pill
 											:color="
-												statusColor(item.currentStatus)
+												statusColor.request(
+													item.currentStatus,
+												)
 											"
 											>{{
 												$t(

@@ -22,10 +22,12 @@
 	import { onUnmounted } from 'vue'
 	import { computed } from 'vue'
 	import { watch } from 'vue'
-	import { statusColor } from '../../composables/statusColor.composable'
-	import { displayKeyboardDates } from '../../composables/dates.composable'
+	import { useStatusColor } from '../../composables/statusColor.composable'
+	import { useFormatDates } from '../../composables/dates.composable'
 	import { useDate } from 'vuetify'
 
+	const statusColor = useStatusColor()
+	const formatDates = useFormatDates()
 	const date = useDate()
 	const router = useRouter()
 	const { t } = useI18n({})
@@ -205,7 +207,7 @@
 							<v-chip
 								density="compact"
 								pill
-								:color="statusColor(item.status)"
+								:color="statusColor.request(item.status)"
 								>{{
 									$t('request.status.' + item.status)
 								}}</v-chip
@@ -214,7 +216,7 @@
 						<td>
 							<span
 								v-text="
-									displayKeyboardDates(
+									formatDates.displayKeyboardDates(
 										date,
 										item.startDate,
 										item.endDate,

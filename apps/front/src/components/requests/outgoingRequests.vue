@@ -15,11 +15,13 @@
 	import { useI18n } from 'vue-i18n'
 	import { mdiChat, mdiCheck, mdiClose } from '@mdi/js'
 	import { computed, watch } from 'vue'
-	import { statusColor } from '../../composables/statusColor.composable'
-	import { displayKeyboardDates } from '../../composables/dates.composable'
+	import { useStatusColor } from '../../composables/statusColor.composable'
+	import { useFormatDates } from '../../composables/dates.composable'
 	import { useDate } from 'vuetify'
 	import { format } from 'date-fns'
 
+	const statusColor = useStatusColor()
+	const formatDate = useFormatDates()
 	const date = useDate()
 	const router = useRouter()
 	const { t } = useI18n({})
@@ -220,7 +222,7 @@
 							<v-chip
 								density="compact"
 								pill
-								:color="statusColor(item.status)"
+								:color="statusColor.request(item.status)"
 								>{{
 									$t('request.status.' + item.status)
 								}}</v-chip
@@ -233,7 +235,7 @@
 									RequestStatus.PENDING_VALIDATION
 								"
 								v-text="
-									displayKeyboardDates(
+									formatDate.displayKeyboardDates(
 										date,
 										item.startDate,
 										item.endDate,

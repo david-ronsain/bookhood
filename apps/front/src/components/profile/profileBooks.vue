@@ -4,8 +4,9 @@
 	import { useProfileStore } from '../../store'
 	import { useRoute } from 'vue-router'
 	import { onMounted, onUnmounted, computed } from 'vue'
-	import { libraryStatusColor } from '../../composables/statusColor.composable'
+	import { useStatusColor } from '../../composables/statusColor.composable'
 
+	const statusColor = useStatusColor()
 	const route = useRoute()
 	const profileStore = useProfileStore()
 	const { t } = useI18n({})
@@ -115,7 +116,7 @@
 							<v-chip
 								density="compact"
 								pill
-								:color="libraryStatusColor(item.status)"
+								:color="statusColor.library(item.status)"
 								>{{
 									$t('profile.books.list.' + item.status)
 								}}</v-chip
