@@ -5,6 +5,8 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { h } from 'vue'
 import { VApp } from 'vuetify/components'
+import { useMainStore, useUserStore } from '../../../src/store'
+import { useRouter } from 'vue-router'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -23,8 +25,16 @@ global.ResizeObserver = require('resize-observer-polyfill')
 
 describe('Testing the signup form', () => {
 	let wrapper: VueWrapper
+	let userStore
+	let mainStore
+	let router
 
 	beforeEach(() => {
+		vi.mocked(useRouter).mockReturnValue({
+			...useRouter(),
+			push: vi.fn(),
+		})
+
 		wrapper = mount(VApp, {
 			slots: {
 				default: h(SignupForm),
@@ -38,6 +48,10 @@ describe('Testing the signup form', () => {
 				],
 			},
 		})
+
+		userStore = useUserStore()
+		mainStore = useMainStore()
+		router = useRouter()
 	})
 
 	it('should display the form', async () => {
@@ -48,11 +62,7 @@ describe('Testing the signup form', () => {
 	})
 
 	it('should not validate the firstName field', async () => {
-		await wrapper.findComponent('.signup-firstName').setValue('')
-		await wrapper.findComponent('.signup-lastName').setValue('test')
-		await wrapper.findComponent('.signup-email').setValue('test@test.test')
-		await wrapper.findComponent('.signup-terms').setValue(true)
-		await wrapper.vm.$nextTick()
+		await fillForm({ firstName: '' })
 
 		expect(
 			wrapper.findComponent('.signup-submit').attributes('disabled'),
@@ -60,11 +70,7 @@ describe('Testing the signup form', () => {
 	})
 
 	it('should not validate the lastName field', async () => {
-		await wrapper.findComponent('.signup-firstName').setValue('test')
-		await wrapper.findComponent('.signup-lastName').setValue('')
-		await wrapper.findComponent('.signup-email').setValue('test@test.test')
-		await wrapper.findComponent('.signup-terms').setValue(true)
-		await wrapper.vm.$nextTick()
+		await fillForm({ lastName: '' })
 
 		expect(
 			wrapper.findComponent('.signup-submit').attributes('disabled'),
@@ -72,11 +78,7 @@ describe('Testing the signup form', () => {
 	})
 
 	it('should not validate the email field', async () => {
-		await wrapper.findComponent('.signup-firstName').setValue('test')
-		await wrapper.findComponent('.signup-lastName').setValue('test')
-		await wrapper.findComponent('.signup-email').setValue('')
-		await wrapper.findComponent('.signup-terms').setValue(true)
-		await wrapper.vm.$nextTick()
+		await fillForm({ email: '' })
 
 		expect(
 			wrapper.findComponent('.signup-submit').attributes('disabled'),
@@ -91,10 +93,7 @@ describe('Testing the signup form', () => {
 	})
 
 	it('should not validate the temrs checkbox', async () => {
-		await wrapper.findComponent('.signup-firstName').setValue('test')
-		await wrapper.findComponent('.signup-lastName').setValue('test')
-		await wrapper.findComponent('.signup-email').setValue('test@test.test')
-		await wrapper.vm.$nextTick()
+		await fillForm({ acceptTerms: false })
 
 		expect(
 			wrapper.findComponent('.signup-submit').attributes('disabled'),
@@ -102,14 +101,56 @@ describe('Testing the signup form', () => {
 	})
 
 	it('should validate the form', async () => {
-		await wrapper.findComponent('.signup-firstName').setValue('test')
-		await wrapper.findComponent('.signup-lastName').setValue('test')
-		await wrapper.findComponent('.signup-email').setValue('test@test.test')
-		await wrapper.findComponent('.signup-terms').setValue(true)
-		await wrapper.findComponent({ name: 'SignupForm' }).vm.$nextTick()
-
+		await fillForm({})
 		expect(
 			wrapper.findComponent('.signup-submit').attributes('disabled'),
 		).toBeUndefined()
 	})
+
+	it('should succeed registering the user', async () => {
+		await fillForm({})
+
+		userStore.signup = () => Promise.resolve()
+		vi.spyOn(userStore, 'signup')
+
+		wrapper.findComponent('.signup-submit').trigger('click')
+		await wrapper.vm.$nextTick()
+
+		expect(userStore.signup).toHaveBeenCalledTimes(1)
+		await wrapper.vm.$nextTick()
+		await wrapper.vm.$nextTick()
+		expect(router.push).toHaveBeenCalledWith({ name: 'home' })
+	})
+
+	it('should fail registering the user', async () => {
+		await fillForm({})
+
+		userStore.signup = () => Promise.reject({ message: 'error' })
+		vi.spyOn(userStore, 'signup')
+
+		wrapper.findComponent('.signup-submit').trigger('click')
+		await wrapper.vm.$nextTick()
+		await wrapper.vm.$nextTick()
+
+		expect(userStore.signup).toHaveBeenCalledTimes(1)
+		await wrapper.vm.$nextTick()
+		await wrapper.vm.$nextTick()
+		expect(mainStore.error.length).toBeGreaterThan(0)
+	})
+
+	const fillForm = async (user): Promise<void> => {
+		await wrapper
+			.findComponent('.signup-firstName')
+			.setValue(user?.firstName ?? 'first')
+		await wrapper
+			.findComponent('.signup-lastName')
+			.setValue(user?.lastName ?? 'last')
+		await wrapper
+			.findComponent('.signup-email')
+			.setValue(user?.email ?? 'test@test.test')
+		await wrapper
+			.findComponent('.signup-terms')
+			.setValue(user?.acceptTerms ?? true)
+		await wrapper.vm.$nextTick()
+	}
 })
