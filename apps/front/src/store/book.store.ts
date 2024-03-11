@@ -4,10 +4,10 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { mapBook, mapBooks } from '../mappers/bookMapper'
-import type {
+import {
 	IBook,
 	IBookSearch,
-	BookStatus,
+	LibraryStatus,
 	ILibraryFull,
 } from '@bookhood/shared'
 
@@ -42,6 +42,7 @@ export const useBookStore = defineStore('bookStore', () => {
 				)
 			})
 			.catch(() => {
+				searchMaxResults.value = 0
 				return []
 			})
 
@@ -89,10 +90,10 @@ export const useBookStore = defineStore('bookStore', () => {
 
 	const add = async (
 		book: IBook,
-		status: BookStatus,
+		status: LibraryStatus,
 		location: { lat; lng },
 		place: string,
-	) =>
+	): Promise<IBook | null> =>
 		axios.post(
 			EnvConfig.api.base + EnvConfig.api.url.book,
 			{ ...book, location, status, place },
@@ -111,6 +112,7 @@ export const useBookStore = defineStore('bookStore', () => {
 				},
 			})
 			.then((response: { data: ILibraryFull[] }) => response.data)
+			.catch(() => [])
 
 	return {
 		searchGoogleByName,

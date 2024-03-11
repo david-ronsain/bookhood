@@ -1,27 +1,9 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { describe } from 'vitest'
-import { mapBooks, mapBook } from '../../src/mappers/bookMapper'
+import { mapBook } from '../../src/mappers/bookMapper'
 import { IGoogleBook } from '../../src/interfaces/book.interface'
 import { IBook } from '../../../shared/src'
-
-const googleBooks: IGoogleBook[] = [
-	{
-		volumeInfo: {
-			industryIdentifiers: [{ type: 'ISBN_13', identifier: '0000' }],
-			title: 'title',
-			authors: ['author'],
-			categories: ['categories'],
-			description: 'desc',
-			imageLinks: {
-				smallThumbnail: 'small',
-				thumbnail: 'normal',
-			},
-			language: 'fr',
-			subtitle: 'subtitle',
-			publisher: 'publisher',
-			publishedDate: '2022',
-		},
-	},
-]
+import { googleBooks } from '../data/bookData'
 
 describe('Testing the book mapper', () => {
 	describe('Testing the mapBooks method', () => {

@@ -7,6 +7,7 @@ import {
 	LibraryStatus,
 	RequestStatus,
 } from '../../../shared/src'
+import { IGoogleBook } from '../../src/interfaces/book.interface'
 
 export const emptyBooksResults: IBooksList = {
 	total: 0,
@@ -81,4 +82,29 @@ export const bookToAdd: IBook = {
 	description: 'desc',
 	isbn: [{ type: 'ISBN_13', identifier: '0000' }],
 	language: 'fr',
+}
+
+export const googleBooks: IGoogleBook[] = [
+	{
+		volumeInfo: {
+			industryIdentifiers: [{ type: 'ISBN_13', identifier: '0000' }],
+			title: 'title',
+			authors: ['author'],
+			categories: ['categories'],
+			description: 'desc',
+			imageLinks: {
+				smallThumbnail: 'small',
+				thumbnail: 'normal',
+			},
+			language: 'fr',
+			subtitle: 'subtitle',
+			publisher: 'publisher',
+			publishedDate: '2022',
+		},
+	},
+]
+
+export const googleBooksSearch = {
+	totalItems: 1,
+	items: googleBooks,
 }
