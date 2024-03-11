@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IUser, Role } from '../../../shared/src'
+import { ICreateUserDTO, IUser, Role } from '../../../shared/src'
 
 export const user: IUser = {
 	_id: `userId`,
@@ -9,4 +9,10 @@ export const user: IUser = {
 	role: [Role.USER],
 	token: '||',
 	tokenExpiration: new Date(Date.now() * 1000),
+}
+
+export const createdUser: ICreateUserDTO = {
+	firstName: 'first',
+	lastName: 'last',
+	email: 'first.last@name.test',
 }
