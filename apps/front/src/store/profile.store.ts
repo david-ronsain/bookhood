@@ -15,9 +15,9 @@ export const useProfileStore = defineStore('profileStore', () => {
 	const booksListTotal = ref<number>(0)
 	const profile = ref<IExternalProfile>(null)
 
-	const loadBooks = (userId: string): void => {
+	const loadBooks = async (userId: string): Promise<void> => {
 		booksListLoading.value = true
-		axios
+		await axios
 			.get(
 				EnvConfig.api.base +
 					EnvConfig.api.url.library +
@@ -36,13 +36,17 @@ export const useProfileStore = defineStore('profileStore', () => {
 				booksList.value = response.data.results
 				booksListTotal.value = response.data.total
 			})
+			.catch(() => {
+				booksList.value = []
+				booksListTotal.value = 0
+			})
 			.finally(() => {
 				booksListLoading.value = false
 			})
 	}
 
-	const loadProfile = (userId: string): void => {
-		axios
+	const loadProfile = async (userId: string): Promise<void> => {
+		await axios
 			.get(EnvConfig.api.base + EnvConfig.api.url.user + userId, {
 				headers: {
 					'Content-Type': 'application/json',
@@ -51,6 +55,9 @@ export const useProfileStore = defineStore('profileStore', () => {
 			})
 			.then((res) => {
 				profile.value = res.data
+			})
+			.catch(() => {
+				profile.value = null
 			})
 	}
 
