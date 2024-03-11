@@ -1,4 +1,4 @@
-import type { type IBook } from '@bookhood/shared'
+import type { IBook } from '@bookhood/shared'
 import type { IGoogleBook } from '../interfaces/book.interface'
 
 export const mapBooks = (books: IGoogleBook[]): IBook[] =>
@@ -6,14 +6,14 @@ export const mapBooks = (books: IGoogleBook[]): IBook[] =>
 
 export const mapBook = (book: IGoogleBook): IBook => ({
 	value: (book.volumeInfo?.industryIdentifiers || []).find(
-		(isbn) => isbn.type === 'ISBN_13'
+		(isbn) => isbn.type === 'ISBN_13',
 	)
 		? (book.volumeInfo?.industryIdentifiers || []).find(
-				(isbn) => isbn.type === 'ISBN_13'
-		  ).identifier
+				(isbn) => isbn.type === 'ISBN_13',
+			).identifier
 		: (book.volumeInfo?.industryIdentifiers || []).find(
-				(isbn) => isbn.type === 'ISBN_10'
-		  ).identifier,
+				(isbn) => isbn.type === 'ISBN_10',
+			).identifier,
 	title: book.volumeInfo.title,
 	authors: book.volumeInfo.authors ?? [],
 	categories: book.volumeInfo.categories ?? [],
