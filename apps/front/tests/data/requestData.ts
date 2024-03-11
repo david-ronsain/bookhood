@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IRequestList, RequestStatus } from '../../../shared/src'
+import { IRequest, IRequestList, RequestStatus } from '../../../shared/src'
 
 export const requestsList: IRequestList = {
 	total: 15,
@@ -31,4 +31,14 @@ export const requestsList: IRequestList = {
 			},
 		],
 	})),
+}
+
+export const request: IRequest = {
+	_id: `reqId`,
+	libraryId: 'libId',
+	userId: 'userId',
+	ownerId: 'ownerId',
+	status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
+	startDate: `2024-03-10`,
+	endDate: `2024-03-17`,
 }

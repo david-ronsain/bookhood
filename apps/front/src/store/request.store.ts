@@ -84,6 +84,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 				incomingRequests.value = results.data
 				return results.data
 			})
+			.catch(() => {
+				incomingRequests.value = []
+			})
 
 	const getOutgoingRequests = (body: IGetRequests): IRequestList =>
 		axios
@@ -101,6 +104,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 			.then((results) => {
 				outgoingRequests.value = results.data
 				return results.data
+			})
+			.catch(() => {
+				outgoingRequests.value = []
 			})
 
 	return {
