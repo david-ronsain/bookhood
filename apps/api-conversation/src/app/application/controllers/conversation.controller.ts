@@ -3,7 +3,6 @@ import {
 	ForbiddenException,
 	HttpStatus,
 	Inject,
-	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
@@ -11,16 +10,17 @@ import {
 	AddMessageDTO,
 	FlagAsSeenMessageDTO,
 	GetOrCreateConversationDTO,
-	IConversation,
 	IConversationFull,
 	IConversationMessage,
 	IUser,
 } from '@bookhood/shared'
 import { firstValueFrom } from 'rxjs'
-import { Logger } from 'winston'
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetOrCreateUseCase from '../usecases/getOrCreate.usecase'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	MQConversationMessageType,
+	MQUerMessageType,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import AddMessageUseCase from '../usecases/addMessage.usecase'
 import FlagAsSeenUseCase from '../usecases/flagAsSeen.usecase'
 
@@ -33,12 +33,12 @@ export class ConversationController {
 		private readonly flagAsSeenUseCase: FlagAsSeenUseCase,
 	) {}
 
-	@MessagePattern('conversation-health')
+	@MessagePattern()
 	health(): string {
 		return 'up'
 	}
 
-	@MessagePattern('conversation-get-or-create')
+	@MessagePattern(MQConversationMessageType.CREATE_AND_GET)
 	async getOrCreateConversation(
 		dto: GetOrCreateConversationDTO,
 	): Promise<MicroserviceResponseFormatter<IConversationFull>> {
@@ -64,7 +64,7 @@ export class ConversationController {
 		}
 	}
 
-	@MessagePattern('conversation-add-message')
+	@MessagePattern(MQConversationMessageType.ADD_MESSAGE)
 	async addMessage(
 		dto: AddMessageDTO,
 	): Promise<MicroserviceResponseFormatter<IConversationMessage>> {
@@ -88,7 +88,7 @@ export class ConversationController {
 		}
 	}
 
-	@MessagePattern('conversation-flag-seen')
+	@MessagePattern(MQConversationMessageType.FLAG_AS_SEEN)
 	async flagAsSeen(
 		dto: FlagAsSeenMessageDTO,
 	): Promise<MicroserviceResponseFormatter<boolean>> {
@@ -120,7 +120,7 @@ export class ConversationController {
 
 		const userData = await firstValueFrom<
 			MicroserviceResponseFormatter<IUser | null>
-		>(this.userClient.send('user-get-by-token', token.join('|')))
+		>(this.userClient.send(MQUerMessageType.GET_BY_TOKEN, token.join('|')))
 		if (!userData.success) {
 			throw new ForbiddenException()
 		}

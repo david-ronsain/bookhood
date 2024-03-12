@@ -13,7 +13,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 
 import { Server, Socket } from 'socket.io'
 import { firstValueFrom } from 'rxjs'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	MicroserviceResponseFormatter,
+	MQConversationMessageType,
+} from '@bookhood/shared-api'
 import {
 	AddMessageDTO,
 	FlagAsSeenMessageDTO,
@@ -69,7 +72,12 @@ export class ConversationGateway
 		try {
 			const conversation = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationFull>
-			>(this.conversationQueue.send('conversation-get-or-create', dto))
+			>(
+				this.conversationQueue.send(
+					MQConversationMessageType.CREATE_AND_GET,
+					dto,
+				),
+			)
 
 			client.data.roomId = conversation.data.roomId
 			client.join(conversation.data.roomId)
@@ -85,7 +93,12 @@ export class ConversationGateway
 		try {
 			const message = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationMessage>
-			>(this.conversationQueue.send('conversation-add-message', dto))
+			>(
+				this.conversationQueue.send(
+					MQConversationMessageType.ADD_MESSAGE,
+					dto,
+				),
+			)
 
 			client.nsp
 				.to(dto.roomId)
@@ -100,7 +113,10 @@ export class ConversationGateway
 	async flagAsSeen(client: Socket, dto: FlagAsSeenMessageDTO) {
 		try {
 			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
-				this.conversationQueue.send('conversation-flag-seen', dto),
+				this.conversationQueue.send(
+					MQConversationMessageType.FLAG_AS_SEEN,
+					dto,
+				),
 			)
 			client.broadcast.emit(
 				WSConversationEventType.FLAG_MESSAGE_SEEN_SUCCESS,
