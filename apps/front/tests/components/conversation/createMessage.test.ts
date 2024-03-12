@@ -24,7 +24,7 @@ describe('Testing the component CreateMessage', () => {
 	beforeEach(async () => {
 		wrapper = mount(CreateMessage, {
 			props: {
-				conversationId: conversation._id,
+				conversation,
 				roomId: conversation.roomId,
 				requestId: conversation.request._id,
 			},

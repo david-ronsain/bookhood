@@ -5,8 +5,10 @@
 	import { computed } from 'vue'
 	import { useMainStore } from '../../store'
 	import { emitEvent } from '../../composables/socket.composable'
-	import { WSConversationEventType } from '@bookhood/shared'
-	import type { IConversationFull } from 'apps/shared/src'
+	import {
+		WSConversationEventType,
+		type IConversationFull,
+	} from '@bookhood/shared'
 
 	interface MessageProps {
 		message: IConversationMessage

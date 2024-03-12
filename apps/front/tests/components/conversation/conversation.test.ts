@@ -3,6 +3,7 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { vi } from 'vitest'
 import Conversation from '../../../src/components/conversation/conversation.vue'
+import { conversation } from '../../data/conversationData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -22,6 +23,9 @@ describe('Testing the component Conversation', () => {
 
 	beforeEach(() => {
 		wrapper = mount(Conversation, {
+			props: {
+				conversation,
+			},
 			global: {
 				plugins: [
 					vuetify,
@@ -33,10 +37,16 @@ describe('Testing the component Conversation', () => {
 					Message: {
 						name: 'Message',
 						template: '<div class="message"></div>',
+						props: {
+							conversation,
+						},
 					},
 					CreateMessage: {
 						name: 'CreateMessage',
 						template: '<div class="create-message"></div>',
+						props: {
+							conversation,
+						},
 					},
 				},
 			},

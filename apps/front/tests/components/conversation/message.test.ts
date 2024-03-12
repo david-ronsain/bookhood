@@ -5,6 +5,7 @@ import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useMainStore } from '../../../src/store'
 import message from '../../../src/components/conversation/message.vue'
+import { conversation } from '../../data/conversationData'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -23,12 +24,10 @@ describe('Testing the component Message', () => {
 	let wrapper: VueWrapper
 	let mainStore
 
-	const conversationId = 'convId'
-
 	beforeEach(async () => {
 		wrapper = mount(Message, {
 			props: {
-				conversationId: conversationId,
+				conversation,
 				message,
 			},
 			global: {
