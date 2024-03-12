@@ -4,6 +4,7 @@ import { MessagePattern } from '@nestjs/microservices'
 import { IBooksList, ILibrary } from '@bookhood/shared'
 import {
 	GetLibrariesListMQDTO,
+	MQLibraryMessageType,
 	MicroserviceResponseFormatter,
 	PatchLibraryMQDTO,
 } from '@bookhood/shared-api'
@@ -17,7 +18,7 @@ export class LibraryController {
 		private readonly patchUseCase: PatchUseCase,
 	) {}
 
-	@MessagePattern('libraries-list')
+	@MessagePattern(MQLibraryMessageType.LIST)
 	async getLibrariesList(
 		body: GetLibrariesListMQDTO,
 	): Promise<MicroserviceResponseFormatter<IBooksList>> {
@@ -41,7 +42,7 @@ export class LibraryController {
 		}
 	}
 
-	@MessagePattern('library-patch')
+	@MessagePattern(MQLibraryMessageType.PATCH)
 	async patch(
 		body: PatchLibraryMQDTO,
 	): Promise<MicroserviceResponseFormatter<ILibrary>> {

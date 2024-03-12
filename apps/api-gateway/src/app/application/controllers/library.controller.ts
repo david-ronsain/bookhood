@@ -27,6 +27,7 @@ import {
 	GetLibrariesListMQDTO,
 	MicroserviceResponseFormatter,
 	PatchLibraryMQDTO,
+	MQLibraryMessageType,
 } from '@bookhood/shared-api'
 import { RoleGuard } from '../guards/role.guard'
 import { BooksList } from '../dto/library.dto'
@@ -55,7 +56,7 @@ export class LibraryController {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<IBooksList>
 		>(
-			this.bookQueue.send('libraries-list', {
+			this.bookQueue.send(MQLibraryMessageType.LIST, {
 				user,
 				userId,
 				page,
@@ -85,7 +86,7 @@ export class LibraryController {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibrary>
 		>(
-			this.bookQueue.send('library-patch', {
+			this.bookQueue.send(MQLibraryMessageType.PATCH, {
 				user,
 				libraryId,
 				status,

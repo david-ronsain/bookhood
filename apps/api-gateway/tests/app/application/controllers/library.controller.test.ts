@@ -4,6 +4,7 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
 import {
 	CurrentUser,
+	MQLibraryMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
@@ -94,7 +95,7 @@ describe('LibraryController', () => {
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'libraries-list',
+				MQLibraryMessageType.LIST,
 				{
 					userId,
 					page,
@@ -149,7 +150,7 @@ describe('LibraryController', () => {
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'library-patch',
+				MQLibraryMessageType.PATCH,
 				{
 					libraryId,
 					status,

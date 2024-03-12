@@ -25,3 +25,8 @@ export enum MQAuthMessageType {
 export enum MQMailMessageType {
 	AUTH_SEND_LINK = 'mail-auth-send-link',
 }
+
+export enum MQLibraryMessageType {
+	LIST = 'libraries-list',
+	PATCH = 'library-patch',
+}
