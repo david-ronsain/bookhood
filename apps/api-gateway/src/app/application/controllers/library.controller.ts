@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs'
 import { IBooksList, ILibrary, LibraryStatus, Role } from '@bookhood/shared'
 import { BookNotFoundException, UserNotFoundException } from '../exceptions'
 import {
-	CurrentUser,
+	type CurrentUser,
 	GetLibrariesListMQDTO,
 	MicroserviceResponseFormatter,
 	PatchLibraryMQDTO,

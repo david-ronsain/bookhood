@@ -29,7 +29,7 @@ import { IBook, IBookSearch, Role, ILibraryFull } from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import {
 	MicroserviceResponseFormatter,
-	CurrentUser,
+	type CurrentUser,
 	AddBookMQDTO,
 	SearchBookMQDTO,
 	GetBookMQDTO,

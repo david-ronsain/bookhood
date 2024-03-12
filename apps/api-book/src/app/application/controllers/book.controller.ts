@@ -77,7 +77,7 @@ export class BookController {
 				body.startAt,
 				body.language,
 				body.boundingBox,
-				body.user.email,
+				body.user?.email,
 			)
 
 			return new MicroserviceResponseFormatter<IBookSearch>(

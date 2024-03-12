@@ -29,12 +29,12 @@ import {
 	Role,
 	IRequest,
 	IRequestList,
-	IPatchRequestDTO,
+	type IPatchRequestDTO,
 } from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import {
 	CreateRequestMQDTO,
-	CurrentUser,
+	type CurrentUser,
 	GetRequestsMQDTO,
 	MicroserviceResponseFormatter,
 	PatchRequestDTO,

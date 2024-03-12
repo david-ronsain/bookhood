@@ -25,7 +25,7 @@ export class SESManagerService implements IMailer {
 		const template = 'request/created.mjml'
 		const link = `${envConfig().front.protocol}://${
 			envConfig().front.host
-		}:${envConfig().front.port}/account/your-books/lent`
+		}:${envConfig().front.port}/account`
 
 		const content = await this.parseTemplate(
 			template,

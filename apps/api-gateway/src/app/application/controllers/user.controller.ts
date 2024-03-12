@@ -27,7 +27,7 @@ import { IExternalProfile, IUser, Role } from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import { UserEmailExistException, UserNotFoundException } from '../exceptions'
 import {
-	CurrentUser,
+	type CurrentUser,
 	GetProfileMQDTO,
 	MicroserviceResponseFormatter,
 } from '@bookhood/shared-api'
