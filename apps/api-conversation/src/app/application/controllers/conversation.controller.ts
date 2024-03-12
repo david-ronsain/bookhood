@@ -19,7 +19,7 @@ import GetOrCreateUseCase from '../usecases/getOrCreate.usecase'
 import {
 	HealthCheckStatus,
 	MQConversationMessageType,
-	MQUerMessageType,
+	MQUserMessageType,
 	MicroserviceResponseFormatter,
 } from '@bookhood/shared-api'
 import AddMessageUseCase from '../usecases/addMessage.usecase'
@@ -121,7 +121,7 @@ export class ConversationController {
 
 		const userData = await firstValueFrom<
 			MicroserviceResponseFormatter<IUser | null>
-		>(this.userClient.send(MQUerMessageType.GET_BY_TOKEN, token.join('|')))
+		>(this.userClient.send(MQUserMessageType.GET_BY_TOKEN, token.join('|')))
 		if (!userData.success) {
 			throw new ForbiddenException()
 		}

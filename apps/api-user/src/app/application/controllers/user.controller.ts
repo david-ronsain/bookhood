@@ -11,6 +11,9 @@ import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import {
 	GetProfileMQDTO,
+	HealthCheckStatus,
+	MQMailMessageType,
+	MQUserMessageType,
 	MicroserviceResponseFormatter,
 } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
@@ -32,12 +35,12 @@ export class UserController {
 		private readonly createUserUseCase: CreateUserUseCase,
 	) {}
 
-	@MessagePattern('user-health')
+	@MessagePattern(MQUserMessageType.HEALTH)
 	health(): string {
-		return 'up'
+		return HealthCheckStatus.UP
 	}
 
-	@MessagePattern('user-create')
+	@MessagePattern(MQUserMessageType.CREATE)
 	async createUser(
 		user: ICreateUserDTO,
 	): Promise<MicroserviceResponseFormatter<UserModel>> {
@@ -46,7 +49,7 @@ export class UserController {
 				await this.createUserUseCase.handler(user)
 			this.createAuthLinkUseCase.handler(createdUser)
 			this.rabbitMailClient
-				.send('mail-user-registered', createdUser)
+				.send(MQMailMessageType.USER_CREATED, createdUser)
 				.subscribe()
 			return new MicroserviceResponseFormatter<UserModel>(
 				true,
@@ -62,7 +65,7 @@ export class UserController {
 		}
 	}
 
-	@MessagePattern('user-get-role-by-token')
+	@MessagePattern(MQUserMessageType.GET_ROLE_BY_TOKEN)
 	async getRoleByEmail(token: string): Promise<Role[]> {
 		try {
 			const roles = await this.refreshTokenUseCase.handler(token)
@@ -77,7 +80,7 @@ export class UserController {
 		}
 	}
 
-	@MessagePattern('user-get-by-token')
+	@MessagePattern(MQUserMessageType.GET_BY_TOKEN)
 	async getByToken(
 		token: string,
 	): Promise<MicroserviceResponseFormatter<IUser | null>> {
@@ -99,7 +102,7 @@ export class UserController {
 		}
 	}
 
-	@MessagePattern('user-get-me')
+	@MessagePattern(MQUserMessageType.GET_ME)
 	async me(
 		token: string,
 	): Promise<MicroserviceResponseFormatter<IUser | null>> {
@@ -127,7 +130,7 @@ export class UserController {
 		}
 	}
 
-	@MessagePattern('user-get-profile')
+	@MessagePattern(MQUserMessageType.GET_PROFILE)
 	async getProfile(
 		body: GetProfileMQDTO,
 	): Promise<MicroserviceResponseFormatter<IExternalProfile | null>> {

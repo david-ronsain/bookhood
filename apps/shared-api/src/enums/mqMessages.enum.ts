@@ -5,8 +5,13 @@ export enum MQConversationMessageType {
 	FLAG_AS_SEEN = 'conversation-flag-seen',
 }
 
-export enum MQUerMessageType {
+export enum MQUserMessageType {
+	CREATE = 'user-create',
 	GET_BY_TOKEN = 'user-get-by-token',
+	GET_ME = 'user-get-me',
+	GET_PROFILE = 'user-get-profile',
+	GET_ROLE_BY_TOKEN = 'user-get-role-by-token',
+	HEALTH = 'user-health',
 }
 
 export enum MQBookMessageType {
@@ -25,6 +30,7 @@ export enum MQAuthMessageType {
 export enum MQMailMessageType {
 	AUTH_SEND_LINK = 'mail-auth-send-link',
 	REQUEST_CREATED = 'mail-request-created',
+	USER_CREATED = 'mail-user-registered',
 }
 
 export enum MQLibraryMessageType {

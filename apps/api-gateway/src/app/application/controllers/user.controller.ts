@@ -30,6 +30,7 @@ import {
 	type CurrentUser,
 	GetProfileMQDTO,
 	MicroserviceResponseFormatter,
+	MQUserMessageType,
 } from '@bookhood/shared-api'
 import { AuthUserGuard } from '../guards/authUser.guard'
 import { User } from '../decorators/user.decorator'
@@ -52,7 +53,7 @@ export class UserController {
 	async createUser(@Body() user: CreateUserDTO): Promise<CreateUserDTO> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<CreateUserDTO>
-		>(this.userQueue.send('user-create', user))
+		>(this.userQueue.send(MQUserMessageType.CREATE, user))
 		if (!created.success) {
 			throw new UserEmailExistException(created.message)
 		}
@@ -76,7 +77,7 @@ export class UserController {
 
 		const profile = await firstValueFrom<
 			MicroserviceResponseFormatter<IUser>
-		>(this.userQueue.send('user-get-me', user.token))
+		>(this.userQueue.send(MQUserMessageType.GET_ME, user.token))
 
 		if (!profile.success) {
 			throw new UserNotFoundException(profile.message)
@@ -98,7 +99,7 @@ export class UserController {
 		const profile = await firstValueFrom<
 			MicroserviceResponseFormatter<IExternalProfile>
 		>(
-			this.userQueue.send('user-get-profile', {
+			this.userQueue.send(MQUserMessageType.GET_PROFILE, {
 				user,
 				userId,
 			} as GetProfileMQDTO),

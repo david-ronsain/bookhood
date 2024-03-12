@@ -1,5 +1,8 @@
 import { IUser } from '@bookhood/shared'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	MQUserMessageType,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import {
 	CanActivate,
 	ExecutionContext,
@@ -28,7 +31,7 @@ export class AuthUserGuard implements CanActivate {
 		if (token) {
 			const user = await firstValueFrom<
 				MicroserviceResponseFormatter<IUser | null>
-			>(this.userQueue.send('user-get-by-token', token))
+			>(this.userQueue.send(MQUserMessageType.GET_BY_TOKEN, token))
 
 			if (!user.success) {
 				return Promise.reject(

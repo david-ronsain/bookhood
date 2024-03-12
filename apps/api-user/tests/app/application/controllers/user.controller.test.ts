@@ -20,7 +20,12 @@ import {
 } from '../../../../../shared/src'
 import { of, Observable } from 'rxjs'
 import GetUserByIdUseCase from '../../../../src/app/application/usecases/getUserById.usecase'
-import { CurrentUser, GetProfileMQDTO } from '../../../../../shared-api/src'
+import {
+	CurrentUser,
+	GetProfileMQDTO,
+	HealthCheckStatus,
+	MQMailMessageType,
+} from '../../../../../shared-api/src'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -87,7 +92,7 @@ describe('UserController', () => {
 	describe('health', () => {
 		it('should return "up"', () => {
 			const result = controller.health()
-			expect(result).toBe('up')
+			expect(result).toBe(HealthCheckStatus.UP)
 		})
 	})
 
@@ -115,7 +120,7 @@ describe('UserController', () => {
 			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 			expect(rabbitMailClientMock.send).toHaveBeenCalledWith(
-				'mail-user-registered',
+				MQMailMessageType.USER_CREATED,
 				createUserDTO,
 			)
 

@@ -4,6 +4,7 @@ import { UserController } from '../../../../src/app/application/controllers/user
 import { of } from 'rxjs'
 import {
 	CurrentUser,
+	MQUserMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src/'
 import { CreateUserDTO } from '../../../../src/app/application/dto/user.dto'
@@ -76,7 +77,7 @@ describe('Testing UserController', () => {
 			const result = await controller.createUser(userToCreate)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-create',
+				MQUserMessageType.CREATE,
 				userToCreate,
 			)
 
@@ -98,7 +99,7 @@ describe('Testing UserController', () => {
 			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-create',
+				MQUserMessageType.CREATE,
 				userToCreate,
 			)
 		})
@@ -126,7 +127,7 @@ describe('Testing UserController', () => {
 			const result = await controller.me(currentUser)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-get-me',
+				MQUserMessageType.GET_ME,
 				currentUser.token,
 			)
 
@@ -154,7 +155,7 @@ describe('Testing UserController', () => {
 			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-get-me',
+				MQUserMessageType.GET_ME,
 				currentUser.token,
 			)
 		})
@@ -183,7 +184,7 @@ describe('Testing UserController', () => {
 			const result = await controller.getProfile(currentUser, userId)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-get-profile',
+				MQUserMessageType.GET_PROFILE,
 				{ user: currentUser, userId },
 			)
 
@@ -208,7 +209,7 @@ describe('Testing UserController', () => {
 			).rejects.toThrow(UserNotFoundException)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'user-get-profile',
+				MQUserMessageType.GET_PROFILE,
 				{ user: currentUser, userId },
 			)
 		})
