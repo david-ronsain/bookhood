@@ -2,23 +2,21 @@
 	import { BhCard } from '@bookhood/ui'
 	import { computed } from 'vue'
 	import type { IUser, IConversationFull } from '@bookhood/shared'
-	import { useSocket } from '../../composables/socket'
 	import { useMainStore } from '../../store'
 	import Message from './message.vue'
 	import createMessage from './createMessage.vue'
 
 	const mainStore = useMainStore()
-	const { state } = useSocket()
+
+	const props = defineProps<{ conversation: IConversationFull | null }>()
 
 	const me = computed(() => mainStore.profile)
-	const conversation = computed<IConversationFull>(
-		() => state.value.conversation,
-	)
+
 	const other = computed<IUser>(() =>
-		me.value && conversation
-			? conversation.value?.request?.emitter?._id !== me.value._id
-				? conversation.value?.request?.emitter
-				: conversation.value?.request?.owner
+		me.value && props.conversation
+			? props.conversation.value?.request?.emitter?._id !== me.value._id
+				? props.conversation.value?.request?.emitter
+				: props.conversation.value?.request?.owner
 			: null,
 	)
 </script>
@@ -40,19 +38,19 @@
 				v-if="conversation"
 				class="d-flex flex-column">
 				<message
-					v-for="message in conversation.messages"
+					v-for="message in conversation?.messages ?? []"
 					:key="message._id"
 					:message="message"
-					:conversationId="conversation._id" />
+					:conversation="conversation" />
 			</div>
 		</template>
 
 		<template v-slot:actions>
 			<createMessage
 				v-if="conversation"
-				:conversationId="conversation._id"
-				:requestId="conversation.request?._id"
-				:roomId="conversation.roomId" />
+				:conversation="conversation"
+				:requestId="conversation?.request?._id"
+				:roomId="conversation?.roomId" />
 		</template>
 	</bh-card>
 </template>
@@ -116,3 +114,4 @@
 		}
 	}
 </style>
+../../composables/socket.composable

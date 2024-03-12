@@ -1,9 +1,11 @@
 <script setup lang="ts">
 	import { onMounted, onUnmounted, watch, computed } from 'vue'
 	import Conversation from '../components/conversation/conversation.vue'
-	import { socket, state, emitEvent } from '../composables/socket'
+	import { emitEvent, socket, state } from '../composables/socket.composable'
 	import { useRoute } from 'vue-router'
 	import type { IConversationFull } from '@bookhood/shared'
+	import { WSConversationEventType } from '@bookhood/shared'
+
 	const route = useRoute()
 
 	const socketConnected = computed(() => state.value.connected)
@@ -15,7 +17,9 @@
 		socket.connect()
 
 		if (socketConnected.value) {
-			emitEvent('conversation-connect', { requestId: route.params.id })
+			emitEvent(WSConversationEventType.CONNECT, {
+				requestId: route.params.id,
+			})
 		}
 	})
 
@@ -25,7 +29,9 @@
 
 	watch(socketConnected, () => {
 		if (socketConnected.value) {
-			emitEvent('conversation-connect', { requestId: route.params.id })
+			emitEvent(WSConversationEventType.CONNECT, {
+				requestId: route.params.id,
+			})
 		}
 	})
 </script>
@@ -39,7 +45,9 @@
 			(conversation ? '' : 'align-center')
 		"
 		fluid>
-		<conversation v-if="conversation"></conversation>
+		<conversation
+			v-if="conversation"
+			:conversation="conversation"></conversation>
 
 		<v-progress-circular
 			v-else
@@ -54,3 +62,4 @@
 		max-height: 100%;
 	}
 </style>
+../composables/socket.composable

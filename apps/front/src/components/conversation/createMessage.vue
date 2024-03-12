@@ -2,13 +2,22 @@
 	import { BhTextField } from '@bookhood/ui'
 	import { mdiLoading, mdiSendOutline } from '@mdi/js'
 	import { computed, ref, onMounted, watch } from 'vue'
-	import type { WritingDTO, IConversationMessage } from '@bookhood/shared'
-	import { useSocket } from '../../composables/socket'
+	import type {
+		WritingDTO,
+		IConversationMessage,
+		IConversationFull,
+	} from '@bookhood/shared'
+	import {
+		state,
+		emitEvent,
+		socket,
+	} from '../../composables/socket.composable'
 	import { useMainStore } from '../../store'
 	import { useI18n } from 'vue-i18n'
+	import { WSConversationEventType } from '@bookhood/shared'
 
 	interface CreateMessageProps {
-		conversationId: string
+		conversation: IConversationFull
 
 		roomId: string
 
@@ -16,7 +25,6 @@
 	}
 
 	const mainStore = useMainStore()
-	const { state, emitEvent, socket } = useSocket()
 	const { t } = useI18n({})
 	const props = defineProps<CreateMessageProps>()
 
@@ -33,9 +41,9 @@
 	const send = (): void => {
 		if (currentMessage.value) {
 			loading.value = true
-			emitEvent('conversation-add-message', {
+			emitEvent(WSConversationEventType.ADD_MESSAGE, {
 				message: currentMessage.value,
-				_id: props.conversationId,
+				_id: props.conversation?._id,
 				userId: me.value._id,
 				roomId: props.roomId,
 				requestId: props.requestId,
@@ -45,7 +53,7 @@
 
 	onMounted(() => {
 		socket.on(
-			'conversation-message',
+			WSConversationEventType.GET_MESSAGE,
 			(res: { data: IConversationMessage }) => {
 				if (res.data.from === me.value._id) {
 					loading.value = false
@@ -54,24 +62,24 @@
 			},
 		)
 
-		socket.on('conversation-add-message-error', () => {
+		socket.on(WSConversationEventType.ADD_MESSAGE_ERROR, () => {
 			mainStore.error = t('conversation.error.messageCanNotBeCreated')
 		})
 
-		socket.on('conversation-access-forbidden', () => {
+		socket.on(WSConversationEventType.READ_ACCESS_FORBIDDEN, () => {
 			mainStore.error = t('conversation.error.accessForbidden')
 		})
 	})
 
 	watch(currentMessage, () => {
 		if (currentMessage.value.length) {
-			emitEvent('conversation-writing', {
+			emitEvent(WSConversationEventType.IS_WRITING, {
 				firstName: me.value.firstName,
-				roomId: props.conversationId,
+				roomId: props.conversation?._id,
 				userId: me.value._id,
 			})
 		} else {
-			emitEvent('conversation-not-writing', {
+			emitEvent(WSConversationEventType.NOT_WRITING, {
 				roomId: props.roomId,
 				userId: me.value._id,
 			})
@@ -113,3 +121,4 @@
 			@click:appendInner="send" />
 	</div>
 </template>
+../../composables/socket.composable

@@ -4,14 +4,15 @@
 	import type { IConversationMessage } from '@bookhood/shared'
 	import { computed } from 'vue'
 	import { useMainStore } from '../../store'
-	import { useSocket } from '../../composables/socket'
+	import { emitEvent } from '../../composables/socket.composable'
+	import { WSConversationEventType } from '@bookhood/shared'
+	import type { IConversationFull } from 'apps/shared/src'
 
 	interface MessageProps {
 		message: IConversationMessage
-		conversationId: string
+		conversation: IConversationFull | null
 	}
 
-	const { emitEvent } = useSocket()
 	const mainStore = useMainStore()
 	const props = defineProps<MessageProps>()
 
@@ -34,9 +35,9 @@
 			message.from !== me.value._id &&
 			!message.seenBy?.includes(me.value._id)
 		) {
-			emitEvent('conversation-flag-seen', {
+			emitEvent(WSConversationEventType.FLAG_MESSAGE_SEEN, {
 				messageId: message._id,
-				conversationId: props.conversationId,
+				conversationId: props.conversation?._id,
 				userId: me.value._id,
 			})
 		}

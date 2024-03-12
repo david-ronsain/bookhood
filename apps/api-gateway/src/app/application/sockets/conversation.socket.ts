@@ -21,6 +21,7 @@ import {
 	IConversationFull,
 	IConversationMessage,
 	Role,
+	WSConversationEventType,
 	WritingDTO,
 } from '@bookhood/shared'
 import envConfig from '../../../config/env.config'
@@ -53,14 +54,14 @@ export class ConversationGateway
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	handleDisconnect(client: Socket) {
-		client.broadcast.emit('conversation-not-writing', {
+		client.broadcast.emit(WSConversationEventType.NOT_WRITING, {
 			userId: client.data.userId,
 		})
 		this.logger.info(`Cliend id:${client.id} disconnected`)
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	@SubscribeMessage('conversation-connect')
+	@SubscribeMessage(WSConversationEventType.CONNECT)
 	async getOrCreateConversation(
 		client: Socket,
 		dto: GetOrCreateConversationDTO,
@@ -72,51 +73,55 @@ export class ConversationGateway
 
 			client.data.roomId = conversation.data.roomId
 			client.join(conversation.data.roomId)
-
-			client.emit('conversation', conversation)
+			client.emit(WSConversationEventType.READ_SUCCESS, conversation)
 		} catch (err) {
-			client.emit('conversation-access-forbidden')
+			client.emit(WSConversationEventType.READ_ACCESS_FORBIDDEN)
 		}
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	@SubscribeMessage('conversation-add-message')
+	@SubscribeMessage(WSConversationEventType.ADD_MESSAGE)
 	async addMessage(client: Socket, dto: AddMessageDTO) {
 		try {
 			const message = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationMessage>
 			>(this.conversationQueue.send('conversation-add-message', dto))
 
-			client.nsp.to(dto.roomId).emit('conversation-message', message)
+			client.nsp
+				.to(dto.roomId)
+				.emit(WSConversationEventType.GET_MESSAGE, message)
 		} catch (err) {
-			client.emit('conversation-add-message-error')
+			client.emit(WSConversationEventType.ADD_MESSAGE_FAILED)
 		}
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	@SubscribeMessage('conversation-flag-seen')
+	@SubscribeMessage(WSConversationEventType.FLAG_MESSAGE_SEEN)
 	async flagAsSeen(client: Socket, dto: FlagAsSeenMessageDTO) {
 		try {
 			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
 				this.conversationQueue.send('conversation-flag-seen', dto),
 			)
-			client.broadcast.emit('conversation-flag-seen', dto)
+			client.broadcast.emit(
+				WSConversationEventType.FLAG_MESSAGE_SEEN_SUCCESS,
+				dto,
+			)
 		} catch (err) {
-			client.emit('conversation-flag-seen-error')
+			client.emit(WSConversationEventType.FLAG_MESSAGE_SEEN_ERROR)
 		}
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	@SubscribeMessage('conversation-writing')
+	@SubscribeMessage(WSConversationEventType.IS_WRITING)
 	async isWriting(client: Socket, dto: WritingDTO) {
 		client.data.userId = dto.userId
-		client.broadcast.emit('conversation-writing', dto)
+		client.broadcast.emit(WSConversationEventType.IS_WRITING_SUCCESS, dto)
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	@SubscribeMessage('conversation-not-writing')
+	@SubscribeMessage(WSConversationEventType.NOT_WRITING)
 	async isNotWriting(client: Socket, dto: WritingDTO) {
 		client.data.userId = undefined
-		client.broadcast.emit('conversation-not-writing', dto)
+		client.broadcast.emit(WSConversationEventType.NOT_WRITING_SUCCESS, dto)
 	}
 }

@@ -1,0 +1,15 @@
+export enum WSConversationEventType {
+	CONNECT = 'conversation-connect',
+	READ_SUCCESS = 'conversation-read',
+	READ_ACCESS_FORBIDDEN = 'conversation-read-access-forbidden',
+	ADD_MESSAGE = 'conversation-add-message',
+	ADD_MESSAGE_FAILED = 'conversation-add-message-error',
+	GET_MESSAGE = 'conversation-get-message',
+	FLAG_MESSAGE_SEEN = 'conversation-flag-message-seen',
+	FLAG_MESSAGE_SEEN_SUCCESS = 'conversation-flag-message-seen-success',
+	FLAG_MESSAGE_SEEN_ERROR = 'conversation-flag-message-seen-error',
+	IS_WRITING = 'conversation-writing',
+	IS_WRITING_SUCCESS = 'conversation-writing-success',
+	NOT_WRITING = 'conversation-not-writing',
+	NOT_WRITING_SUCCESS = 'conversation-not-writing-success',
+}
