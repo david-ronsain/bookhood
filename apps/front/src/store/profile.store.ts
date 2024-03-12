@@ -28,7 +28,9 @@ export const useProfileStore = defineStore('profileStore', () => {
 						page: booksListPage.value - 1,
 					},
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)
@@ -50,7 +52,9 @@ export const useProfileStore = defineStore('profileStore', () => {
 			.get(EnvConfig.api.base + EnvConfig.api.url.user + userId, {
 				headers: {
 					'Content-Type': 'application/json',
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			})
 			.then((res) => {

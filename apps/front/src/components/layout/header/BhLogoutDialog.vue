@@ -2,12 +2,13 @@
 	import { useRouter } from 'vue-router'
 	import { BhDialog, BhPrimaryButton } from '@bookhood/ui'
 	import { ref } from 'vue'
+	import { EnvConfig } from '../../../../config/env'
 
 	const router = useRouter()
 	const logoutDialog = ref<boolean>(false)
 
 	const logout = () => {
-		localStorage.removeItem('user')
+		localStorage.removeItem(EnvConfig.localStorage.userKey)
 		logoutDialog.value = false
 		router.push({
 			name: 'logout',

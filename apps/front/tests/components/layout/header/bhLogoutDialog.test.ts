@@ -4,6 +4,7 @@ import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import BhLogoutDialog from '../../../../src/components/layout/header/BhLogoutDialog.vue'
 import { useRouter } from 'vue-router'
+import { EnvConfig } from '../../../../config/env'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -53,22 +54,22 @@ describe('Testing the component BhLogoutDialog', () => {
 	})
 
 	it('should remove the user from the localStorage', async () => {
-		localStorage.setItem('user', '')
+		localStorage.setItem(EnvConfig.localStorage.userKey, '')
 
 		wrapper.findComponent('.confirm-logout').trigger('click')
 		await wrapper.vm.$nextTick()
 
-		expect(localStorage.getItem('user')).toBeNull()
+		expect(localStorage.getItem(EnvConfig.localStorage.userKey)).toBeNull()
 
 		expect(useRouter().push).toHaveBeenCalledWith({ name: 'logout' })
 	})
 
 	it('should not remove the user from the localStorage', async () => {
-		localStorage.setItem('user', '')
+		localStorage.setItem(EnvConfig.localStorage.userKey, '')
 
 		wrapper.findComponent('.cancel-logout').trigger('click')
 		await wrapper.vm.$nextTick()
 
-		expect(localStorage.getItem('user')).toBe('')
+		expect(localStorage.getItem(EnvConfig.localStorage.userKey)).toBe('')
 	})
 })

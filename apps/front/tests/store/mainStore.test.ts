@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { describe, vi } from 'vitest'
 import { useMainStore } from '../../src/store/main.store'
 import { user } from '../data/userData'
+import { EnvConfig } from '../../config/env'
 
 vi.mock('axios')
 
@@ -15,13 +16,13 @@ describe('Testint the main store', () => {
 	})
 
 	afterEach(() => {
-		localStorage.removeItem('user')
+		localStorage.removeItem(EnvConfig.localStorage.userKey)
 		vi.clearAllMocks()
 	})
 
 	describe('Testing the getProfile', () => {
 		it('should succeed getting the data', async () => {
-			localStorage.setItem('user', '||')
+			localStorage.setItem(EnvConfig.localStorage.userKey, '||')
 			vi.spyOn(axios, 'get').mockResolvedValueOnce({
 				data: user,
 			})
@@ -40,7 +41,7 @@ describe('Testint the main store', () => {
 		})
 
 		it('should fail getting the data', async () => {
-			localStorage.setItem('user', '||')
+			localStorage.setItem(EnvConfig.localStorage.userKey, '||')
 			vi.spyOn(axios, 'get').mockRejectedValueOnce({})
 
 			await store.getProfile()

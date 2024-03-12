@@ -25,7 +25,7 @@ export function useSocket() {
 
 	const socket = io(EnvConfig.socket.url, {
 		extraHeaders: {
-			'x-token': localStorage.getItem('user'),
+			'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
 		},
 	})
 
@@ -77,7 +77,7 @@ export function useSocket() {
 
 	const emitEvent = (event: string, args: any) => {
 		socket.emit(event, {
-			token: localStorage.getItem('user'),
+			token: localStorage.getItem(EnvConfig.localStorage.userKey),
 			...args,
 		})
 	}

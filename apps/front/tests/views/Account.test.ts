@@ -1,11 +1,9 @@
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
-import MyProfile from '../../src/views/MyProfile.vue'
+import MyProfile from '../../src/views/Account.vue'
 import vuetify from '../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import YourBooks from '../../src/components/account/books/yourBooks/yourBooks.vue'
-import { booksResults } from '../data/bookData'
-import { useAccountStore, useMainStore } from '../../src/store'
 import CreateBookDialog from '../../src/components/dialogs/book/createBookDialog.vue'
 
 vi.mock('vue-i18n', () => ({

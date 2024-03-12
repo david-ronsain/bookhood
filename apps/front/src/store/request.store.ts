@@ -20,7 +20,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 			{ dates },
 			{
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			},
 		)
@@ -62,7 +64,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 			{ status, dates },
 			{
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			},
 		)
@@ -77,7 +81,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 					userId: body.userId,
 				},
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			})
 			.then((results) => {
@@ -98,7 +104,9 @@ export const useRequestStore = defineStore('requestStore', () => {
 					userId: body.userId,
 				},
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			})
 			.then((results) => {

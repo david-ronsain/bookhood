@@ -10,11 +10,13 @@ export const useMainStore = defineStore('mainStore', () => {
 	const profile = ref<IUser>(null)
 
 	const getProfile = async (): Promise<void> => {
-		if (localStorage.getItem('user')) {
+		if (localStorage.getItem(EnvConfig.localStorage.userKey)) {
 			await axios
 				.get(EnvConfig.api.base + EnvConfig.api.url.user + 'me', {
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				})
 				.then((response) => {

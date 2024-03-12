@@ -77,7 +77,7 @@ const router = createRouter({
 							})
 						if (verified) {
 							localStorage.setItem(
-								'user',
+								EnvConfig.localStorage.userKey,
 								to.params.token +
 									'|' +
 									(Date.now() +
@@ -154,7 +154,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 	if (!auth.isAccessGranted(to.meta.requiresAuth as RequiresAuth)) {
-		localStorage.removeItem('user')
+		localStorage.removeItem(EnvConfig.localStorage.userKey)
 		next({ name: to.meta.requiresAuth ? 'signin' : 'home' })
 	} else {
 		next()

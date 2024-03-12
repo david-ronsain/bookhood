@@ -27,7 +27,9 @@ export const useBookStore = defineStore('bookStore', () => {
 				},
 				{
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)
@@ -61,7 +63,9 @@ export const useBookStore = defineStore('bookStore', () => {
 				},
 				{
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)
@@ -75,7 +79,9 @@ export const useBookStore = defineStore('bookStore', () => {
 				EnvConfig.api.base + EnvConfig.api.url.book + 'google/' + isbn,
 				{
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)
@@ -99,7 +105,9 @@ export const useBookStore = defineStore('bookStore', () => {
 			{ ...book, location, status, place },
 			{
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			},
 		)
@@ -108,7 +116,9 @@ export const useBookStore = defineStore('bookStore', () => {
 		axios
 			.get(EnvConfig.api.base + EnvConfig.api.url.book, {
 				headers: {
-					'x-token': localStorage.getItem('user'),
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
 				},
 			})
 			.then((response: { data: ILibraryFull[] }) => response.data)

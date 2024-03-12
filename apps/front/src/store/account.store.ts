@@ -4,7 +4,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type {
 	IBooksList,
-	IBook,
 	LibraryStatus,
 	IBooksListResult,
 } from '@bookhood/shared'
@@ -27,7 +26,9 @@ export const useAccountStore = defineStore('accountStore', () => {
 						page: booksPage.value - 1,
 					},
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)
@@ -54,7 +55,9 @@ export const useAccountStore = defineStore('accountStore', () => {
 				},
 				{
 					headers: {
-						'x-token': localStorage.getItem('user'),
+						'x-token': localStorage.getItem(
+							EnvConfig.localStorage.userKey,
+						),
 					},
 				},
 			)

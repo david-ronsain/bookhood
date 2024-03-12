@@ -10,6 +10,11 @@ interface IEnvConfig {
 	googleApis: IGoogleApi
 	settings: ISettingsConfig
 	socket: ISocketConfig
+	localStorage: ILocalStorageConfig
+}
+
+interface ILocalStorageConfig {
+	userKey: string
 }
 
 interface ISocketConfig {
@@ -93,5 +98,8 @@ export const EnvConfig: IEnvConfig = {
 	},
 	socket: {
 		url: import.meta.env.VITE_APP_SOCKET_URL || '',
+	},
+	localStorage: {
+		userKey: import.meta.env.VITE_APP_LOCALSTORAGE_USER_KEY,
 	},
 }
