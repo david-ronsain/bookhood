@@ -43,7 +43,7 @@ describe('Testing the component Search', () => {
 					SearchMap: {
 						name: 'SearchMap',
 						template: '<div class="search-map"><slot/></div>',
-						emits: ['search', 'book:picked'],
+						emits: ['search', 'book:picked', 'map:ready'],
 						expose: [
 							'removeMarkers',
 							'getBoundingBox',
@@ -119,11 +119,29 @@ describe('Testing the component Search', () => {
 	it('should mount the component', async () => {
 		await search(emptySearchResults)
 
+		vi.spyOn(bookStore, 'searchByName')
+
 		expect(wrapper.findComponent(Search).exists()).toBe(true)
 		expect(wrapper.findComponent(SearchFields).exists()).toBe(true)
 		expect(wrapper.findComponent(SearchMap).exists()).toBe(true)
 		expect(wrapper.findComponent(CreateRequestDialog).exists()).toBe(true)
-		expect(wrapper.findComponent(SearchList).exists()).toBe(false)
+
+		expect(bookStore.searchByName).not.toHaveBeenCalled()
+
+		vi.spyOn(bookStore, 'searchByName').mockImplementationOnce(() => {
+			return {
+				data: searchResults,
+			}
+		})
+
+		wrapper.findComponent(SearchMap).vm.$emit('map:ready')
+		vi.advanceTimersByTime(3000)
+		await wrapper.vm.$nextTick()
+
+		expect(bookStore.searchByName).toHaveBeenCalledTimes(1)
+		await wrapper.vm.$nextTick()
+
+		expect(wrapper.findComponent(SearchList).exists()).toBe(true)
 	})
 
 	it('should display the empty state', async () => {
@@ -274,8 +292,9 @@ describe('Testing the component Search', () => {
 				data: results,
 			}),
 		)
+
+		wrapper.findComponent(SearchMap).vm.$emit('map:ready')
 		vi.advanceTimersByTime(3000)
-		await wrapper.vm.$nextTick()
 		await wrapper.vm.$nextTick()
 		await wrapper.vm.$nextTick()
 		await wrapper.vm.$nextTick()

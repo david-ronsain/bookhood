@@ -4,7 +4,7 @@
 	import SearchFields from './searchFields.vue'
 	import SearchMap from './searchMap.vue'
 
-	import { ref, onMounted } from 'vue'
+	import { ref } from 'vue'
 	import { type IBookSearchResult } from '@bookhood/shared'
 	import debounce from 'debounce'
 	import { useBookStore } from '../../store'
@@ -80,11 +80,11 @@
 		map.value?.setCenter({ lat: point[1], lng: point[0] })
 	}
 
-	onMounted(() => {
+	const mapReady = () => {
 		search()
-	})
+	}
 
-	defineExpose({ pickedBook })
+	defineExpose({ pickedBook, mapReady })
 </script>
 
 <template>
@@ -111,6 +111,7 @@
 					class="search-map"
 					@search="search"
 					@book:picked="(e) => (pickedBook = e)"
+					@map:ready="mapReady"
 					ref="map" />
 			</v-col>
 			<v-col

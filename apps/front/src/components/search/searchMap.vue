@@ -56,6 +56,7 @@
 
 		map.value.addListener('zoom_changed', mapUpdated)
 		map.value.addListener('center_changed', mapUpdated)
+		map.value.addListener('bounds_changed', () => events('map:ready'))
 		events('search')
 	}
 
@@ -162,7 +163,7 @@
 		map.value.setCenter({ lat, lng })
 	}
 
-	const events = defineEmits(['search', 'book:picked'])
+	const events = defineEmits(['search', 'book:picked', 'map:ready'])
 
 	defineExpose({
 		getBoundingBox,
