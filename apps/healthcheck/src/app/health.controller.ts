@@ -9,12 +9,14 @@ import {
 	HealthIndicatorFunction,
 	HealthIndicatorResult,
 	HealthCheckResult,
+	HealthIndicatorStatus,
 } from '@nestjs/terminus'
 import envConfig from '../config/env.config'
 import { ClientProxy, RedisOptions, Transport } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
+import { HealthCheckStatus } from '@bookhood/shared-api'
 
 @Controller()
 export class HealthController {
@@ -53,7 +55,11 @@ export class HealthController {
 						promise = null
 						resolve(
 							new Promise((resolve) =>
-								resolve({ [`api-mail`]: { status: 'down' } }),
+								resolve({
+									[`api-mail`]: {
+										status: HealthCheckStatus.DOWN.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+									},
+								}),
 							),
 						)
 					}, 3000)
@@ -61,43 +67,11 @@ export class HealthController {
 						this.mailClient.send(`mail-health`, {}),
 					).then(() => {
 						clearTimeout(timeout)
-						return resolve({ [`api-mail`]: { status: 'up' } })
-					})
-				}),
-			() =>
-				new Promise<HealthIndicatorResult>((resolve) => {
-					let promise
-					const timeout = setTimeout(() => {
-						promise = null
-						resolve(
-							new Promise((resolve) =>
-								resolve({ [`api-user`]: { status: 'down' } }),
-							),
-						)
-					}, 3000)
-					promise = firstValueFrom(
-						this.userClient.send(`user-health`, {}),
-					).then(() => {
-						clearTimeout(timeout)
-						return resolve({ [`api-user`]: { status: 'up' } })
-					})
-				}),
-			() =>
-				new Promise<HealthIndicatorResult>((resolve) => {
-					let promise
-					const timeout = setTimeout(() => {
-						promise = null
-						resolve(
-							new Promise((resolve) =>
-								resolve({ [`api-book`]: { status: 'down' } }),
-							),
-						)
-					}, 3000)
-					promise = firstValueFrom(
-						this.bookClient.send(`book-health`, {}),
-					).then(() => {
-						clearTimeout(timeout)
-						return resolve({ [`api-book`]: { status: 'up' } })
+						return resolve({
+							[`api-mail`]: {
+								status: HealthCheckStatus.UP.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+							},
+						})
 					})
 				}),
 			() =>
@@ -108,7 +82,61 @@ export class HealthController {
 						resolve(
 							new Promise((resolve) =>
 								resolve({
-									[`api-conversation`]: { status: 'down' },
+									[`api-user`]: {
+										status: HealthCheckStatus.DOWN.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+									},
+								}),
+							),
+						)
+					}, 3000)
+					promise = firstValueFrom(
+						this.userClient.send(`user-health`, {}),
+					).then(() => {
+						clearTimeout(timeout)
+						return resolve({
+							[`api-user`]: {
+								status: HealthCheckStatus.UP.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+							},
+						})
+					})
+				}),
+			() =>
+				new Promise<HealthIndicatorResult>((resolve) => {
+					let promise
+					const timeout = setTimeout(() => {
+						promise = null
+						resolve(
+							new Promise((resolve) =>
+								resolve({
+									[`api-book`]: {
+										status: HealthCheckStatus.DOWN.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+									},
+								}),
+							),
+						)
+					}, 3000)
+					promise = firstValueFrom(
+						this.bookClient.send(`book-health`, {}),
+					).then(() => {
+						clearTimeout(timeout)
+						return resolve({
+							[`api-book`]: {
+								status: HealthCheckStatus.UP.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+							},
+						})
+					})
+				}),
+			() =>
+				new Promise<HealthIndicatorResult>((resolve) => {
+					let promise
+					const timeout = setTimeout(() => {
+						promise = null
+						resolve(
+							new Promise((resolve) =>
+								resolve({
+									[`api-conversation`]: {
+										status: HealthCheckStatus.DOWN.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+									},
 								}),
 							),
 						)
@@ -118,7 +146,9 @@ export class HealthController {
 					).then(() => {
 						clearTimeout(timeout)
 						return resolve({
-							[`api-conversation`]: { status: 'up' },
+							[`api-conversation`]: {
+								status: HealthCheckStatus.UP.toString().toLocaleLowerCase() as HealthIndicatorStatus,
+							},
 						})
 					})
 				}),
