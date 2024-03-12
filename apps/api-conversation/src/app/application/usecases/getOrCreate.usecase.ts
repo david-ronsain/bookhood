@@ -3,7 +3,10 @@ import { ConversationRepository } from '../../domain/ports/conversation.reposito
 import ConversationModel from '../../domain/models/conversation.model'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	MQRequestMessageType,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import { IConversationFull, IRequestInfos } from '@bookhood/shared'
 import { v4 } from 'uuid'
 
@@ -26,7 +29,7 @@ export default class GetOrCreateUseCase {
 		if (!conversation) {
 			const request = await firstValueFrom<
 				MicroserviceResponseFormatter<IRequestInfos>
-			>(this.bookClient.send('request-get', requestId))
+			>(this.bookClient.send(MQRequestMessageType.GET, requestId))
 
 			let roomId: string
 			do {

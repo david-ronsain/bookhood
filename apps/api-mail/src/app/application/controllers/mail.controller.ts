@@ -11,6 +11,7 @@ import RequestAcceptedUseCase from '../usecases/request/requestAccepted.usecase'
 import RequestRefusedUseCase from '../usecases/request/requestRefused.usecase'
 import RequestNeverReceivedUseCase from '../usecases/request/requestNeverReceived.usecase'
 import RequestReturnedWithIssueUseCase from '../usecases/request/requestReturnedWithIssue.usecase'
+import { HealthCheckStatus, MQMailMessageType } from '@bookhood/shared-api'
 
 @Controller()
 export class MailController {
@@ -25,42 +26,42 @@ export class MailController {
 		private readonly requestReturnedWithIssueUseCase: RequestReturnedWithIssueUseCase,
 	) {}
 
-	@MessagePattern('mail-health')
+	@MessagePattern(MQMailMessageType.HEALTH)
 	health(): string {
-		return 'up'
+		return HealthCheckStatus.UP
 	}
 
-	@MessagePattern('mail-user-registered')
+	@MessagePattern(MQMailMessageType.USER_CREATED)
 	userRegistered(user: IUser): void {
 		this.userRegisteredUseCase.handler(user)
 	}
 
-	@MessagePattern('mail-auth-send-link')
+	@MessagePattern(MQMailMessageType.AUTH_SEND_LINK)
 	authSendLink(user: IUser): void {
 		this.authSendLinkUseCase.handler(user)
 	}
 
-	@MessagePattern('mail-request-created')
+	@MessagePattern(MQMailMessageType.REQUEST_CREATED)
 	requestCreated(infos: BookRequestMailDTO): void {
 		this.requestCreatedUseCase.handler(infos)
 	}
 
-	@MessagePattern('mail-request-accepted')
+	@MessagePattern(MQMailMessageType.REQUEST_ACCEPTED)
 	requestAccepted(infos: IRequestInfos): void {
 		this.requestAcceptedUseCase.handler(infos)
 	}
 
-	@MessagePattern('mail-request-refused')
+	@MessagePattern(MQMailMessageType.REQUEST_REFUSED)
 	requestRefused(infos: IRequestInfos): void {
 		this.requestRefusedUseCase.handler(infos)
 	}
 
-	@MessagePattern('mail-request-never-received')
+	@MessagePattern(MQMailMessageType.REQUEST_NEVER_RECEIVED)
 	requestNeverReceived(infos: IRequestInfos): void {
 		this.requestNeverReceivedUseCase.handler(infos)
 	}
 
-	@MessagePattern('mail-request-returned-with-issue')
+	@MessagePattern(MQMailMessageType.REQUEST_RETURNED_WITH_ISSUE)
 	requestReturnedWithIssue(infos: IRequestInfos): void {
 		this.requestReturnedWithIssueUseCase.handler(infos)
 	}

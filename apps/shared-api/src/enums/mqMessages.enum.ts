@@ -29,7 +29,12 @@ export enum MQAuthMessageType {
 
 export enum MQMailMessageType {
 	AUTH_SEND_LINK = 'mail-auth-send-link',
+	HEALTH = 'mail-health',
+	REQUEST_ACCEPTED = 'mail-request-accepted',
 	REQUEST_CREATED = 'mail-request-created',
+	REQUEST_NEVER_RECEIVED = 'mail-request-never-received',
+	REQUEST_REFUSED = 'mail-request-refused',
+	REQUEST_RETURNED_WITH_ISSUE = 'mail-request-returned-with-issue',
 	USER_CREATED = 'mail-user-registered',
 }
 

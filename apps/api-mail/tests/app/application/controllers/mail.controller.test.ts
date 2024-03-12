@@ -11,6 +11,7 @@ import RequestRefusedUseCase from '../../../../src/app/application/usecases/requ
 import RequestNeverReceivedUseCase from '../../../../src/app/application/usecases/request/requestNeverReceived.usecase'
 import RequestReturnedWithIssueUseCase from '../../../../src/app/application/usecases/request/requestReturnedWithIssue.usecase'
 import { BookRequestMailDTO, IRequestInfos } from '../../../../../shared/src'
+import { HealthCheckStatus } from '../../../../../shared-api/src'
 
 describe('MailController', () => {
 	let controller: MailController
@@ -72,7 +73,7 @@ describe('MailController', () => {
 
 	it('should handle mail-health', () => {
 		const result = controller.health()
-		expect(result).toEqual('up')
+		expect(result).toEqual(HealthCheckStatus.UP)
 	})
 
 	it('should handle mail-user-registered', () => {
