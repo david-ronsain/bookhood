@@ -17,7 +17,7 @@ import {
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
-import { CurrentUser } from '../../../../../shared-api/src'
+import { CurrentUser, HealthCheckStatus } from '../../../../../shared-api/src'
 
 describe('BookController', () => {
 	let controller: BookController
@@ -94,7 +94,7 @@ describe('BookController', () => {
 	describe('health', () => {
 		it('should return "up"', () => {
 			const result = controller.health()
-			expect(result).toBe('up')
+			expect(result).toBe(HealthCheckStatus.UP)
 		})
 	})
 

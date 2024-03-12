@@ -5,6 +5,7 @@ import { BookController } from '../../../../src/app/application/controllers/book
 import { AddBookDTO } from '../../../../src/app/application/dto/book.dto'
 import {
 	CurrentUser,
+	MQBookMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
@@ -94,7 +95,7 @@ describe('BookController', () => {
 			const result = await controller.addBook(currentUser, addBookDTO)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'book-add',
+				MQBookMessageType.CREATE,
 				{
 					user: currentUser,
 					book: addBookDTO,
@@ -176,7 +177,7 @@ describe('BookController', () => {
 			})
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'book-search',
+				MQBookMessageType.SEARCH,
 				{
 					search: q,
 					startAt: startIndex,
@@ -208,7 +209,6 @@ describe('BookController', () => {
 	describe('getUserBooks', () => {
 		it('should get books', async () => {
 			const page = 0
-			const token = 'token'
 
 			const response = new MicroserviceResponseFormatter(
 				true,
@@ -249,7 +249,7 @@ describe('BookController', () => {
 			const result = await controller.getUserBooks(currentUser, page)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'book-get',
+				MQBookMessageType.GET,
 				{
 					page,
 					user: currentUser,

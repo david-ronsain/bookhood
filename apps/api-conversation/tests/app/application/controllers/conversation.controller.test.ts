@@ -5,7 +5,10 @@ import { ConversationController } from '../../../../src/app/application/controll
 import GetOrCreateUseCase from '../../../../src/app/application/usecases/getOrCreate.usecase'
 import AddMessageUseCase from '../../../../src/app/application/usecases/addMessage.usecase'
 import { ForbiddenException, HttpStatus } from '@nestjs/common'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
+import {
+	HealthCheckStatus,
+	MicroserviceResponseFormatter,
+} from '../../../../../shared-api/src'
 import { Observable, of } from 'rxjs'
 import {
 	AddMessageDTO,
@@ -66,7 +69,7 @@ describe('ConversationController', () => {
 	describe('health', () => {
 		it('should return "up"', () => {
 			const result = controller.health()
-			expect(result).toBe('up')
+			expect(result).toBe(HealthCheckStatus.UP)
 		})
 	})
 

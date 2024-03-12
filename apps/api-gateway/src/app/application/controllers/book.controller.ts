@@ -33,6 +33,7 @@ import {
 	AddBookMQDTO,
 	SearchBookMQDTO,
 	GetBookMQDTO,
+	MQBookMessageType,
 } from '@bookhood/shared-api'
 import { AddBookDTO, Book, BookSearch, BookSearchDTO } from '../dto/book.dto'
 import { google } from 'googleapis'
@@ -60,7 +61,12 @@ export class BookController {
 	): Promise<IBook> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBook>
-		>(this.bookQueue.send('book-add', { user, book } as AddBookMQDTO))
+		>(
+			this.bookQueue.send(MQBookMessageType.CREATE, {
+				user,
+				book,
+			} as AddBookMQDTO),
+		)
 		if (!created.success) {
 			throw new HttpException(created.message, created.code)
 		}
@@ -115,7 +121,7 @@ export class BookController {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBookSearch>
 		>(
-			this.bookQueue.send('book-search', {
+			this.bookQueue.send(MQBookMessageType.SEARCH, {
 				search: body.q,
 				startAt: body.startIndex,
 				language: 'fr',
@@ -142,7 +148,7 @@ export class BookController {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibraryFull[]>
 		>(
-			this.bookQueue.send('book-get', {
+			this.bookQueue.send(MQBookMessageType.GET, {
 				page,
 				user,
 			} as GetBookMQDTO),

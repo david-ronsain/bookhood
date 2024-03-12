@@ -47,7 +47,7 @@ describe('SearchBookUseCase', () => {
 					description: 'desc',
 					language: 'en',
 					isbn: [],
-					owner: undefined as unknown as IBookSearchResultOwner,
+					owner: undefined as unknown as IBookSearchResultOwner[],
 				},
 				{
 					_id: '456',
@@ -57,7 +57,7 @@ describe('SearchBookUseCase', () => {
 					description: 'desc',
 					language: 'en',
 					isbn: [],
-					owner: undefined as unknown as IBookSearchResultOwner,
+					owner: undefined as unknown as IBookSearchResultOwner[],
 				},
 			],
 			total: 2,

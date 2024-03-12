@@ -8,3 +8,10 @@ export enum MQConversationMessageType {
 export enum MQUerMessageType {
 	GET_BY_TOKEN = 'user-get-by-token',
 }
+
+export enum MQBookMessageType {
+	CREATE = 'book-add',
+	SEARCH = 'book-search',
+	GET = 'book-get',
+	HEALTH = 'book-health',
+}

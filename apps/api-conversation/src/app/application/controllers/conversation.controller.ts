@@ -17,6 +17,7 @@ import {
 import { firstValueFrom } from 'rxjs'
 import GetOrCreateUseCase from '../usecases/getOrCreate.usecase'
 import {
+	HealthCheckStatus,
 	MQConversationMessageType,
 	MQUerMessageType,
 	MicroserviceResponseFormatter,
@@ -35,7 +36,7 @@ export class ConversationController {
 
 	@MessagePattern()
 	health(): string {
-		return 'up'
+		return HealthCheckStatus.UP
 	}
 
 	@MessagePattern(MQConversationMessageType.CREATE_AND_GET)

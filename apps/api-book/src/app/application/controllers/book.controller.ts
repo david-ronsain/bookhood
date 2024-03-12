@@ -10,6 +10,8 @@ import {
 import {
 	AddBookMQDTO,
 	GetBookMQDTO,
+	HealthCheckStatus,
+	MQBookMessageType,
 	MicroserviceResponseFormatter,
 	SearchBookMQDTO,
 } from '@bookhood/shared-api'
@@ -31,12 +33,12 @@ export class BookController {
 		private readonly searchBookUseCase: SearchBookUseCase,
 	) {}
 
-	@MessagePattern('book-health')
+	@MessagePattern(MQBookMessageType.HEALTH)
 	health(): string {
-		return 'up'
+		return HealthCheckStatus.UP
 	}
 
-	@MessagePattern('book-add')
+	@MessagePattern(MQBookMessageType.CREATE)
 	async addBook(
 		body: AddBookMQDTO,
 	): Promise<MicroserviceResponseFormatter<IBook>> {
@@ -67,7 +69,7 @@ export class BookController {
 		}
 	}
 
-	@MessagePattern('book-search')
+	@MessagePattern(MQBookMessageType.SEARCH)
 	async searchBook(
 		body: SearchBookMQDTO,
 	): Promise<MicroserviceResponseFormatter<IBookSearch>> {
@@ -94,7 +96,7 @@ export class BookController {
 		}
 	}
 
-	@MessagePattern('book-get')
+	@MessagePattern(MQBookMessageType.GET)
 	async getUserBooks(
 		body: GetBookMQDTO,
 	): Promise<MicroserviceResponseFormatter<ILibraryFull[]>> {
