@@ -6,6 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 import { of } from 'rxjs'
 import {
 	CurrentUser,
+	MQRequestMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import {
@@ -87,7 +88,7 @@ describe('RequestController', () => {
 			})
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-create',
+				MQRequestMessageType.CREATE,
 				{
 					libraryId,
 					user: currentUser,
@@ -118,7 +119,7 @@ describe('RequestController', () => {
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-create',
+				MQRequestMessageType.CREATE,
 				{
 					libraryId,
 					user: currentUser,
@@ -165,7 +166,7 @@ describe('RequestController', () => {
 			const result = await controller.getListByStatus(currentUser, data)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-list',
+				MQRequestMessageType.LIST,
 				{
 					...data,
 					user: currentUser,
@@ -193,7 +194,7 @@ describe('RequestController', () => {
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-list',
+				MQRequestMessageType.LIST,
 				{
 					...data,
 					user: currentUser,
@@ -229,7 +230,7 @@ describe('RequestController', () => {
 			const result = await controller.patch(currentUser, data, requestId)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-patch',
+				MQRequestMessageType.PATCH,
 				{
 					...data,
 					requestId,
@@ -257,7 +258,7 @@ describe('RequestController', () => {
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
-				'request-patch',
+				MQRequestMessageType.PATCH,
 				{
 					...data,
 					requestId,

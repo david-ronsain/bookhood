@@ -24,9 +24,17 @@ export enum MQAuthMessageType {
 
 export enum MQMailMessageType {
 	AUTH_SEND_LINK = 'mail-auth-send-link',
+	REQUEST_CREATED = 'mail-request-created',
 }
 
 export enum MQLibraryMessageType {
 	LIST = 'libraries-list',
 	PATCH = 'library-patch',
+}
+
+export enum MQRequestMessageType {
+	CREATE = 'request-create',
+	GET = 'request-get',
+	LIST = 'request-list',
+	PATCH = 'request-patch',
 }

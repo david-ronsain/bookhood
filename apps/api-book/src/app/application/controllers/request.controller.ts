@@ -10,6 +10,8 @@ import {
 import {
 	CreateRequestMQDTO,
 	GetRequestsMQDTO,
+	MQMailMessageType,
+	MQRequestMessageType,
 	MicroserviceResponseFormatter,
 	PatchRequestMQDTO,
 } from '@bookhood/shared-api'
@@ -33,7 +35,7 @@ export class RequestController {
 		private readonly getByIdUseCase: GetByIdUseCase,
 	) {}
 
-	@MessagePattern('request-create')
+	@MessagePattern(MQRequestMessageType.CREATE)
 	async create(
 		body: CreateRequestMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequest>> {
@@ -49,7 +51,7 @@ export class RequestController {
 			)
 
 			this.mailClient
-				.send('mail-request-created', {
+				.send(MQMailMessageType.REQUEST_CREATED, {
 					book: library.book.title,
 					emitterFirstName: body.user.firstName,
 					recipientFirstName: library.user.firstName,
@@ -72,7 +74,7 @@ export class RequestController {
 		}
 	}
 
-	@MessagePattern('request-list')
+	@MessagePattern(MQRequestMessageType.LIST)
 	async getByListStatus(
 		body: GetRequestsMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequestList>> {
@@ -102,7 +104,7 @@ export class RequestController {
 		}
 	}
 
-	@MessagePattern('request-patch')
+	@MessagePattern(MQRequestMessageType.PATCH)
 	async update(
 		body: PatchRequestMQDTO,
 	): Promise<MicroserviceResponseFormatter<IRequest>> {
@@ -123,7 +125,7 @@ export class RequestController {
 		}
 	}
 
-	@MessagePattern('request-get')
+	@MessagePattern(MQRequestMessageType.GET)
 	async getById(
 		requestId: string,
 	): Promise<MicroserviceResponseFormatter<IRequestInfos>> {

@@ -22,7 +22,7 @@ import {
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { ClientProxy } from '@nestjs/microservices'
-import { Observable, of } from 'rxjs'
+import { of } from 'rxjs'
 import {
 	CreateRequestMQDTO,
 	CurrentUser,

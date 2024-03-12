@@ -39,6 +39,7 @@ import {
 	MicroserviceResponseFormatter,
 	PatchRequestDTO,
 	PatchRequestMQDTO,
+	MQRequestMessageType,
 } from '@bookhood/shared-api'
 import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import { AuthUserGuard } from '../guards/authUser.guard'
@@ -65,7 +66,7 @@ export class RequestController {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
 		>(
-			this.bookQueue.send('request-create', {
+			this.bookQueue.send(MQRequestMessageType.CREATE, {
 				libraryId,
 				user,
 				...body,
@@ -91,7 +92,7 @@ export class RequestController {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequestList>
 		>(
-			this.bookQueue.send('request-list', {
+			this.bookQueue.send(MQRequestMessageType.LIST, {
 				...body,
 				user,
 			} as GetRequestsMQDTO),
@@ -120,7 +121,7 @@ export class RequestController {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
 		>(
-			this.bookQueue.send('request-patch', {
+			this.bookQueue.send(MQRequestMessageType.PATCH, {
 				...body,
 				requestId: id,
 				user,
