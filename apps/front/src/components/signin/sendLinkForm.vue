@@ -29,7 +29,9 @@
 					mainStore.success = 'Le lien vous a été envoyé'
 				})
 				.catch((err) => {
-					mainStore.error = err.message
+					mainStore.error = t(
+						`signin.sendLink.error${err.response.status}`,
+					)
 				})
 				.finally(() => {
 					loading.value = false

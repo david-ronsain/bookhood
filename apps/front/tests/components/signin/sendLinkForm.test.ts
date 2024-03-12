@@ -86,7 +86,8 @@ describe('Testing the component Search', () => {
 	it('should fail sending the link', async () => {
 		await fillForm()
 
-		userStore.sendSigninLink = () => Promise.reject({ message: 'error' })
+		userStore.sendSigninLink = () =>
+			Promise.reject({ message: 'error', response: { status: 400 } })
 		vi.spyOn(userStore, 'sendSigninLink')
 
 		wrapper.findComponent(BhPrimaryButton).trigger('click')
@@ -99,9 +100,7 @@ describe('Testing the component Search', () => {
 		expect(mainStore.error.length).toBeGreaterThan(0)
 	})
 
-	const fillForm = async (
-		email: string = 'test@email.com',
-	): Promise<void> => {
+	const fillForm = async (email = 'test@email.com'): Promise<void> => {
 		wrapper.findComponent(BhTextField).find('input').setValue(email)
 		await wrapper.vm.$nextTick()
 		await wrapper.vm.$nextTick()
