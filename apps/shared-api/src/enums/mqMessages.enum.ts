@@ -15,3 +15,13 @@ export enum MQBookMessageType {
 	GET = 'book-get',
 	HEALTH = 'book-health',
 }
+
+export enum MQAuthMessageType {
+	HEALTH = 'auth-health',
+	SEND_LINK = 'auth-send-link',
+	SIGNIN = 'auth-signin',
+}
+
+export enum MQMailMessageType {
+	AUTH_SEND_LINK = 'mail-auth-send-link',
+}

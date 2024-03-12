@@ -20,7 +20,10 @@ import {
 import { firstValueFrom } from 'rxjs'
 import { Role } from '@bookhood/shared'
 import { UserNotFoundException } from '../exceptions'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	MQAuthMessageType,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import { SendLinkDTO, SigninDTO } from '../dto/auth.dto'
 import { RoleGuard } from '../guards/role.guard'
 
@@ -40,7 +43,7 @@ export class AuthController {
 	async sendLink(@Body() dto: SendLinkDTO): Promise<boolean> {
 		const sent = await firstValueFrom<
 			MicroserviceResponseFormatter<boolean>
-		>(this.userQueue.send('auth-send-link', dto))
+		>(this.userQueue.send(MQAuthMessageType.SEND_LINK, dto))
 		if (!sent.success) {
 			throw new UserNotFoundException(sent.message)
 		}
@@ -58,7 +61,7 @@ export class AuthController {
 	async signin(@Body() dto: SigninDTO): Promise<boolean> {
 		const verified = await firstValueFrom<
 			MicroserviceResponseFormatter<boolean>
-		>(this.userQueue.send('auth-signin', dto))
+		>(this.userQueue.send(MQAuthMessageType.SIGNIN, dto))
 
 		if (!verified.success) {
 			throw new ForbiddenException(verified.message)

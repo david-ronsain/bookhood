@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
-import {
-	BadRequestException,
-	ForbiddenException,
-	HttpStatus,
-} from '@nestjs/common'
-import { ClientProxy } from '@nestjs/microservices'
+import { ForbiddenException, HttpStatus } from '@nestjs/common'
 import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
 import {
 	SendLinkDTO,
@@ -14,7 +9,10 @@ import {
 } from '../../../../src/app/application/dto/auth.dto'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 import { of } from 'rxjs'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
+import {
+	MQAuthMessageType,
+	MicroserviceResponseFormatter,
+} from '../../../../../shared-api/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -54,14 +52,14 @@ describe('AuthController', () => {
 			const response = new MicroserviceResponseFormatter<boolean>(true)
 
 			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			const result = await controller.sendLink(sendLinkDTO)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'auth-send-link',
-				sendLinkDTO
+				MQAuthMessageType.SEND_LINK,
+				sendLinkDTO,
 			)
 			expect(result).toBe(true)
 		})
@@ -73,15 +71,15 @@ describe('AuthController', () => {
 
 			const response = new MicroserviceResponseFormatter(
 				false,
-				HttpStatus.NOT_FOUND
+				HttpStatus.NOT_FOUND,
 			)
 
 			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			await expect(controller.sendLink(sendLinkDTO)).rejects.toThrow(
-				UserNotFoundException
+				UserNotFoundException,
 			)
 		})
 	})
@@ -95,14 +93,14 @@ describe('AuthController', () => {
 			const response = new MicroserviceResponseFormatter(true)
 
 			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			const result = await controller.signin(signinDTO)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
-				'auth-signin',
-				signinDTO
+				MQAuthMessageType.SIGNIN,
+				signinDTO,
 			)
 			expect(result).toBe(true)
 		})
@@ -114,15 +112,15 @@ describe('AuthController', () => {
 
 			const response = new MicroserviceResponseFormatter(
 				false,
-				HttpStatus.FORBIDDEN
+				HttpStatus.FORBIDDEN,
 			)
 
 			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
-				of(response)
+				of(response),
 			)
 
 			await expect(controller.signin(signinDTO)).rejects.toThrow(
-				ForbiddenException
+				ForbiddenException,
 			)
 		})
 	})

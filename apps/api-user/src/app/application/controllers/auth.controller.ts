@@ -8,7 +8,12 @@ import {
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import { ISendLinkDTO, ISigninDTO } from '@bookhood/shared'
-import { MicroserviceResponseFormatter } from '@bookhood/shared-api'
+import {
+	HealthCheckStatus,
+	MQAuthMessageType,
+	MQMailMessageType,
+	MicroserviceResponseFormatter,
+} from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
 import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
@@ -23,26 +28,26 @@ export class AuthController {
 		private readonly getUserByEmailUseCase: GetUserByEmailUseCase,
 		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly verifyAuthTokenUseCase: VerifyAuthTokenUseCase,
-		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy
+		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy,
 	) {}
 
-	@MessagePattern('auth-health')
+	@MessagePattern(MQAuthMessageType.HEALTH)
 	health(): string {
-		return 'up'
+		return HealthCheckStatus.UP
 	}
 
-	@MessagePattern('auth-send-link')
+	@MessagePattern(MQAuthMessageType.SEND_LINK)
 	async sendLink(
-		@Body() dto: ISendLinkDTO
+		@Body() dto: ISendLinkDTO,
 	): Promise<MicroserviceResponseFormatter<boolean>> {
 		try {
 			const user: UserModel = await this.getUserByEmailUseCase.handler(
-				dto.email
+				dto.email,
 			)
 			this.createAuthLinkUseCase.handler(user)
 			if (user) {
 				this.rabbitMailClient
-					.send('mail-auth-send-link', user)
+					.send(MQMailMessageType.AUTH_SEND_LINK, user)
 					.subscribe()
 			}
 
@@ -50,25 +55,25 @@ export class AuthController {
 				true,
 				HttpStatus.OK,
 				dto,
-				!!user
+				!!user,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<boolean>().buildFromException(
 				err,
-				dto
+				dto,
 			)
 		}
 	}
 
-	@MessagePattern('auth-signin')
+	@MessagePattern(MQAuthMessageType.SIGNIN)
 	async signin(
-		@Body() dto: ISigninDTO
+		@Body() dto: ISigninDTO,
 	): Promise<MicroserviceResponseFormatter<boolean>> {
 		try {
 			const token = dto.token.split('|')
 			if (token.length !== 2) {
 				throw new ForbiddenException(
-					'Your signin link is incorrect, please signin again'
+					'Your signin link is incorrect, please signin again',
 				)
 			}
 
@@ -80,12 +85,12 @@ export class AuthController {
 				true,
 				HttpStatus.OK,
 				dto,
-				true
+				true,
 			)
 		} catch (err) {
 			return new MicroserviceResponseFormatter<boolean>().buildFromException(
 				err,
-				dto
+				dto,
 			)
 		}
 	}

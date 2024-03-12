@@ -1,19 +1,9 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
-import CreateUserUseCase from '../../../../src/app/application/usecases/createUser.usecase'
-import {
-	ICreateUserDTO,
-	ISendLinkDTO,
-	winstonConfig,
-} from '../../../../../shared/src'
+import { winstonConfig } from '../../../../../shared/src'
 import UserModel from '../../../../src/app/domain/models/user.model'
-import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
-import {
-	ConflictException,
-	HttpStatus,
-	NotFoundException,
-} from '@nestjs/common'
+import { HttpStatus, NotFoundException } from '@nestjs/common'
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
 import * as winston from 'winston'
 import { WinstonModule } from 'nest-winston'
@@ -22,6 +12,7 @@ import { Observable } from 'rxjs'
 import GetUserByEmailUseCase from '../../../../src/app/application/usecases/getUserByEmail.usecase'
 import CreateAuthLinkUseCase from '../../../../src/app/application/usecases/createAuthLink.usecase'
 import VerifyAuthTokenUseCase from '../../../../src/app/application/usecases/verifyAuthToken.usecase'
+import { HealthCheckStatus } from '../../../../../shared-api/src'
 
 const moduleMocker = new ModuleMocker(global)
 describe('Testing AuthController', () => {
@@ -38,7 +29,7 @@ describe('Testing AuthController', () => {
 						firstName: 'first',
 						lastName: 'lastName',
 						email: 'first.last@name.test',
-					})
+					}),
 				)
 			}),
 	} as unknown as GetUserByEmailUseCase
@@ -47,7 +38,7 @@ describe('Testing AuthController', () => {
 			new Promise((resolve) => resolve(user)),
 	} as unknown as CreateAuthLinkUseCase
 	const mockVerifyAuthTokenUseCase = {
-		handler: (email: string, token: string): Promise<boolean> =>
+		handler: (email: string): Promise<boolean> =>
 			new Promise((resolve) => {
 				if (email === '') {
 					throw new NotFoundException('error')
@@ -60,7 +51,10 @@ describe('Testing AuthController', () => {
 		const module = await Test.createTestingModule({
 			imports: [
 				WinstonModule.forRoot(
-					winstonConfig(winston, envConfig().gateway.user.serviceName)
+					winstonConfig(
+						winston,
+						envConfig().gateway.user.serviceName,
+					),
 				),
 			],
 			controllers: [AuthController],
@@ -83,7 +77,7 @@ describe('Testing AuthController', () => {
 				}
 				if (typeof token === 'function') {
 					const mockMetadata = moduleMocker.getMetadata(
-						token
+						token,
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					) as MockFunctionMetadata<any, any>
 					const Mock = moduleMocker.generateFromMetadata(mockMetadata)
@@ -96,14 +90,14 @@ describe('Testing AuthController', () => {
 
 	describe('The healthcheck', () => {
 		it('should return "up"', () => {
-			expect(controller.health()).toBe('up')
+			expect(controller.health()).toBe(HealthCheckStatus.UP)
 		})
 	})
 
 	describe('sendLink method', () => {
 		it('should send the signin link', async () => {
 			expect(
-				controller.sendLink({ email: 'first.last@name.test' })
+				controller.sendLink({ email: 'first.last@name.test' }),
 			).resolves.toMatchObject({
 				success: true,
 				code: HttpStatus.OK,
@@ -120,13 +114,13 @@ describe('Testing AuthController', () => {
 	describe('signin method', () => {
 		it('should validate the authentication', async () => {
 			expect(
-				controller.signin({ token: 'test|test' })
+				controller.signin({ token: 'test|test' }),
 			).resolves.toMatchObject({ success: true })
 		})
 
 		it('should reject the incorrect token', async () => {
 			expect(controller.signin({ token: 'test' })).resolves.toMatchObject(
-				{ success: false }
+				{ success: false },
 			)
 		})
 
