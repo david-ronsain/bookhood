@@ -4,17 +4,11 @@
 	import { useRoute } from 'vue-router'
 	import { useI18n } from 'vue-i18n'
 	import { useMainStore } from '../../../store'
-	import {
-		mdiAccountCircle,
-		mdiBookshelf,
-		mdiLogin,
-		mdiLogout,
-		mdiMagnify,
-	} from '@mdi/js'
+	import { mdiAccountCircle, mdiLogin, mdiLogout, mdiMagnify } from '@mdi/js'
 	import { computed } from 'vue'
 
 	const mainStore = useMainStore()
-	let route = useRoute()
+	const route = useRoute()
 	const { t } = useI18n({})
 	const { lgAndUp, mdAndDown } = useDisplay()
 	const drawerOpened = ref(false)
@@ -38,15 +32,8 @@
 				},
 				{
 					prependIcon: mdiAccountCircle,
-					title: t('common.menu.profile'),
+					title: t('common.menu.account'),
 					link: { name: 'account' },
-					children: [
-						{
-							prependIcon: mdiBookshelf,
-							title: t('common.menu.yourbooks'),
-							link: { name: 'yourBooks' },
-						},
-					],
 				},
 				{
 					prependIcon: mdiMagnify,
@@ -86,7 +73,7 @@
 				:value="item.title">
 				<template v-slot:activator="{ props }">
 					<v-list-item
-						:active="item.link.name === route.name.toString()"
+						:active="item.link.name === route.name"
 						v-bind="props"
 						:to="!item.children?.length ? item.link : null"
 						@click.stop="item.action ?? null">
@@ -135,6 +122,9 @@
 </template>
 
 <style lang="scss">
+	.v-navigation-drawer {
+		bottom: 0 !important;
+	}
 	.v-list-item--density-compact:not(.v-list-item--nav).v-list-item--one-line {
 		padding-inline-start: 13px !important;
 	}

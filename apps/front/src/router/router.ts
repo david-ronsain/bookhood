@@ -4,7 +4,6 @@ const Signup = () => import('../views/Signup.vue')
 const Signin = () => import('../views/Signin.vue')
 const Account = () => import('../views/Account.vue')
 const Logout = () => import('../views/Logout.vue')
-import YourBooks from '../views/YourBooks.vue'
 import Requests from '../views/Requests.vue'
 const Profile = () => import('../views/Profile.vue')
 const Conversation = () => import('../views/Conversation.vue')
@@ -97,31 +96,12 @@ const router = createRouter({
 		},
 		{
 			path: '/account',
-			children: [
-				{
-					path: '',
-					name: 'account',
-					component: Account,
-					meta: {
-						requiresAuth: RequiresAuth.AUTHENTICATED,
-						authenticated: auth.isAuthenticated(),
-					},
-				},
-				{
-					path: 'your-books',
-					children: [
-						{
-							path: '',
-							name: 'yourBooks',
-							component: YourBooks,
-							meta: {
-								requiresAuth: RequiresAuth.AUTHENTICATED,
-								authenticated: auth.isAuthenticated(),
-							},
-						},
-					],
-				},
-			],
+			name: 'account',
+			component: Account,
+			meta: {
+				requiresAuth: RequiresAuth.AUTHENTICATED,
+				authenticated: auth.isAuthenticated(),
+			},
 		},
 		{
 			path: '/requests',

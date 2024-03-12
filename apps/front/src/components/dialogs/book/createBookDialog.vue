@@ -105,7 +105,7 @@
 			.add(book.value, status.value, location.value, place.value)
 			.then(() => {
 				mainStore.success = t(
-					'account.books.yourBooks.addForm.success',
+					'account.books.myProfile.addForm.success',
 					{ title: book.value.title },
 				)
 				if ('close' in addDialog.value) {
@@ -152,7 +152,7 @@
 
 <template>
 	<bh-dialog
-		:title="$t('account.books.yourBooks.addForm.title')"
+		:title="$t('account.books.myProfile.addForm.title')"
 		ref="addDialog"
 		fullscreen>
 		<template v-slot>
@@ -164,7 +164,7 @@
 						class="mb-4 mx-auto">
 						<div
 							v-text="
-								$t('account.books.yourBooks.addForm.scan')
+								$t('account.books.myProfile.addForm.scan')
 							" />
 						<StreamBarcodeReader @result="readBarCode" />
 					</div>
@@ -174,7 +174,7 @@
 							class="mx-auto mb-4 create-book-isbn-search"
 							ref="isbnSearch"
 							:label="
-								$t('account.books.yourBooks.addForm.searchISBN')
+								$t('account.books.myProfile.addForm.searchISBN')
 							"
 							v-model="search"
 							clearable
@@ -194,7 +194,7 @@
 								:key="'status-' + key"
 								:label="
 									$t(
-										'account.books.yourBooks.addForm.status.' +
+										'account.books.myProfile.addForm.status.' +
 											key,
 									)
 								"
@@ -204,7 +204,7 @@
 						<bh-address-autocomplete
 							class="mb-8"
 							:placeholder="
-								$t('account.books.yourBooks.addForm.address')
+								$t('account.books.myProfile.addForm.address')
 							"
 							@center:updated="centerUpdated"
 							@place:updated="placeUpdated" />
@@ -223,20 +223,20 @@
 						color="warning"
 						:icon="mdiAlertCircleOutline"
 						:text="
-							$t('account.books.yourBooks.addForm.bookNotFound')
+							$t('account.books.myProfile.addForm.bookNotFound')
 						" />
 				</div>
 			</div>
 		</template>
 		<template v-slot:actions>
 			<bh-primary-button
-				:text="$t('account.books.yourBooks.addForm.close')"
+				:text="$t('account.books.myProfile.addForm.close')"
 				no-background
 				@click.prevent="addDialog.close()" />
 
 			<bh-primary-button
 				class="create-book"
-				:text="$t('account.books.yourBooks.addForm.add')"
+				:text="$t('account.books.myProfile.addForm.add')"
 				:loading="saveButtonLoading"
 				:disabled="saveButtonDisabled"
 				@click.prevent="save" />

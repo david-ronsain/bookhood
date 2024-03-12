@@ -1,8 +1,6 @@
 <script setup lang="ts">
-	import { mdiPlusCircleOutline } from '@mdi/js'
 	import { ref } from 'vue'
-	import CreateBookDialog from '../../../dialogs/book/createBookDialog.vue'
-	import { BhPrimaryButton, BhCard, BhDatatable } from '@bookhood/ui'
+	import { BhCard, BhDatatable } from '@bookhood/ui'
 	import {
 		LibraryStatus,
 		type IBooksListResult,
@@ -18,12 +16,11 @@
 	const { t } = useI18n({})
 	const mainStore = useMainStore()
 	const accountStore = useAccountStore()
-	const addDialog = ref(null)
 	const tempStatus = ref<RequestStatus>(RequestStatus.NONE)
 
 	const libraryStatus = Object.values(LibraryStatus).map(
 		(status: LibraryStatus) => ({
-			title: t('account.books.yourBooks.list.statusNames.' + status),
+			title: t('account.books.myProfile.list.statusNames.' + status),
 			value: status,
 		}),
 	)
@@ -32,43 +29,43 @@
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.book'),
+			title: t('account.books.myProfile.list.book'),
 			key: 'title',
 		},
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.authors'),
+			title: t('account.books.myProfile.list.authors'),
 			key: 'authors',
 		},
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.category'),
+			title: t('account.books.myProfile.list.category'),
 			key: 'category',
 		},
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.status'),
+			title: t('account.books.myProfile.list.status'),
 			key: 'status',
 		},
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.currentStatus'),
+			title: t('account.books.myProfile.list.currentStatus'),
 			key: 'currentStatus',
 		},
 		{
 			align: 'center',
 			sortable: false,
-			title: t('account.books.yourBooks.list.place'),
+			title: t('account.books.myProfile.list.place'),
 			key: 'place',
 		},
 		/*{
 				align: 'center',
 				sortable: false,
-				title: t('account.books.yourBooks.list.actions'),
+				title: t('account.books.myProfile.list.actions'),
 				key: '',
 			},*/
 	]
@@ -117,7 +114,7 @@
 					.then(() => {
 						mainStore.$patch({
 							success: t(
-								'account.books.yourBooks.list.patch.success',
+								'account.books.myProfile.list.patch.success',
 							),
 						})
 						//books.value[index].status = value
@@ -125,7 +122,7 @@
 					.catch(() => {
 						mainStore.$patch({
 							error: t(
-								'account.books.yourBooks.list.patch.error',
+								'account.books.myProfile.list.patch.error',
 							),
 						})
 					})
@@ -145,113 +142,73 @@
 </script>
 
 <template>
-	<div>
-		<div class="d-flex align-center justify-end">
-			<bh-primary-button
-				class="add-book"
-				:text="$t('account.books.yourBooks.add')"
-				:icon="{ icon: mdiPlusCircleOutline, prepend: true }"
-				@click="addDialog.open()" />
-		</div>
-
-		<v-row>
-			<v-col
-				cols="12"
-				md="6">
-				<bh-card
-					flat
-					border
-					:hover="false"
-					:title="$t('account.books.yourBooks.list.title')">
-					<template v-slot:text>
-						<bh-datatable
-							class="your-books-list"
-							:headers="headers"
-							:items="books"
-							:loading="loading"
-							:loading-text="
-								$t('account.books.yourBooks.list.loading')
-							"
-							:no-data-text="
-								$t('account.books.yourBooks.list.noData')
-							"
-							:page="page"
-							@update:page="books">
-							<template v-slot:item="{ item }">
-								<tr>
-									<td>{{ item.title }}</td>
-									<td>{{ item.authors.join(', ') }}</td>
-									<td>{{ item.categories.join(', ') }}</td>
-									<td
-										@dblclick="
-											edit(
-												item.editing ? undefined : item,
-											)
-										">
-										<div
-											v-if="!!item.editing"
-											class="d-flex">
-											<v-select
-												density="compact"
-												hide-details
-												:items="libraryStatus"
-												:model-value="tempStatus"
-												variant="outlined"
-												@update:menu="changeMenuStatus"
-												@update:model-value="
-													(event) =>
-														saveStatus(item, event)
-												" />
-										</div>
-										<v-chip
-											v-else
-											density="compact"
-											pill
-											:color="
-												statusColor.library(item.status)
-											"
-											>{{
-												$t(
-													'account.books.yourBooks.list.statusNames.' +
-														item.status,
-												)
-											}}</v-chip
-										>
-									</td>
-									<td>
-										<v-chip
-											v-if="item.currentStatus"
-											density="compact"
-											pill
-											:color="
-												statusColor.request(
-													item.currentStatus,
-												)
-											"
-											>{{
-												$t(
-													'request.status.' +
-														item.currentStatus,
-												)
-											}}</v-chip
-										>
-									</td>
-									<td>{{ item.place }}</td>
-									<!--<td>
-										<div
-											class="d-flex align-center justify-center"></div>
-									</td>-->
-								</tr>
-							</template>
-						</bh-datatable>
-					</template>
-				</bh-card>
-			</v-col>
-		</v-row>
-
-		<create-book-dialog
-			class="add-book-dialog"
-			ref="addDialog"
-			@bookCreated="loadBooks" />
-	</div>
+	<bh-card
+		flat
+		border
+		:hover="false"
+		:title="$t('account.books.myProfile.list.title')">
+		<template v-slot:text>
+			<bh-datatable
+				class="your-books-list"
+				:headers="headers"
+				:items="books"
+				:loading="loading"
+				:loading-text="$t('account.books.myProfile.list.loading')"
+				:no-data-text="$t('account.books.myProfile.list.noData')"
+				:page="page"
+				@update:page="books">
+				<template v-slot:item="{ item }">
+					<tr>
+						<td>{{ item.title }}</td>
+						<td>{{ item.authors.join(', ') }}</td>
+						<td>{{ item.categories.join(', ') }}</td>
+						<td @dblclick="edit(item.editing ? undefined : item)">
+							<div
+								v-if="!!item.editing"
+								class="d-flex">
+								<v-select
+									density="compact"
+									hide-details
+									:items="libraryStatus"
+									:model-value="tempStatus"
+									variant="outlined"
+									@update:menu="changeMenuStatus"
+									@update:model-value="
+										(event) => saveStatus(item, event)
+									" />
+							</div>
+							<v-chip
+								v-else
+								density="compact"
+								pill
+								:color="statusColor.library(item.status)"
+								>{{
+									$t(
+										'account.books.myProfile.list.statusNames.' +
+											item.status,
+									)
+								}}</v-chip
+							>
+						</td>
+						<td>
+							<v-chip
+								v-if="item.currentStatus"
+								density="compact"
+								pill
+								:color="statusColor.request(item.currentStatus)"
+								>{{
+									$t('request.status.' + item.currentStatus)
+								}}</v-chip
+							>
+						</td>
+						<td>{{ item.place }}</td>
+						<!--<td>
+								<div
+									class="d-flex align-center justify-center"></div>
+							</td>-->
+					</tr>
+				</template>
+			</bh-datatable>
+		</template>
+	</bh-card>
 </template>

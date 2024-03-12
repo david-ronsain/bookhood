@@ -5,10 +5,10 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { mapBook, mapBooks } from '../mappers/bookMapper'
 import {
-	IBook,
-	IBookSearch,
+	type IBook,
+	type IBookSearch,
 	LibraryStatus,
-	ILibraryFull,
+	type ILibraryFull,
 } from '@bookhood/shared'
 
 export const useBookStore = defineStore('bookStore', () => {

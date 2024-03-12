@@ -6,7 +6,6 @@ import vuetify from '../../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useAccountStore, useMainStore } from '../../../../src/store'
 import { LibraryStatus } from '../../../../../shared/src'
-import CreateBookDialog from '../../../../src/components/dialogs/book/createBookDialog.vue'
 import { VSelect } from 'vuetify/lib/components/index.mjs'
 import { booksResults } from '../../../data/bookData'
 
@@ -43,17 +42,6 @@ describe('Testing the component YourBooks', () => {
 						createSpy: vi.fn,
 					}),
 				],
-				stubs: {
-					CreateBookDialog: {
-						name: 'CreateBookDialog',
-						template:
-							'<div class="v-dialog-stub" @bookCreated="() => loadBooks()"></div>',
-						emits: ['bookCreated'],
-						methods: {
-							open: () => vi.fn(),
-						},
-					},
-				},
 			},
 		})
 		accountStore = useAccountStore()
@@ -64,13 +52,7 @@ describe('Testing the component YourBooks', () => {
 		expect(wrapper.findComponent(YourBooks)).toBeTruthy()
 	})
 
-	it('should show the button to add a book', async () => {
-		expect(wrapper.find('.add-book').exists()).toBeTruthy()
-		await wrapper.find('.add-book').trigger('click')
-		await wrapper.vm.$nextTick()
-
-		expect(wrapper.emitted()).toHaveProperty('click')
-
+	it('should show the empty list', async () => {
 		expect(wrapper.find('.your-books-list').exists()).toBeTruthy()
 
 		expect(
@@ -148,27 +130,5 @@ describe('Testing the component YourBooks', () => {
 		).contain(accountStore.books[0].status)
 
 		expect(mainStore.error.length).toBeGreaterThan(0)
-	})
-
-	it('should reload the list if a book has been created', async () => {
-		accountStore.books = booksResults.results
-		accountStore.loadBooks = () => {
-			accountStore.books = []
-		}
-		mainStore.profile = { _id: 'id' }
-
-		await wrapper.vm.$nextTick()
-
-		expect(wrapper.findComponent(CreateBookDialog).exists()).toBe(true)
-
-		wrapper.vm.$forceUpdate()
-
-		wrapper.findComponent(CreateBookDialog).vm.$emit('bookCreated')
-		wrapper.vm.$nextTick()
-
-		expect(
-			wrapper.findComponent(CreateBookDialog).emitted(),
-		).toHaveProperty('bookCreated')
-		expect(accountStore.books).toMatchObject([])
 	})
 })

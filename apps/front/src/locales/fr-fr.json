@@ -5,9 +5,8 @@
 		"no": "Non",
 		"menu": {
 			"signin": "Se connecter",
-			"profile": "Mon profil",
+			"account": "Mon profil",
 			"logout": "Déconnexion",
-			"yourbooks": "Vos livres",
 			"lend": "Livres prêtés",
 			"borrowed": "Livres empruntés",
 			"search": "Rechercher",
@@ -54,13 +53,14 @@
 				"email_regex": "Vous adresse email est incorrecte"
 			},
 			"send": "Envoyer",
-			"error": "Nous n'avons pas de compte lié à cette adresse",
+			"error404": "Nous n'avons pas de compte lié à cette adresse",
+			"error400": "L'adresse email est incorrecte",
 			"success": "Le mail vous a été envoyé"
 		}
 	},
 	"account": {
 		"books": {
-			"yourBooks": {
+			"myProfile": {
 				"title": "Vos livres",
 				"add": "Ajouter un livre",
 				"addForm": {
