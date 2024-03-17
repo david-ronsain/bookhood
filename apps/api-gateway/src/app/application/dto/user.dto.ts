@@ -1,4 +1,4 @@
-import { ICreateUserDTO, IExternalProfile } from '@bookhood/shared'
+import { ICreateUserDTO, IExternalProfile, IUserStats } from '@bookhood/shared'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsString, IsEmail } from 'class-validator'
 
@@ -34,4 +34,14 @@ export class ExternalProfile implements IExternalProfile {
 	lastName: string
 
 	firstName: string
+}
+
+export class UserStats implements IUserStats {
+	nbBooks: number
+
+	nbPlaces: number
+
+	nbIncomingRequests: number
+
+	nbOutgoingRequests: number
 }

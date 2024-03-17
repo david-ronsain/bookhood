@@ -4,7 +4,6 @@ import {
 	Controller,
 	ForbiddenException,
 	Get,
-	Headers,
 	HttpCode,
 	HttpStatus,
 	Inject,
@@ -22,7 +21,12 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { CreateUserDTO, CreatedUser, ExternalProfile } from '../dto/user.dto'
+import {
+	CreateUserDTO,
+	CreatedUser,
+	ExternalProfile,
+	UserStats,
+} from '../dto/user.dto'
 import { IExternalProfile, IUser, Role } from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import { UserEmailExistException, UserNotFoundException } from '../exceptions'
@@ -83,6 +87,23 @@ export class UserController {
 			throw new UserNotFoundException(profile.message)
 		}
 		return profile.data
+	}
+
+	@Get('stats')
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.ADMIN]))
+	@ApiOperation({ description: "Returns an user's stats" })
+	@ApiOkResponse({ type: UserStats, status: HttpStatus.OK })
+	async getStats(@User() user: CurrentUser): Promise<UserStats> {
+		if (!user.token) {
+			throw new UserNotFoundException('')
+		}
+
+		const stats = await firstValueFrom<
+			MicroserviceResponseFormatter<UserStats>
+		>(this.userQueue.send(MQUserMessageType.GET_STATS, user._id))
+
+		return stats.data
 	}
 
 	@Get(':userId')

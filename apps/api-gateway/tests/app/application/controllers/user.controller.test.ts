@@ -7,10 +7,17 @@ import {
 	MQUserMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src/'
-import { CreateUserDTO } from '../../../../src/app/application/dto/user.dto'
+import {
+	CreateUserDTO,
+	UserStats,
+} from '../../../../src/app/application/dto/user.dto'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { IExternalProfile, IUser, Role } from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
+import {
+	userLibraryStats,
+	userRequestStats,
+} from '../../../../../shared-api/test'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: jest.fn(() => ({
@@ -212,6 +219,33 @@ describe('Testing UserController', () => {
 				MQUserMessageType.GET_PROFILE,
 				{ user: currentUser, userId },
 			)
+		})
+	})
+
+	describe('getStats', () => {
+		it("should return the user's stats", async () => {
+			const response = new MicroserviceResponseFormatter<UserStats>(
+				true,
+				HttpStatus.OK,
+				{},
+				{
+					...userLibraryStats,
+					...userRequestStats,
+				},
+			)
+
+			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
+				of(response),
+			)
+
+			const result = await controller.getStats(currentUser)
+
+			expect(controller['userQueue'].send).toHaveBeenCalledWith(
+				MQUserMessageType.GET_STATS,
+				'userId',
+			)
+
+			expect(result).toMatchObject(response.data)
 		})
 	})
 })

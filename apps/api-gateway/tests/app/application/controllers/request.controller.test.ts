@@ -1,7 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
 import { RequestController } from '../../../../src/app/application/controllers/request.controller'
-import { ClientProxy } from '@nestjs/microservices'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { of } from 'rxjs'
 import {
