@@ -20,6 +20,7 @@ describe('AddBookUseCase', () => {
 			getFullById: jest.fn(),
 			list: jest.fn(),
 			update: jest.fn(),
+			getStats: jest.fn(),
 		}
 
 		addBookUseCase = new AddBookUseCase(libraryRepositoryMock)

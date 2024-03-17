@@ -2,7 +2,6 @@
 import GetListByStatusUseCase from '../../../../../src/app/application/usecases/request/getListByStatus.usecase'
 import { RequestRepository } from '../../../../../src/app/domain/ports/request.repository'
 import { IRequestList, RequestStatus } from '../../../../../../shared/src/'
-import { NotFoundException } from '@nestjs/common'
 
 describe('GetListByStatusUseCase', () => {
 	let getListByStatusUseCase: GetListByStatusUseCase

@@ -3,28 +3,15 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
 import { ForbiddenException, HttpStatus } from '@nestjs/common'
-import {
-	IBooksList,
-	ILibrary,
-	LibraryStatus,
-	Role,
-} from '../../../../../shared/src'
+import { ILibrary, LibraryStatus } from '../../../../../shared/src'
 import ListUseCase from '../../../../src/app/application/usecases/library/list.usecase'
 import PatchUseCase from '../../../../src/app/application/usecases/library/patch.usecase'
-import { CurrentUser } from '../../../../../shared-api/src'
+import { booksList, currentUser, library } from '../../../../../shared-api/test'
 
 describe('LibraryController', () => {
 	let controller: LibraryController
 	let listUseCase: ListUseCase
 	let patchLibraryUseCase: PatchUseCase
-
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -59,23 +46,10 @@ describe('LibraryController', () => {
 	})
 
 	describe('getLibrariesList', () => {
-		it('should return profile books when token is valid', async () => {
-			const body = { user: currentUser, page: 1, userId: 'aaaaaaaaaaaa' }
+		const body = { user: currentUser, page: 1, userId: 'aaaaaaaaaaaa' }
 
-			const mockProfileBooks: IBooksList = {
-				results: [
-					{
-						_id: 'aaaaaaaaaaaa',
-						authors: ['author'],
-						description: 'description',
-						place: 'place',
-						status: LibraryStatus.TO_LEND,
-						title: 'title',
-						categories: ['category'],
-					},
-				],
-				total: 1,
-			}
+		it('should return profile books when token is valid', async () => {
+			const mockProfileBooks = booksList
 			jest.spyOn(listUseCase, 'handler').mockImplementationOnce(() =>
 				Promise.resolve(mockProfileBooks),
 			)
@@ -96,11 +70,6 @@ describe('LibraryController', () => {
 		})
 
 		it('should throw an error', async () => {
-			const body = {
-				user: currentUser,
-				page: 1,
-				userId: 'aaaaaaaaaaaa',
-			}
 			const error = new ForbiddenException()
 
 			jest.spyOn(listUseCase, 'handler').mockRejectedValueOnce(error)
@@ -141,21 +110,9 @@ describe('LibraryController', () => {
 		})
 
 		it('should update the library', async () => {
-			const body = {
-				user: currentUser,
-				status: LibraryStatus.TO_LEND,
-				libraryId: 'aaaaaaaaaaaa',
-			}
-
 			const mockLibrary: ILibrary = {
-				userId: 'userId',
-				bookId: 'bookId',
-				place: 'somePlace',
+				...library,
 				status: body.status,
-				location: {
-					coordinates: [0, 0],
-					type: 'Point',
-				},
 			}
 			jest.spyOn(patchLibraryUseCase, 'handler').mockImplementationOnce(
 				() => Promise.resolve(mockLibrary),

@@ -37,6 +37,7 @@ describe('PatchUseCase', () => {
 			getFullById: jest.fn(),
 			list: jest.fn(),
 			update: jest.fn(),
+			getStats: jest.fn(),
 		}
 
 		patchUseCase = new PatchUseCase(libraryRepositoryMock)
