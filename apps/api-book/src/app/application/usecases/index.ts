@@ -9,6 +9,8 @@ import PatchRequestUseCase from './request/patchRequest.usecase'
 import GetByIdUseCase from './request/getById.usecase'
 import ListUseCase from './library/list.usecase'
 import PatchUseCase from './library/patch.usecase'
+import GetUserLibraryStatsUseCase from './library/getUserLibraryStats.usecase'
+import GetUserRequestStatsUseCase from './request/getUserRequestStats.usecase'
 
 export const BOOK_USECASES = [
 	AddBookUseCase,
@@ -21,8 +23,13 @@ export const BOOK_USECASES = [
 export const REQUEST_USECASES = [
 	CreateRequestUseCase,
 	GetListByStatusUseCase,
+	GetUserRequestStatsUseCase,
 	PatchRequestUseCase,
 	GetByIdUseCase,
 ]
 
-export const LIBRARY_USECASES = [ListUseCase, PatchUseCase]
+export const LIBRARY_USECASES = [
+	GetUserLibraryStatsUseCase,
+	ListUseCase,
+	PatchUseCase,
+]

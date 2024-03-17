@@ -14,6 +14,8 @@ import {
 	MQBookMessageType,
 	MicroserviceResponseFormatter,
 	SearchBookMQDTO,
+	UserLibraryStats,
+	UserRequestStats,
 } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
@@ -22,6 +24,8 @@ import BookModel from '../../domain/models/book.model'
 import CreateBookIfNewUseCase from '../usecases/book/createBookIfNew.usecase'
 import SearchBookUseCase from '../usecases/book/searchBook.usecase'
 import GetUserBooksUseCase from '../usecases/book/getUserBooks.usecase'
+import GetUserLibraryStatsUseCase from '../usecases/library/getUserLibraryStats.usecase'
+import GetUserRequestStatsUseCase from '../usecases/request/getUserRequestStats.usecase'
 
 @Controller()
 export class BookController {
@@ -30,6 +34,8 @@ export class BookController {
 		private readonly createBookIfNewUseCase: CreateBookIfNewUseCase,
 		private readonly addBookUseCase: AddBookUseCase,
 		private readonly getUserBooksUseCase: GetUserBooksUseCase,
+		private readonly getUserLibraryStatsUseCase: GetUserLibraryStatsUseCase,
+		private readonly getUserRequestStatsUseCase: GetUserRequestStatsUseCase,
 		private readonly searchBookUseCase: SearchBookUseCase,
 	) {}
 
@@ -116,6 +122,33 @@ export class BookController {
 			return new MicroserviceResponseFormatter<
 				ILibraryFull[]
 			>().buildFromException(err, body)
+		}
+	}
+
+	@MessagePattern(MQBookMessageType.GET_STATS)
+	async getUserBooksStats(
+		userId: string,
+	): Promise<
+		MicroserviceResponseFormatter<UserLibraryStats & UserRequestStats>
+	> {
+		try {
+			const libStats: UserLibraryStats =
+				await this.getUserLibraryStatsUseCase.handler(userId)
+			const reqStats: UserRequestStats =
+				await this.getUserRequestStatsUseCase.handler(userId)
+
+			const stats = {
+				...libStats,
+				...reqStats,
+			}
+
+			return new MicroserviceResponseFormatter<
+				UserLibraryStats & UserRequestStats
+			>(true, HttpStatus.OK, undefined, stats)
+		} catch (err) {
+			return new MicroserviceResponseFormatter<
+				UserLibraryStats & UserRequestStats
+			>().buildFromException(err, { userId })
 		}
 	}
 }
