@@ -99,6 +99,14 @@
 					}
 				}
 			}
+		},
+		"myProfile": {
+			"nbBooks": "{nb} livre disponible | {nb} livres disponibles",
+			"nbPlaces": "{nb} lieu | {nb} lieux",
+			"nbBooksToGive": "{nb} livre à donner | {nb} livres à donner",
+			"nbBooksToLend": "{nb} livre à prêter | {nb} livres à prêter",
+			"nbIncomingRequests": "{nb} demande reçue | {nb} demandes reçues",
+			"mdiBookArrowRightOutline": "{nb} demande envoyée | {nb} demandes envoyées"
 		}
 	},
 	"logout": {
