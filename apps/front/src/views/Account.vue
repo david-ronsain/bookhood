@@ -2,11 +2,17 @@
 	import { mdiPlusCircleOutline } from '@mdi/js'
 	import CreateBookDialog from '../components/dialogs/book/createBookDialog.vue'
 	import YourBooks from '../components/account/books/yourBooks/yourBooks.vue'
-	import { ref } from 'vue'
+	import { computed, ref } from 'vue'
 	import { BhPrimaryButton } from '@bookhood/ui'
+	import { useMainStore } from '../store'
+	import MyProfile from '../components/profile/myProfile.vue'
+
+	const mainStore = useMainStore()
 
 	const addDialog = ref(null)
 	const profileCard = ref(null)
+
+	const profile = computed(() => mainStore.profile)
 </script>
 
 <template>
@@ -29,6 +35,7 @@
 			<v-col
 				cols="12"
 				md="4">
+				<my-profile :profile="profile" />
 			</v-col>
 			<v-col
 				cols="12"

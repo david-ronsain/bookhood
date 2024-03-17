@@ -1,10 +1,12 @@
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
-import MyProfile from '../../src/views/Account.vue'
+import Account from '../../src/views/Account.vue'
 import vuetify from '../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import YourBooks from '../../src/components/account/books/yourBooks/yourBooks.vue'
 import CreateBookDialog from '../../src/components/dialogs/book/createBookDialog.vue'
+import { myProfile as profileData } from '../data/profileData'
+import MyProfile from '../../src/components/profile/myProfile.vue'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({
@@ -23,7 +25,7 @@ describe('Testing the view Account', () => {
 	let wrapper: VueWrapper
 
 	beforeEach(() => {
-		wrapper = mount(MyProfile, {
+		wrapper = mount(Account, {
 			global: {
 				plugins: [
 					vuetify,
@@ -49,14 +51,22 @@ describe('Testing the view Account', () => {
 							open: () => vi.fn(),
 						},
 					},
+					MyProfile: {
+						name: 'MyProfile',
+						template: '<div class="my-profile"></div>',
+						props: {
+							myProfile: profileData,
+						},
+					},
 				},
 			},
 		})
 	})
 
 	it('should mount the component', () => {
-		expect(wrapper.findComponent(MyProfile)).toBeTruthy()
+		expect(wrapper.findComponent(Account)).toBeTruthy()
 		expect(wrapper.findComponent(YourBooks)).toBeTruthy()
+		expect(wrapper.findComponent(MyProfile)).toBeTruthy()
 		expect(wrapper.findComponent(CreateBookDialog).exists()).toBe(true)
 	})
 
