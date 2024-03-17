@@ -2,6 +2,7 @@ import {
 	type IBook,
 	type IBooksList,
 	type IExternalProfile,
+	type IUserStats,
 } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
 import axios from 'axios'
@@ -14,6 +15,7 @@ export const useProfileStore = defineStore('profileStore', () => {
 	const booksListLoading = ref<boolean>(false)
 	const booksListTotal = ref<number>(0)
 	const profile = ref<IExternalProfile>(null)
+	const stats: IUserStats = ref(null)
 
 	const loadBooks = async (userId: string): Promise<void> => {
 		booksListLoading.value = true
@@ -65,6 +67,24 @@ export const useProfileStore = defineStore('profileStore', () => {
 			})
 	}
 
+	const loadProfileStats = async (): Promise<void> => {
+		await axios
+			.get(EnvConfig.api.base + EnvConfig.api.url.user + 'stats', {
+				headers: {
+					'Content-Type': 'application/json',
+					'x-token': localStorage.getItem(
+						EnvConfig.localStorage.userKey,
+					),
+				},
+			})
+			.then((res) => {
+				stats.value = res.data
+			})
+			.catch(() => {
+				stats.value = null
+			})
+	}
+
 	return {
 		loadBooks,
 		booksList,
@@ -73,5 +93,7 @@ export const useProfileStore = defineStore('profileStore', () => {
 		booksListTotal,
 		loadProfile,
 		profile,
+		loadProfileStats,
+		stats,
 	}
 })

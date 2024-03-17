@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { describe, vi } from 'vitest'
 import { useProfileStore } from '../../src/store/profile.store'
 import { booksResults } from '../data/bookData'
-import { externalProfile } from '../data/profileData'
+import { externalProfile, userStats } from '../data/profileData'
 
 vi.mock('axios')
 
@@ -62,6 +62,28 @@ describe('Testint the profile store', () => {
 
 			expect(axios.get).toHaveBeenCalledTimes(1)
 			expect(store.profile).toBeNull()
+		})
+	})
+
+	describe('Testing the loadProfileStats', () => {
+		it('should succeed getting the data', async () => {
+			vi.spyOn(axios, 'get').mockResolvedValueOnce({
+				data: userStats,
+			})
+
+			await store.loadProfileStats()
+
+			expect(axios.get).toHaveBeenCalledTimes(1)
+			expect(store.stats).toMatchObject(userStats)
+		})
+
+		it('should fail getting the data', async () => {
+			vi.spyOn(axios, 'get').mockRejectedValueOnce(null)
+
+			await store.loadProfileStats()
+
+			expect(axios.get).toHaveBeenCalledTimes(1)
+			expect(store.stats).toBeNull()
 		})
 	})
 })

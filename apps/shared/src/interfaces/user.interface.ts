@@ -31,3 +31,17 @@ export interface IExternalProfile {
 
 	firstName: string
 }
+
+export interface IUserStats {
+	nbBooks: number
+
+	nbPlaces: number
+
+	nbBooksToLend: number
+
+	nbBooksToGive: number
+
+	nbIncomingRequests: number
+
+	nbOutgoingRequests: number
+}

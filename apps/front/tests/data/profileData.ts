@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IExternalProfile, IUser, Role } from '../../../shared/src'
+import { IExternalProfile, IUser, IUserStats, Role } from '../../../shared/src'
 
 export const externalProfile: IExternalProfile = {
 	_id: 'profileId',
@@ -15,4 +15,13 @@ export const myProfile: IUser = {
 	role: [Role.USER],
 	token: 'token',
 	tokenExpiration: new Date(),
+}
+
+export const userStats: IUserStats = {
+	nbBooks: 1,
+	nbPlaces: 2,
+	nbBooksToLend: 3,
+	nbBooksToGive: 4,
+	nbIncomingRequests: 5,
+	nbOutgoingRequests: 6,
 }
