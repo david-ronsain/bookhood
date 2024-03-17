@@ -5,13 +5,17 @@ import mongoose, { Model, Query } from 'mongoose'
 import LibraryRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/library.repository.mongo'
 import { LibraryEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/library.entity'
 import LibraryModel from '../../../../../src/app/domain/models/library.model'
-import {
-	IBooksList,
-	ILibrary,
-	ILibraryFull,
-	LibraryStatus,
-} from '../../../../../../shared/src'
+import { ILibraryFull, LibraryStatus } from '../../../../../../shared/src'
 import LibraryMapper from '../../../../../src/app/application/mappers/library.mapper'
+import {
+	library,
+	libraryFull,
+	userLibraryStats,
+	libraryEntity,
+	booksList,
+	librariesFull,
+	libraryModel as libModel,
+} from '../../../../../../shared-api/test'
 
 describe('LibraryRepositoryMongo', () => {
 	let libraryRepository: LibraryRepositoryMongo
@@ -43,12 +47,7 @@ describe('LibraryRepositoryMongo', () => {
 
 	describe('getByUserIdAndBookId', () => {
 		it('should return a LibraryModel if library is found', async () => {
-			const mock = {
-				_id: new mongoose.Types.ObjectId(),
-				userId: new mongoose.Types.ObjectId(),
-				bookId: new mongoose.Types.ObjectId(),
-				location: { type: 'Point', coordinates: [0, 0] },
-			}
+			const mock = libModel
 			const findOneMock = jest.fn().mockReturnValue(mock)
 			jest.spyOn(libraryModel, 'findOne').mockImplementationOnce(
 				findOneMock,
@@ -87,12 +86,7 @@ describe('LibraryRepositoryMongo', () => {
 		it('should return a created LibraryModel', async () => {
 			const mock = {
 				_id: '123',
-				userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				bookId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
+				...libraryEntity,
 			} as LibraryEntity
 			const createMock = jest.fn().mockReturnValue(mock)
 			jest.spyOn(libraryModel, 'create').mockImplementationOnce(
@@ -110,42 +104,7 @@ describe('LibraryRepositoryMongo', () => {
 		it('should return library list with pagination', async () => {
 			const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 			const page = 1
-			const expectedLibraries: ILibraryFull[] = [
-				{
-					_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-					book: {
-						_id: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-						title: 'Title',
-						authors: ['author'],
-						isbn: [
-							{ type: 'ISBN_13', identifier: '0123456789123' },
-						],
-						description: 'desc',
-						language: 'fr',
-					},
-					location: {
-						type: 'Point',
-						coordinates: [0, 0],
-					},
-				},
-				{
-					_id: 'cccccccccccccccccccccccc',
-					book: {
-						_id: 'dddddddddddddddddddddddd',
-						title: 'Title',
-						authors: ['author'],
-						isbn: [
-							{ type: 'ISBN_13', identifier: '1234567890123' },
-						],
-						description: 'desc',
-						language: 'fr',
-					},
-					location: {
-						type: 'Point',
-						coordinates: [0, 0],
-					},
-				},
-			]
+			const expectedLibraries: ILibraryFull[] = librariesFull
 			const libraryEntities: LibraryEntity[] =
 				expectedLibraries as unknown as LibraryEntity[]
 
@@ -163,20 +122,7 @@ describe('LibraryRepositoryMongo', () => {
 		it('should return books list with pagination', async () => {
 			const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 			const page = 1
-			const expectedLibraries: IBooksList = {
-				total: 1,
-				results: [
-					{
-						_id: 'aaaaaaaaaaaa',
-						authors: ['author'],
-						description: 'description',
-						place: 'place',
-						status: LibraryStatus.TO_LEND,
-						title: 'title',
-						categories: ['category'],
-					},
-				],
-			}
+			const expectedLibraries = booksList
 
 			jest.spyOn(libraryModel, 'aggregate').mockResolvedValueOnce([
 				expectedLibraries,
@@ -189,34 +135,25 @@ describe('LibraryRepositoryMongo', () => {
 	})
 
 	describe('getById', () => {
+		const id = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+
 		it('should return a library item by id', async () => {
-			const id = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-			const libraryEntity = {
+			const lib = {
+				...libraryEntity,
 				_id: id,
-				userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				bookId: 'cccccccccccccccccccccccc',
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				status: LibraryStatus.TO_LEND,
-				place: 'Some place',
 			} as unknown as LibraryEntity
 
-			jest.spyOn(libraryModel, 'findOne').mockResolvedValue(libraryEntity)
+			jest.spyOn(libraryModel, 'findOne').mockResolvedValue(lib)
 
 			const result = await libraryRepository.getById(id)
 
-			expect(result).toMatchObject(
-				LibraryMapper.fromEntitytoModel(libraryEntity),
-			)
+			expect(result).toMatchObject(LibraryMapper.fromEntitytoModel(lib))
 			expect(libraryModel.findOne).toHaveBeenCalledWith({
 				_id: new mongoose.Types.ObjectId(id),
 			})
 		})
 
 		it('should return null if no library item is found', async () => {
-			const id = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 			jest.spyOn(libraryModel, 'findOne').mockResolvedValue(null)
 
 			const result = await libraryRepository.getById(id)
@@ -229,21 +166,10 @@ describe('LibraryRepositoryMongo', () => {
 	})
 
 	describe('getFullById', () => {
+		const libraryId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+
 		it('should return a library item with full details by id', async () => {
-			const libraryId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-			const expectedResult: ILibraryFull = {
-				book: {
-					title: 'Title',
-					authors: ['author'],
-					description: 'desc',
-					isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
-					language: 'fr',
-				},
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-			}
+			const expectedResult = libraryFull
 
 			jest.spyOn(libraryModel, 'aggregate').mockResolvedValue([
 				expectedResult,
@@ -255,7 +181,6 @@ describe('LibraryRepositoryMongo', () => {
 		})
 
 		it('should return null if no library item is found', async () => {
-			const libraryId = 'cccccccccccccccccccccccc'
 			jest.spyOn(libraryModel, 'aggregate').mockResolvedValue([])
 
 			const result = await libraryRepository.getFullById(libraryId)
@@ -266,16 +191,7 @@ describe('LibraryRepositoryMongo', () => {
 
 	describe('update', () => {
 		it('should update the library', () => {
-			const mockedValue: ILibrary = {
-				bookId: 'bookId',
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				place: 'somePlace',
-				status: LibraryStatus.TO_GIVE,
-				userId: 'userId',
-			}
+			const mockedValue = library
 			jest.spyOn(libraryModel, 'findOneAndUpdate').mockImplementationOnce(
 				() =>
 					Promise.resolve(mockedValue) as unknown as Query<
@@ -307,6 +223,27 @@ describe('LibraryRepositoryMongo', () => {
 			expect(
 				libraryRepository.update('libraryId', LibraryStatus.TO_GIVE),
 			).resolves.toBeNull()
+		})
+	})
+
+	describe('getStats', () => {
+		const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+
+		it("should return the user's stats", () => {
+			const stats = userLibraryStats
+			jest.spyOn(libraryModel, 'aggregate').mockResolvedValue([stats])
+
+			expect(libraryRepository.getStats(userId)).resolves.toMatchObject(
+				stats,
+			)
+		})
+
+		it('should return null if no data is found', async () => {
+			jest.spyOn(libraryModel, 'aggregate').mockResolvedValue([])
+
+			const result = await libraryRepository.getStats(userId)
+
+			expect(result).toBeNull()
 		})
 	})
 })

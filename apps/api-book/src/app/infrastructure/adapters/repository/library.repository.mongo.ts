@@ -12,6 +12,7 @@ import {
 	LibraryStatus,
 	RequestStatus,
 } from '@bookhood/shared'
+import { UserLibraryStats } from '@bookhood/shared-api'
 
 @Injectable()
 export default class LibraryRepositoryMongo implements LibraryRepository {
@@ -248,5 +249,93 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 				new: true,
 			},
 		)
+	}
+
+	async getStats(userId: string): Promise<UserLibraryStats | null> {
+		return this.libraryModel
+			.aggregate([
+				{
+					$match: {
+						userId: new mongoose.Types.ObjectId(userId),
+					},
+				},
+				{
+					$facet: {
+						nbPlaces: [
+							{
+								$group: {
+									_id: '$place',
+								},
+							},
+							{
+								$count: 'nbPlaces',
+							},
+						],
+						nbBooks: [
+							{
+								$group: {
+									_id: null,
+									total: {
+										$sum: 1,
+									},
+								},
+							},
+						],
+						nbBooksToLend: [
+							{
+								$match: {
+									status: LibraryStatus.TO_LEND,
+								},
+							},
+							{
+								$group: {
+									_id: null,
+									total: {
+										$sum: 1,
+									},
+								},
+							},
+						],
+						nbBooksToGive: [
+							{
+								$match: {
+									status: LibraryStatus.TO_GIVE,
+								},
+							},
+							{
+								$group: {
+									_id: null,
+									total: {
+										$sum: 1,
+									},
+								},
+							},
+						],
+					},
+				},
+				{
+					$project: {
+						nbPlaces: {
+							$ifNull: [
+								{
+									$first: '$nbPlaces.nbPlaces',
+								},
+								0,
+							],
+						},
+						nbBooks: {
+							$ifNull: [
+								{
+									$first: '$nbBooks.total',
+								},
+								0,
+							],
+						},
+					},
+				},
+			])
+			.then((results: UserLibraryStats[]) =>
+				results.length ? results[0] : null,
+			)
 	}
 }

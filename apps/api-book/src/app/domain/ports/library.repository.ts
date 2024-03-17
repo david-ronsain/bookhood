@@ -5,6 +5,7 @@ import {
 	LibraryStatus,
 } from '@bookhood/shared'
 import LibraryModel from '../models/library.model'
+import { UserLibraryStats } from '@bookhood/shared-api'
 
 export interface LibraryRepository {
 	getByUserIdAndBookId(
@@ -23,4 +24,6 @@ export interface LibraryRepository {
 	list(userId: string, page: number): Promise<IBooksList>
 
 	update(libraryId: string, status: LibraryStatus): Promise<ILibrary>
+
+	getStats(userId: string): Promise<UserLibraryStats | null>
 }
