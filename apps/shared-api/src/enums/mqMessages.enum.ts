@@ -11,14 +11,16 @@ export enum MQUserMessageType {
 	GET_ME = 'user-get-me',
 	GET_PROFILE = 'user-get-profile',
 	GET_ROLE_BY_TOKEN = 'user-get-role-by-token',
+	GET_STATS = 'user-get-stats',
 	HEALTH = 'user-health',
 }
 
 export enum MQBookMessageType {
 	CREATE = 'book-add',
-	SEARCH = 'book-search',
 	GET = 'book-get',
+	GET_STATS = 'book-stats',
 	HEALTH = 'book-health',
+	SEARCH = 'book-search',
 }
 
 export enum MQAuthMessageType {

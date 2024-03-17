@@ -22,6 +22,7 @@ export default (): INestEnvConfig => ({
 		password: process.env.RMQ_PASSWORD || '',
 		vhost: process.env.RMQ_VHOST || '',
 		queues: {
+			book: process.env.RMQ_BOOK_QUEUE || '',
 			gateway: process.env.RMQ_GATEWAY_QUEUE || '',
 			mail: process.env.RMQ_MAIL_QUEUE || '',
 			user: process.env.RMQ_USER_QUEUE || '',

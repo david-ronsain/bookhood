@@ -5,19 +5,23 @@ import {
 	NotFoundException,
 } from '@nestjs/common'
 
-import { ClientProxy, MessagePattern } from '@nestjs/microservices'
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices'
 import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import {
 	GetProfileMQDTO,
 	HealthCheckStatus,
+	MQBookMessageType,
 	MQMailMessageType,
 	MQUserMessageType,
 	MicroserviceResponseFormatter,
+	UserLibraryStats,
+	UserRequestStats,
 } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
+import { firstValueFrom, of } from 'rxjs'
 import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import GetUserByTokenUseCase from '../usecases/getUserByToken.usecase'
 import RefreshTokenUseCase from '../usecases/refreshToken.usecase'
@@ -28,6 +32,7 @@ export class UserController {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
 		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy,
+		@Inject('RabbitBook') private readonly rabbitBook: ClientProxy,
 		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly getUserByTokenUseCase: GetUserByTokenUseCase,
 		private readonly getUserByIdUseCase: GetUserByIdUseCase,
@@ -132,7 +137,7 @@ export class UserController {
 
 	@MessagePattern(MQUserMessageType.GET_PROFILE)
 	async getProfile(
-		body: GetProfileMQDTO,
+		@Payload() body: GetProfileMQDTO,
 	): Promise<MicroserviceResponseFormatter<IExternalProfile | null>> {
 		try {
 			const user: UserModel = await this.getUserByIdUseCase.handler(
@@ -154,6 +159,26 @@ export class UserController {
 				err,
 				body,
 			)
+		}
+	}
+
+	@MessagePattern(MQUserMessageType.GET_STATS)
+	async getStats(
+		userId: string,
+	): Promise<
+		MicroserviceResponseFormatter<UserLibraryStats & UserRequestStats>
+	> {
+		try {
+			return await firstValueFrom<
+				MicroserviceResponseFormatter<
+					UserLibraryStats & UserRequestStats
+				>
+			>(this.rabbitBook.send(MQBookMessageType.GET_STATS, userId))
+		} catch (err) {
+			console.log(err)
+			return new MicroserviceResponseFormatter<
+				UserLibraryStats & UserRequestStats
+			>().buildFromException(err, { userId })
 		}
 	}
 }

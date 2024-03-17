@@ -24,17 +24,26 @@ import {
 	CurrentUser,
 	GetProfileMQDTO,
 	HealthCheckStatus,
+	MQBookMessageType,
 	MQMailMessageType,
+	UserLibraryStats,
+	UserRequestStats,
 } from '../../../../../shared-api/src'
+import {
+	userLibraryStats,
+	userRequestStats,
+} from '../../../../../shared-api/test'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
+	firstValueFrom: () => Promise.resolve(),
 }))
 
 describe('UserController', () => {
 	let controller: UserController
 	let loggerMock: Logger
 	let rabbitMailClientMock: ClientProxy
+	let rabbitBookClientMock: ClientProxy
 	let mockedUseCase
 	const currentUser: CurrentUser = {
 		_id: 'userId',
@@ -55,16 +64,20 @@ describe('UserController', () => {
 			send: jest.fn(() => of(null)),
 		} as any
 
+		rabbitBookClientMock = {
+			send: jest.fn(() => of({})),
+		} as any
+
 		mockedUseCase = {
 			handler: jest.fn(),
 		} as any
-		;(of as jest.Mock).mockReturnValue(of(null))
 
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [UserController],
 			providers: [
 				{ provide: WINSTON_MODULE_PROVIDER, useValue: loggerMock },
 				{ provide: 'RabbitMail', useValue: rabbitMailClientMock },
+				{ provide: 'RabbitBook', useValue: rabbitBookClientMock },
 				{
 					provide: CreateAuthLinkUseCase,
 					useValue: mockedUseCase,
@@ -312,6 +325,33 @@ describe('UserController', () => {
 					error,
 					dto,
 				),
+			)
+		})
+	})
+
+	describe('getStats', () => {
+		const userId = 'userId'
+		const dto: UserLibraryStats & UserRequestStats = {
+			...userLibraryStats,
+			...userRequestStats,
+		}
+
+		it('should return the user stats', async () => {
+			const response = new MicroserviceResponseFormatter(
+				true,
+				HttpStatus.OK,
+				dto,
+			)
+
+			jest.spyOn(rabbitBookClientMock, 'send').mockImplementation(() =>
+				of(response),
+			)
+
+			await controller.getStats(userId)
+
+			expect(rabbitBookClientMock.send).toHaveBeenCalledWith(
+				MQBookMessageType.GET_STATS,
+				userId,
 			)
 		})
 	})
