@@ -5,6 +5,7 @@ import {
 	RequestStatus,
 } from '@bookhood/shared'
 import RequestModel from '../models/request.model'
+import { UserRequestStats } from '@bookhood/shared-api'
 
 export interface RequestRepository {
 	getListByStatus(
@@ -33,4 +34,6 @@ export interface RequestRepository {
 	): Promise<RequestModel>
 
 	getRequestInfos(requestId: string): Promise<IRequestInfos | null>
+
+	getStats(userId: string): Promise<UserRequestStats | null>
 }

@@ -11,6 +11,7 @@ import {
 } from '@bookhood/shared'
 import RequestMapper from '../../../application/mappers/request.mapper'
 import { RequestEntity } from './entities/request.entity'
+import { UserRequestStats } from '@bookhood/shared-api'
 
 @Injectable()
 export default class RequestRepositoryMongo implements RequestRepository {
@@ -351,6 +352,71 @@ export default class RequestRepositoryMongo implements RequestRepository {
 				results.length
 					? { ...results[0], _id: results[0]._id.toString() }
 					: null,
+			)
+	}
+
+	async getStats(userId: string): Promise<UserRequestStats | null> {
+		return this.requestModel
+			.aggregate([
+				{
+					$facet: {
+						nbOutgoingRequests: [
+							{
+								$match: {
+									userId: new mongoose.Types.ObjectId(userId),
+								},
+							},
+							{
+								$group: {
+									_id: null,
+									total: {
+										$sum: 1,
+									},
+								},
+							},
+						],
+						nbIncomingRequests: [
+							{
+								$match: {
+									ownerId: new mongoose.Types.ObjectId(
+										userId,
+									),
+								},
+							},
+							{
+								$group: {
+									_id: null,
+									total: {
+										$sum: 1,
+									},
+								},
+							},
+						],
+					},
+				},
+				{
+					$project: {
+						nbOutgoingRequests: {
+							$ifNull: [
+								{
+									$first: '$nbOutgoingRequests.total',
+								},
+								0,
+							],
+						},
+						nbIncomingRequests: {
+							$ifNull: [
+								{
+									$first: '$nbIncomingRequests.total',
+								},
+								0,
+							],
+						},
+					},
+				},
+			])
+			.then((results: UserRequestStats[]) =>
+				results.length ? results[0] : null,
 			)
 	}
 }

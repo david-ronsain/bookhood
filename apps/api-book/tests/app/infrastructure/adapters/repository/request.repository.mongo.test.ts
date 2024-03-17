@@ -4,12 +4,14 @@ import { Document, Model } from 'mongoose'
 import RequestRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/request.repository.mongo'
 import { RequestEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/request.entity'
 import RequestModel from '../../../../../src/app/domain/models/request.model'
-import {
-	IRequestInfos,
-	IRequestList,
-	RequestStatus,
-} from '../../../../../../shared/src'
+import { RequestStatus } from '../../../../../../shared/src'
 import RequestMapper from '../../../../../src/app/application/mappers/request.mapper'
+import {
+	requestEntity,
+	requestInfos,
+	requestsList,
+	userRequestStats,
+} from '../../../../../../shared-api/test/data/books/request'
 
 const mockRequestModel = () => ({
 	countDocuments: jest.fn(),
@@ -55,15 +57,7 @@ describe('RequestRepositoryMongo', () => {
 
 	describe('create', () => {
 		it('should create a new request and return the mapped model', async () => {
-			const request = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				libraryId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				userId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
-				dueDate: new Date().toString(),
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				events: [],
-			} as unknown as RequestEntity
+			const request = requestEntity as unknown as RequestEntity
 
 			const createdRequest = new RequestModel(request)
 
@@ -92,28 +86,8 @@ describe('RequestRepositoryMongo', () => {
 			const status = RequestStatus.PENDING_VALIDATION
 			const startAt = 0
 
-			const mockedRequestList: IRequestList[] = [
-				{
-					total: 1,
-					results: [
-						{
-							_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-							userFirstName: 'first1',
-							ownerFirstName: 'first2',
-							title: 'title',
-							place: 'Some place',
-							startDate: new Date().toString(),
-							endDate: new Date().toString(),
-							createdAt: new Date().toString(),
-							userId,
-							ownerId,
-						},
-					],
-				},
-			]
-
 			jest.spyOn(requestModel, 'aggregate').mockResolvedValue(
-				mockedRequestList,
+				requestsList,
 			)
 
 			const result = await repository.getListByStatus(
@@ -123,7 +97,7 @@ describe('RequestRepositoryMongo', () => {
 				startAt,
 			)
 
-			expect(result).toEqual(mockedRequestList[0])
+			expect(result).toEqual(requestsList[0])
 		})
 	})
 
@@ -146,20 +120,12 @@ describe('RequestRepositoryMongo', () => {
 	})
 
 	describe('patch', () => {
-		it('should update and return the patched request', async () => {
-			const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-			const status = RequestStatus.PENDING_VALIDATION
-			const events = []
+		const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+		const status = RequestStatus.PENDING_VALIDATION
+		const events = []
 
-			const entity = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				libraryId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				userId: 'cccccccccccccccccccccccc',
-				ownerId: 'dddddddddddddddddddddddd',
-				dueDate: new Date().toString(),
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-				events: [],
-			} as unknown as RequestEntity
+		it('should update and return the patched request', async () => {
+			const entity = requestEntity as unknown as RequestEntity
 
 			const model = new RequestModel(entity)
 
@@ -179,10 +145,6 @@ describe('RequestRepositoryMongo', () => {
 		})
 
 		it('should return null if no request is found', async () => {
-			const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-			const status = RequestStatus.PENDING_VALIDATION
-			const events = []
-
 			jest.spyOn(requestModel, 'findByIdAndUpdate').mockResolvedValue(
 				null,
 			)
@@ -194,28 +156,10 @@ describe('RequestRepositoryMongo', () => {
 	})
 
 	describe('getRequestInfos', () => {
-		it('should return request infos', async () => {
-			const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+		const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 
-			const mockedResults: IRequestInfos[] = [
-				{
-					_id: 'request_id',
-					createdAt: new Date().toString(),
-					emitter: {
-						firstName: 'John',
-						lastName: 'Doe',
-						email: 'john@example.com',
-					},
-					owner: {
-						firstName: 'Jane',
-						lastName: 'Doe',
-						email: 'jane@example.com',
-					},
-					book: {
-						title: 'Sample Book',
-					},
-				},
-			]
+		it('should return request infos', async () => {
+			const mockedResults = requestInfos
 
 			jest.spyOn(requestModel, 'aggregate').mockResolvedValue(
 				mockedResults,
@@ -227,11 +171,33 @@ describe('RequestRepositoryMongo', () => {
 		})
 
 		it('should return null if no request is found', async () => {
-			const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-
 			jest.spyOn(requestModel, 'aggregate').mockResolvedValue([])
 
 			const result = await repository.getRequestInfos(requestId)
+
+			expect(result).toBeNull()
+		})
+	})
+
+	describe('getStats', () => {
+		const userId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
+
+		it("should return the user's stats", async () => {
+			const mockedResults = userRequestStats
+
+			jest.spyOn(requestModel, 'aggregate').mockResolvedValue([
+				mockedResults,
+			])
+
+			const result = await repository.getStats(userId)
+
+			expect(result).toMatchObject(mockedResults)
+		})
+
+		it('should return null if no data is found', async () => {
+			jest.spyOn(requestModel, 'aggregate').mockResolvedValue([])
+
+			const result = await repository.getStats(userId)
 
 			expect(result).toBeNull()
 		})
