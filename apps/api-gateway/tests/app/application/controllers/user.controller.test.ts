@@ -15,7 +15,9 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 import { IExternalProfile, IUser, Role } from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 import {
+	currentUser,
 	userLibraryStats,
+	userLight,
 	userRequestStats,
 } from '../../../../../shared-api/test'
 
@@ -27,14 +29,6 @@ jest.mock('@nestjs/microservices', () => ({
 
 describe('Testing UserController', () => {
 	let controller: UserController
-
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -114,17 +108,11 @@ describe('Testing UserController', () => {
 
 	describe('me', () => {
 		it("should return the current user's data", async () => {
-			const user = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			}
-
 			const response = new MicroserviceResponseFormatter<IUser>(
 				true,
 				HttpStatus.OK,
 				{},
-				user,
+				userLight,
 			)
 
 			jest.spyOn(controller['userQueue'], 'send').mockReturnValueOnce(
@@ -138,7 +126,7 @@ describe('Testing UserController', () => {
 				currentUser.token,
 			)
 
-			expect(result).toMatchObject(user)
+			expect(result).toMatchObject(userLight)
 		})
 
 		it('should throw an error if no token is provided', async () => {

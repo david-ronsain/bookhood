@@ -21,7 +21,6 @@ import {
 import { of, Observable } from 'rxjs'
 import GetUserByIdUseCase from '../../../../src/app/application/usecases/getUserById.usecase'
 import {
-	CurrentUser,
 	GetProfileMQDTO,
 	HealthCheckStatus,
 	MQBookMessageType,
@@ -30,7 +29,10 @@ import {
 	UserRequestStats,
 } from '../../../../../shared-api/src'
 import {
+	currentUser,
+	externalProfile,
 	userLibraryStats,
+	userModel,
 	userRequestStats,
 } from '../../../../../shared-api/test'
 
@@ -45,13 +47,6 @@ describe('UserController', () => {
 	let rabbitMailClientMock: ClientProxy
 	let rabbitBookClientMock: ClientProxy
 	let mockedUseCase
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		loggerMock = {
@@ -118,9 +113,6 @@ describe('UserController', () => {
 				email: 'first.last@email.test',
 			}
 
-			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(
-				createUserDTO,
-			)
 			jest.spyOn(mockedUseCase, 'handler').mockImplementationOnce(() =>
 				Promise.resolve(createUserDTO),
 			)
@@ -130,7 +122,6 @@ describe('UserController', () => {
 
 			const result = await controller.createUser(createUserDTO)
 
-			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 			expect(mockedUseCase.handler).toHaveBeenCalledWith(createUserDTO)
 			expect(rabbitMailClientMock.send).toHaveBeenCalledWith(
 				MQMailMessageType.USER_CREATED,
@@ -200,13 +191,8 @@ describe('UserController', () => {
 	describe('getByToken', () => {
 		it('should get user by token', async () => {
 			const token = 'someToken'
-			const user: UserModel = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@email.test',
-			}
 
-			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(user)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(userModel)
 
 			const result = await controller.getByToken(token)
 
@@ -216,7 +202,7 @@ describe('UserController', () => {
 					true,
 					HttpStatus.CREATED,
 					undefined,
-					user,
+					userModel,
 				),
 			)
 		})
@@ -243,13 +229,8 @@ describe('UserController', () => {
 	describe('me', () => {
 		it('should get user by token', async () => {
 			const token = 'someToken'
-			const user: UserModel = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@email.test',
-			}
 
-			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(user)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(userModel)
 
 			const result = await controller.me(token)
 
@@ -259,7 +240,7 @@ describe('UserController', () => {
 					true,
 					HttpStatus.OK,
 					undefined,
-					user,
+					userModel,
 				),
 			)
 		})
@@ -290,13 +271,9 @@ describe('UserController', () => {
 		}
 
 		it('should get user by id', async () => {
-			const user: IExternalProfile = {
-				firstName: 'first',
-				lastName: 'last',
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			}
-
-			jest.spyOn(mockedUseCase, 'handler').mockResolvedValueOnce(user)
+			jest.spyOn(mockedUseCase, 'handler').mockResolvedValueOnce(
+				externalProfile,
+			)
 
 			const result = await controller.getProfile(dto)
 
@@ -306,7 +283,7 @@ describe('UserController', () => {
 					true,
 					HttpStatus.OK,
 					undefined,
-					user,
+					externalProfile,
 				),
 			)
 		})

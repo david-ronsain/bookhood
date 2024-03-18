@@ -6,7 +6,7 @@ import { UserRepository } from '../../domain/ports/user.repository'
 export default class CreateUserUseCase {
 	constructor(
 		@Inject('UserRepository')
-		private readonly userRepository: UserRepository
+		private readonly userRepository: UserRepository,
 	) {}
 
 	async handler(user: ICreateUserDTO): Promise<UserModel> {

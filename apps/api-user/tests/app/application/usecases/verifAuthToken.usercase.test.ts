@@ -1,63 +1,85 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import VerifAuthTokenUseCase from '../../../../src/app/application/usecases/verifyAuthToken.usecase'
-import UserModel from '../../../../src/app/domain/models/user.model'
 import { UserRepository } from '../../../../src/app/domain/ports/user.repository'
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
+import {
+	userModelWithToken,
+	userRepository as userRepo,
+} from '../../../../../shared-api/test'
 
 describe('Testing the VerifAuthTokenUseCase', () => {
 	let usecase: VerifAuthTokenUseCase
 
-	const mock = {
-		getUserByEmail: (email: string): Promise<UserModel | null> =>
-			new Promise<UserModel | null>((resolve) => {
-				if (email === '') resolve(null)
-				else if (email === 'incorrectToken')
-					resolve({
-						email,
-						token: '',
-						tokenExpiration: new Date(Date.now() + 10000),
-					} as UserModel)
-				else if (email === 'expiredToken')
-					resolve({
-						email,
-						token: '|a',
-						tokenExpiration: new Date(Date.now() - 10000),
-					} as UserModel)
-				else
-					resolve({
-						email,
-						token: '|s',
-						tokenExpiration: new Date(Date.now() + 10000),
-					} as UserModel)
-			}),
-		update: (user: UserModel): Promise<UserModel> => Promise.resolve(user),
-	} as unknown as UserRepository
+	let mock: UserRepository
 
 	beforeEach(async () => {
-		jest.resetAllMocks()
+		mock = { ...userRepo } as unknown as UserRepository
+
 		usecase = new VerifAuthTokenUseCase(mock)
+	})
+
+	afterAll(() => {
+		jest.clearAllMocks()
 	})
 
 	describe('Testing the handler method', () => {
 		it('should throw an error if the user does not exist', () => {
+			jest.spyOn(mock, 'getUserByEmail').mockResolvedValueOnce(null)
+
 			expect(usecase.handler('', '')).rejects.toThrow(NotFoundException)
+			expect(mock.getUserByEmail).toHaveBeenCalledWith('')
 		})
 
 		it('should throw an error if the token is incorrect', () => {
-			expect(usecase.handler('incorrectToken', 'a')).rejects.toThrow(
-				ForbiddenException
+			jest.spyOn(mock, 'getUserByEmail').mockResolvedValueOnce({
+				...userModelWithToken,
+			})
+			jest.spyOn(mock, 'update').mockResolvedValueOnce({
+				...userModelWithToken,
+			})
+
+			expect(
+				usecase.handler(userModelWithToken.email, 'a'),
+			).rejects.toThrow(ForbiddenException)
+			expect(mock.getUserByEmail).toHaveBeenCalledWith(
+				userModelWithToken.email,
 			)
 		})
 
 		it('should throw an error if the token has expired', () => {
-			expect(usecase.handler('expiredToken', 'a')).rejects.toThrow(
-				ForbiddenException
+			jest.spyOn(mock, 'getUserByEmail').mockResolvedValue({
+				...userModelWithToken,
+				tokenExpiration: new Date(),
+			})
+			jest.spyOn(mock, 'update').mockResolvedValueOnce({
+				...userModelWithToken,
+			})
+
+			expect(
+				usecase.handler(
+					userModelWithToken.email,
+					userModelWithToken.token.split('|')[1],
+				),
+			).rejects.toThrow(ForbiddenException)
+			expect(mock.getUserByEmail).toHaveBeenCalledWith(
+				userModelWithToken.email,
 			)
 		})
 
 		it('should return validate the token', async () => {
-			expect(usecase.handler('first.last@name.test', 's')).resolves.toBe(
-				true
+			jest.spyOn(mock, 'getUserByEmail').mockResolvedValue({
+				...userModelWithToken,
+			})
+			jest.spyOn(mock, 'update')
+
+			expect(
+				usecase.handler(
+					userModelWithToken.email,
+					userModelWithToken.token.split('|')[1],
+				),
+			).resolves.toBe(true)
+			expect(mock.getUserByEmail).toHaveBeenCalledWith(
+				userModelWithToken.email,
 			)
 		})
 	})

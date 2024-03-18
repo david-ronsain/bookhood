@@ -5,7 +5,7 @@ export interface UserRepository {
 
 	emailExists(email: string, id?: string): Promise<boolean>
 
-	getUserByEmail(email: string): Promise<UserModel>
+	getUserByEmail(email: string): Promise<UserModel | null>
 
 	getUserById(id: string): Promise<UserModel>
 

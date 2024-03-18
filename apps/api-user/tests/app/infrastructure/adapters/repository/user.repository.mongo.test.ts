@@ -1,10 +1,12 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
-import { Document, Model, Query } from 'mongoose'
+import { Document, Model } from 'mongoose'
 import { UserEntity } from '../../../../../src/app/infrastructure/adapters/repository/entities/user.entity'
 import UserRepositoryMongo from '../../../../../src/app/infrastructure/adapters/repository/user.repository.mongo'
 import UserModel from '../../../../../src/app/domain/models/user.model'
 import UserMapper from '../../../../../src/app/application/mappers/user.mapper'
+import { userEntity } from '../../../../../../shared-api/test'
 
 const mockUserModel = () => ({
 	countDocuments: jest.fn(),
@@ -57,17 +59,8 @@ describe('UserRepositoryMongo', () => {
 
 	describe('createUser', () => {
 		it('should create a user', async () => {
-			const user: UserModel = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			}
-			const createdUserEntity: UserEntity = {
-				...user,
-				_id: '123',
-			} as unknown as UserEntity
 			jest.spyOn(userModel, 'create').mockResolvedValueOnce(
-				createdUserEntity as unknown as (Document<
+				userEntity as unknown as (Document<
 					unknown,
 					object,
 					UserEntity
@@ -76,29 +69,31 @@ describe('UserRepositoryMongo', () => {
 					Required<{ _id: string }>)[],
 			)
 
-			const result = await userRepository.createUser(user)
+			const result = await userRepository.createUser(
+				userModel as unknown as UserModel,
+			)
 
 			expect(result).toEqual(
-				UserMapper.fromEntitytoModel(createdUserEntity),
+				UserMapper.fromEntitytoModel(
+					userEntity as unknown as UserEntity,
+				),
 			)
-			expect(userModel.create).toHaveBeenCalledWith(user)
+			expect(userModel.create).toHaveBeenCalledWith(userModel)
 		})
 	})
 
 	describe('getUserByEmail', () => {
 		it('should get a user by email', async () => {
 			const email = 'first.last@name.test'
-			const userEntity: UserEntity = {
-				firstName: 'first',
-				lastName: 'last',
-				email,
-				_id: '123',
-			} as unknown as UserEntity
 			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(userEntity)
 
 			const result = await userRepository.getUserByEmail(email)
 
-			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(result).toEqual(
+				UserMapper.fromEntitytoModel(
+					userEntity as unknown as UserEntity,
+				),
+			)
 			expect(userModel.findOne).toHaveBeenCalledWith({ email })
 		})
 
@@ -116,17 +111,15 @@ describe('UserRepositoryMongo', () => {
 	describe('getUserById', () => {
 		it('should get a user by id', async () => {
 			const id = 'aaaaaaaaaaaa'
-			const userEntity: UserEntity = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-				_id: id,
-			} as unknown as UserEntity
 			jest.spyOn(userModel, 'findById').mockResolvedValueOnce(userEntity)
 
 			const result = await userRepository.getUserById(id)
 
-			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(result).toEqual(
+				UserMapper.fromEntitytoModel(
+					userEntity as unknown as UserEntity,
+				),
+			)
 			expect(userModel.findById).toHaveBeenCalledWith(id)
 		})
 
@@ -144,17 +137,15 @@ describe('UserRepositoryMongo', () => {
 	describe('getUserByToken', () => {
 		it('should get a user by token', async () => {
 			const token = 'someToken'
-			const userEntity: UserEntity = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-				_id: '123',
-			} as unknown as UserEntity
 			jest.spyOn(userModel, 'findOne').mockResolvedValueOnce(userEntity)
 
 			const result = await userRepository.getUserByToken(token)
 
-			expect(result).toEqual(UserMapper.fromEntitytoModel(userEntity))
+			expect(result).toEqual(
+				UserMapper.fromEntitytoModel(
+					userEntity as unknown as UserEntity,
+				),
+			)
 			expect(userModel.findOne).toHaveBeenCalledWith({ token })
 		})
 

@@ -2,52 +2,37 @@
 import { Test } from '@nestjs/testing'
 import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
 import { winstonConfig } from '../../../../../shared/src'
-import UserModel from '../../../../src/app/domain/models/user.model'
 import { HttpStatus, NotFoundException } from '@nestjs/common'
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
 import * as winston from 'winston'
 import { WinstonModule } from 'nest-winston'
 import envConfig from '../../../../src/config/env.config'
-import { Observable } from 'rxjs'
+import { of } from 'rxjs'
 import GetUserByEmailUseCase from '../../../../src/app/application/usecases/getUserByEmail.usecase'
 import CreateAuthLinkUseCase from '../../../../src/app/application/usecases/createAuthLink.usecase'
 import VerifyAuthTokenUseCase from '../../../../src/app/application/usecases/verifyAuthToken.usecase'
 import { HealthCheckStatus } from '../../../../../shared-api/src'
+import { userModel } from '../../../../../shared-api/test'
+import { ClientProxy } from '@nestjs/microservices'
 
-const moduleMocker = new ModuleMocker(global)
+jest.mock('rxjs', () => ({
+	of: jest.fn(),
+	firstValueFrom: () => Promise.resolve(),
+}))
+
 describe('Testing AuthController', () => {
 	let controller: AuthController
-
-	const mockGetUserByEmailUseCase = {
-		handler: (email: string): Promise<UserModel> =>
-			new Promise((resolve) => {
-				if (email === '') {
-					throw new NotFoundException('error')
-				}
-				resolve(
-					new UserModel({
-						firstName: 'first',
-						lastName: 'lastName',
-						email: 'first.last@name.test',
-					}),
-				)
-			}),
-	} as unknown as GetUserByEmailUseCase
-	const mockCreateAuthLinkUseCase = {
-		handler: (user: UserModel): Promise<UserModel> =>
-			new Promise((resolve) => resolve(user)),
-	} as unknown as CreateAuthLinkUseCase
-	const mockVerifyAuthTokenUseCase = {
-		handler: (email: string): Promise<boolean> =>
-			new Promise((resolve) => {
-				if (email === '') {
-					throw new NotFoundException('error')
-				}
-				resolve(true)
-			}),
-	} as unknown as VerifyAuthTokenUseCase
+	let getUserByEmailUseCase: GetUserByEmailUseCase
+	let createAuthLinkUseCase: CreateAuthLinkUseCase
+	let verifyAuthTokenUseCase: VerifyAuthTokenUseCase
+	let rabbitMailClientMock: ClientProxy
 
 	beforeEach(async () => {
+		jest.clearAllMocks()
+
+		rabbitMailClientMock = {
+			send: jest.fn(() => of(null)),
+		} as unknown as ClientProxy
+
 		const module = await Test.createTestingModule({
 			imports: [
 				WinstonModule.forRoot(
@@ -61,31 +46,38 @@ describe('Testing AuthController', () => {
 			providers: [
 				{
 					provide: 'RabbitMail',
+					useValue: rabbitMailClientMock,
+				},
+				{
+					provide: GetUserByEmailUseCase,
 					useValue: {
-						send: () => new Observable(),
+						handler: jest.fn(),
+					},
+				},
+				{
+					provide: CreateAuthLinkUseCase,
+					useValue: {
+						handler: jest.fn(),
+					},
+				},
+				{
+					provide: VerifyAuthTokenUseCase,
+					useValue: {
+						handler: jest.fn(),
 					},
 				},
 			],
-		})
-			.useMocker((token) => {
-				if (token === GetUserByEmailUseCase) {
-					return mockGetUserByEmailUseCase
-				} else if (token === CreateAuthLinkUseCase) {
-					return mockCreateAuthLinkUseCase
-				} else if (token === VerifyAuthTokenUseCase) {
-					return mockVerifyAuthTokenUseCase
-				}
-				if (typeof token === 'function') {
-					const mockMetadata = moduleMocker.getMetadata(
-						token,
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					) as MockFunctionMetadata<any, any>
-					const Mock = moduleMocker.generateFromMetadata(mockMetadata)
-					return new Mock()
-				}
-			})
-			.compile()
+		}).compile()
 		controller = module.get<AuthController>(AuthController)
+		getUserByEmailUseCase = module.get<GetUserByEmailUseCase>(
+			GetUserByEmailUseCase,
+		)
+		createAuthLinkUseCase = module.get<CreateAuthLinkUseCase>(
+			CreateAuthLinkUseCase,
+		)
+		verifyAuthTokenUseCase = module.get<VerifyAuthTokenUseCase>(
+			VerifyAuthTokenUseCase,
+		)
 	})
 
 	describe('The healthcheck', () => {
@@ -96,15 +88,35 @@ describe('Testing AuthController', () => {
 
 	describe('sendLink method', () => {
 		it('should send the signin link', async () => {
-			expect(
-				controller.sendLink({ email: 'first.last@name.test' }),
-			).resolves.toMatchObject({
+			jest.spyOn(getUserByEmailUseCase, 'handler').mockResolvedValue(
+				userModel,
+			)
+
+			jest.spyOn(rabbitMailClientMock, 'send').mockReturnValue({
+				subscribe: jest.fn(() => of({})),
+			} as any)
+
+			const result = await controller.sendLink({
+				email: 'first.last@name.test',
+			})
+
+			expect(getUserByEmailUseCase.handler).toHaveBeenCalledWith(
+				'first.last@name.test',
+			)
+			expect(rabbitMailClientMock.send).toHaveBeenCalled()
+
+			expect(result).toMatchObject({
 				success: true,
 				code: HttpStatus.OK,
 			})
 		})
 
 		it('should fail to send the link', async () => {
+			jest.spyOn(getUserByEmailUseCase, 'handler').mockImplementationOnce(
+				() => {
+					throw new NotFoundException()
+				},
+			)
 			expect(controller.sendLink({ email: '' })).resolves.toMatchObject({
 				success: false,
 			})
@@ -113,6 +125,10 @@ describe('Testing AuthController', () => {
 
 	describe('signin method', () => {
 		it('should validate the authentication', async () => {
+			jest.spyOn(verifyAuthTokenUseCase, 'handler').mockResolvedValue(
+				true,
+			)
+
 			expect(
 				controller.signin({ token: 'test|test' }),
 			).resolves.toMatchObject({ success: true })
@@ -125,6 +141,12 @@ describe('Testing AuthController', () => {
 		})
 
 		it('should reject the token because the email does not exist', async () => {
+			jest.spyOn(verifyAuthTokenUseCase, 'handler').mockImplementation(
+				() => {
+					throw new Error()
+				},
+			)
+
 			expect(controller.signin({ token: '|' })).resolves.toMatchObject({
 				success: false,
 			})

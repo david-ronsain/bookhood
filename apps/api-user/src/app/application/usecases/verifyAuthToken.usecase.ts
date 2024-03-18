@@ -4,14 +4,14 @@ import { UserRepository } from '../../domain/ports/user.repository'
 export default class VerifyAuthTokenUseCase {
 	constructor(
 		@Inject('UserRepository')
-		private readonly userRepository: UserRepository
+		private readonly userRepository: UserRepository,
 	) {}
 
 	async handler(email: string, token: string): Promise<boolean> {
 		const user = await this.userRepository.getUserByEmail(email)
 		if (!user) {
 			throw new NotFoundException(
-				"We don't have an account linked to this email"
+				"We don't have an account linked to this email",
 			)
 		}
 
@@ -19,16 +19,16 @@ export default class VerifyAuthTokenUseCase {
 		if (!userToken || userToken !== token) {
 			user.token = null
 			user.tokenExpiration = null
-			this.userRepository.update(user)
+			await this.userRepository.update(user)
 			throw new ForbiddenException(
-				'Your signin link is incorrect, please signin again'
+				'Your signin link is incorrect, please signin again',
 			)
 		} else if (user.tokenExpiration < new Date()) {
 			user.token = null
 			user.tokenExpiration = null
-			this.userRepository.update(user)
+			await this.userRepository.update(user)
 			throw new ForbiddenException(
-				'Your session has expired, please signin again'
+				'Your session has expired, please signin again',
 			)
 		}
 
