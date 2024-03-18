@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { Role } from '../../../../shared/src'
+import { IUser, Role } from '../../../../shared/src'
 import { CurrentUser } from '../../../src'
 
 export const currentUser: CurrentUser = {
@@ -8,4 +8,11 @@ export const currentUser: CurrentUser = {
 	email: 'first.last@name.test',
 	roles: [Role.ADMIN],
 	firstName: 'first',
+}
+
+export const userLight: IUser = {
+	firstName: 'first',
+	lastName: 'last',
+	email: 'first.last@name.test',
+	token: 'token',
 }

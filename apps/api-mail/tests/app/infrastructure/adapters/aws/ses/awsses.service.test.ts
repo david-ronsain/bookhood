@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Test, TestingModule } from '@nestjs/testing'
 import { SESManagerService } from '../../../../../../src/app/infrastructure/adapters/aws/ses/awsses.service'
@@ -10,6 +11,8 @@ import {
 	BookRequestMailDTO,
 	IRequestInfos,
 } from '../../../../../../../shared/src'
+import { requestInfos, userLight } from '../../../../../../../shared-api/test'
+import { bookRequestMailDTO } from '../../../../../../../shared-api/test/data/mail/mail'
 
 const mockI18nService = {
 	t: jest.fn(),
@@ -67,14 +70,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mockUser = {
-				firstName: 'first',
-				lastName: '',
-				email: 'first.last@name.test',
-				token: 'mytoken',
-			}
-
-			expect(service.userRegistered(mockUser)).rejects.toThrow()
+			expect(service.userRegistered(userLight)).rejects.toThrow()
 		})
 
 		it('should send a user registration email', async () => {
@@ -84,14 +80,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mockUser = {
-				firstName: 'first',
-				lastName: '',
-				email: 'first.last@name.test',
-				token: 'mytoken',
-			}
-
-			await service.userRegistered(mockUser)
+			await service.userRegistered(userLight)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -106,14 +95,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mockUser = {
-				firstName: 'first',
-				lastName: '',
-				email: 'first.last@name.test',
-				token: 'mytoken',
-			}
-
-			expect(service.authSendLink(mockUser)).rejects.toThrow()
+			expect(service.authSendLink(userLight)).rejects.toThrow()
 		})
 
 		it('should send a signin email', async () => {
@@ -123,14 +105,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mockUser = {
-				firstName: 'first',
-				lastName: '',
-				email: 'first.last@name.test',
-				token: 'mytoken',
-			}
-
-			await service.authSendLink(mockUser)
+			await service.authSendLink(userLight)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -158,15 +133,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mock: BookRequestMailDTO = {
-				book: 'title',
-				emitterFirstName: 'emitter',
-				recipientFirstName: 'recipient',
-				email: 'first.last@name.test',
-				requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			}
-
-			expect(service.requestCreated(mock)).rejects.toThrow()
+			expect(service.requestCreated(bookRequestMailDTO)).rejects.toThrow()
 		})
 
 		it('should send a request created email', async () => {
@@ -176,15 +143,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mockUser = {
-				book: 'title',
-				emitterFirstName: 'emitter',
-				recipientFirstName: 'recipient',
-				email: 'first.last@name.test',
-				requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			}
-
-			await service.requestCreated(mockUser)
+			await service.requestCreated(bookRequestMailDTO)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -199,25 +158,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			expect(service.requestAccepted(mock)).rejects.toThrow()
+			expect(service.requestAccepted(requestInfos)).rejects.toThrow()
 		})
 
 		it('should send a request accepted email', async () => {
@@ -227,25 +168,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			await service.requestAccepted(mock)
+			await service.requestAccepted(requestInfos)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -260,25 +183,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			expect(service.requestRefused(mock)).rejects.toThrow()
+			expect(service.requestRefused(requestInfos)).rejects.toThrow()
 		})
 
 		it('should send a request refused email', async () => {
@@ -288,25 +193,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			await service.requestRefused(mock)
+			await service.requestRefused(requestInfos)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -321,25 +208,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			expect(service.requestNeverReceived(mock)).rejects.toThrow()
+			expect(service.requestNeverReceived(requestInfos)).rejects.toThrow()
 		})
 
 		it('should send a request never received email', async () => {
@@ -349,25 +218,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			await service.requestNeverReceived(mock)
+			await service.requestNeverReceived(requestInfos)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -382,25 +233,9 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			expect(service.requestReturnedWithIssue(mock)).rejects.toThrow()
+			expect(
+				service.requestReturnedWithIssue(requestInfos),
+			).rejects.toThrow()
 		})
 
 		it('should send a request returned with issue email', async () => {
@@ -410,25 +245,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			const mock: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-
-			await service.requestReturnedWithIssue(mock)
+			await service.requestReturnedWithIssue(requestInfos)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()

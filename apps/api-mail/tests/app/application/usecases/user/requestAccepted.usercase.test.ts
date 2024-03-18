@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import { IMailer } from '../../../../../src/app/domain/ports/mailer.interface'
-import { IRequestInfos, IUser } from '../../../../../../shared/src'
 import RequestAcceptedUseCase from '../../../../../src/app/application/usecases/request/requestAccepted.usecase'
+import { requestInfos } from '../../../../../../shared-api/test'
 
 describe('Testing the RequestAcceptedUseCase', () => {
 	let usecase: RequestAcceptedUseCase
@@ -28,25 +27,8 @@ describe('Testing the RequestAcceptedUseCase', () => {
 
 	describe('Testing the handler method', () => {
 		it('should call the mailer', () => {
-			const user: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-			usecase.handler(user)
-			expect(mailer.requestAccepted).toHaveBeenCalledWith(user)
+			usecase.handler(requestInfos)
+			expect(mailer.requestAccepted).toHaveBeenCalledWith(requestInfos)
 		})
 	})
 })

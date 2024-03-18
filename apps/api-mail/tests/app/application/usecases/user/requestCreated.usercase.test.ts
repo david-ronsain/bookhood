@@ -2,8 +2,8 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import { IMailer } from '../../../../../src/app/domain/ports/mailer.interface'
-import { BookRequestMailDTO } from '../../../../../../shared/src'
 import RequestCreatedUseCase from '../../../../../src/app/application/usecases/request/requestCreated.usecase'
+import { bookRequestMailDTO } from '../../../../../../shared-api/test/data/mail/mail'
 
 describe('Testing the RequestCreatedUseCase', () => {
 	let usecase: RequestCreatedUseCase
@@ -28,15 +28,10 @@ describe('Testing the RequestCreatedUseCase', () => {
 
 	describe('Testing the handler method', () => {
 		it('should call the mailer', () => {
-			const infos: BookRequestMailDTO = {
-				book: 'title',
-				emitterFirstName: 'emitter',
-				recipientFirstName: 'recipient',
-				email: 'first.last@name.test',
-				requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			}
-			usecase.handler(infos)
-			expect(mailer.requestCreated).toHaveBeenCalledWith(infos)
+			usecase.handler(bookRequestMailDTO)
+			expect(mailer.requestCreated).toHaveBeenCalledWith(
+				bookRequestMailDTO,
+			)
 		})
 	})
 })

@@ -3,10 +3,9 @@
 import { Test } from '@nestjs/testing'
 import AuthSendLinkUseCase from '../../../../../src/app/application/usecases/user/authSendLink.usecase'
 import { IMailer } from '../../../../../src/app/domain/ports/mailer.interface'
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
 import { IUser } from '../../../../../../shared/src'
+import { userLight } from '../../../../../../shared-api/test'
 
-const moduleMocker = new ModuleMocker(global)
 describe('Testing the AuthSendLinkUseCase', () => {
 	let usecase: AuthSendLinkUseCase
 	let mailer: IMailer
@@ -30,13 +29,8 @@ describe('Testing the AuthSendLinkUseCase', () => {
 
 	describe('Testing the handler method', () => {
 		it('should call the mailer', () => {
-			const user: IUser = {
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			}
-			usecase.handler(user)
-			expect(mailer.authSendLink).toHaveBeenCalledWith(user)
+			usecase.handler(userLight)
+			expect(mailer.authSendLink).toHaveBeenCalledWith(userLight)
 		})
 	})
 })

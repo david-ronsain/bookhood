@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import UserRegisteredUseCase from '../../../../../src/app/application/usecases/user/userRegistered.usecase'
 import { IMailer } from '../../../../../src/app/domain/ports/mailer.interface'
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock'
+import { userLight } from '../../../../../../shared-api/test'
 
 const moduleMocker = new ModuleMocker(global)
 describe('Testing the UserRegisteredUseCase', () => {
@@ -24,7 +24,7 @@ describe('Testing the UserRegisteredUseCase', () => {
 				}
 				if (typeof token === 'function') {
 					const mockMetadata = moduleMocker.getMetadata(
-						token
+						token,
 					) as MockFunctionMetadata<any, any>
 					const Mock = moduleMocker.generateFromMetadata(mockMetadata)
 					return new Mock()
@@ -38,11 +38,7 @@ describe('Testing the UserRegisteredUseCase', () => {
 	describe('Testing the handler method', () => {
 		it('should call the mailer', () => {
 			const spy = jest.spyOn(mailer, 'userRegistered')
-			usecase.handler({
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@name.test',
-			})
+			usecase.handler(userLight)
 			expect(spy).toHaveBeenCalledTimes(1)
 		})
 	})

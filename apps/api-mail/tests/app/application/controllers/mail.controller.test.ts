@@ -1,10 +1,10 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
 import { MailController } from '../../../../src/app/application/controllers/mail.controller'
 import { IUser } from '@bookhood/shared'
 import UserRegisteredUseCase from '../../../../src/app/application/usecases/user/userRegistered.usecase'
 import AuthSendLinkUseCase from '../../../../src/app/application/usecases/user/authSendLink.usecase'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
-import envConfig from '../../../../src/config/env.config'
 import RequestCreatedUseCase from '../../../../src/app/application/usecases/request/requestCreated.usecase'
 import RequestAcceptedUseCase from '../../../../src/app/application/usecases/request/requestAccepted.usecase'
 import RequestRefusedUseCase from '../../../../src/app/application/usecases/request/requestRefused.usecase'
@@ -12,6 +12,8 @@ import RequestNeverReceivedUseCase from '../../../../src/app/application/usecase
 import RequestReturnedWithIssueUseCase from '../../../../src/app/application/usecases/request/requestReturnedWithIssue.usecase'
 import { BookRequestMailDTO, IRequestInfos } from '../../../../../shared/src'
 import { HealthCheckStatus } from '../../../../../shared-api/src'
+import { requestInfos, userLight } from '../../../../../shared-api/test'
+import { bookRequestMailDTO } from '../../../../../shared-api/test/data/mail/mail'
 
 describe('MailController', () => {
 	let controller: MailController
@@ -77,136 +79,44 @@ describe('MailController', () => {
 	})
 
 	it('should handle mail-user-registered', () => {
-		const mockUser: IUser = {
-			firstName: 'first',
-			lastName: 'last',
-			email: 'first.last@name.test',
-		}
+		controller.userRegistered(userLight)
 
-		controller.userRegistered(mockUser)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockUser)
+		expect(mock.handler).toHaveBeenCalledWith(userLight)
 	})
 
 	it('should handle mail-auth-send-link', () => {
-		const mockUser: IUser = {
-			firstName: 'first',
-			lastName: 'last',
-			email: 'first.last@name.test',
-		}
+		controller.authSendLink(userLight)
 
-		controller.authSendLink(mockUser)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockUser)
+		expect(mock.handler).toHaveBeenCalledWith(userLight)
 	})
 
 	it('should handle mail-request-created', () => {
-		const mockDTO: BookRequestMailDTO = {
-			book: 'title',
-			emitterFirstName: 'emitter',
-			recipientFirstName: 'recipient',
-			email: 'first.last@name.test',
-			requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-		}
+		controller.requestCreated(bookRequestMailDTO)
 
-		controller.requestCreated(mockDTO)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockDTO)
+		expect(mock.handler).toHaveBeenCalledWith(bookRequestMailDTO)
 	})
 
 	it('should handle mail-request-accepted', () => {
-		const mockDTO: IRequestInfos = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			createdAt: new Date().toString(),
-			owner: {
-				firstName: '',
-				lastName: '',
-				email: 'email@fake.test',
-			},
-			emitter: {
-				firstName: '',
-				lastName: '',
-				email: 'email2@fake.test',
-			},
-			book: {
-				title: 'title',
-			},
-		}
+		controller.requestAccepted(requestInfos)
 
-		controller.requestAccepted(mockDTO)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockDTO)
+		expect(mock.handler).toHaveBeenCalledWith(requestInfos)
 	})
 
 	it('should handle mail-request-refused', () => {
-		const mockDTO: IRequestInfos = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			createdAt: new Date().toString(),
-			owner: {
-				firstName: '',
-				lastName: '',
-				email: 'email@fake.test',
-			},
-			emitter: {
-				firstName: '',
-				lastName: '',
-				email: 'email2@fake.test',
-			},
-			book: {
-				title: 'title',
-			},
-		}
+		controller.requestRefused(requestInfos)
 
-		controller.requestRefused(mockDTO)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockDTO)
+		expect(mock.handler).toHaveBeenCalledWith(requestInfos)
 	})
 
 	it('should handle mail-request-never-received', () => {
-		const mockDTO: IRequestInfos = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			createdAt: new Date().toString(),
-			owner: {
-				firstName: '',
-				lastName: '',
-				email: 'email@fake.test',
-			},
-			emitter: {
-				firstName: '',
-				lastName: '',
-				email: 'email2@fake.test',
-			},
-			book: {
-				title: 'title',
-			},
-		}
+		controller.requestNeverReceived(requestInfos)
 
-		controller.requestNeverReceived(mockDTO)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockDTO)
+		expect(mock.handler).toHaveBeenCalledWith(requestInfos)
 	})
 
 	it('should handle mail-request-returned-with-issue', () => {
-		const mockDTO: IRequestInfos = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			createdAt: new Date().toString(),
-			owner: {
-				firstName: '',
-				lastName: '',
-				email: 'email@fake.test',
-			},
-			emitter: {
-				firstName: '',
-				lastName: '',
-				email: 'email2@fake.test',
-			},
-			book: {
-				title: 'title',
-			},
-		}
+		controller.requestReturnedWithIssue(requestInfos)
 
-		controller.requestReturnedWithIssue(mockDTO)
-
-		expect(mock.handler).toHaveBeenCalledWith(mockDTO)
+		expect(mock.handler).toHaveBeenCalledWith(requestInfos)
 	})
 })

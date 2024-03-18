@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import { IMailer } from '../../../../../src/app/domain/ports/mailer.interface'
-import { IRequestInfos } from '../../../../../../shared/src'
 import RequestReturnedWithIssueUseCase from '../../../../../src/app/application/usecases/request/requestReturnedWithIssue.usecase'
+import { requestInfos } from '../../../../../../shared-api/test'
 
 describe('Testing the RequestReturnedWithIssueUseCase', () => {
 	let usecase: RequestReturnedWithIssueUseCase
@@ -30,25 +29,10 @@ describe('Testing the RequestReturnedWithIssueUseCase', () => {
 
 	describe('Testing the handler method', () => {
 		it('should call the mailer', () => {
-			const user: IRequestInfos = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				createdAt: new Date().toString(),
-				owner: {
-					firstName: '',
-					lastName: '',
-					email: 'email@fake.test',
-				},
-				emitter: {
-					firstName: '',
-					lastName: '',
-					email: 'email2@fake.test',
-				},
-				book: {
-					title: 'title',
-				},
-			}
-			usecase.handler(user)
-			expect(mailer.requestReturnedWithIssue).toHaveBeenCalledWith(user)
+			usecase.handler(requestInfos)
+			expect(mailer.requestReturnedWithIssue).toHaveBeenCalledWith(
+				requestInfos,
+			)
 		})
 	})
 })
