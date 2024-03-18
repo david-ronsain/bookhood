@@ -2,35 +2,25 @@
 import GetUserBooksUseCase from '../../../../../src/app/application/usecases/book/getUserBooks.usecase'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
 import { ILibraryFull } from '../../../../../../shared/src/interfaces/library.interface'
+import {
+	libraryRepository as libRepo,
+	librariesFull,
+} from '../../../../../../shared-api/test'
 
 describe('GetUserBookUseCase', () => {
 	let getUserBooksUseCase: GetUserBooksUseCase
 	let libraryRepository: LibraryRepository
 
 	beforeEach(() => {
-		libraryRepository = {
-			getByUser: jest.fn(),
-		} as unknown as LibraryRepository
+		jest.clearAllMocks()
+		libraryRepository = libRepo as unknown as LibraryRepository
+
 		getUserBooksUseCase = new GetUserBooksUseCase(libraryRepository)
 	})
 
 	describe('handler', () => {
 		it('should return the books when it exists', async () => {
-			const book: ILibraryFull[] = [
-				{
-					_id: '123',
-					book: {
-						title: 'Title',
-						authors: ['author'],
-						description: 'desc',
-						isbn: [
-							{ type: 'ISBN_13', identifier: '0123456789123' },
-						],
-						language: 'fr',
-					},
-					location: { type: 'Point', coordinates: [0, 0] },
-				},
-			]
+			const book: ILibraryFull[] = [...librariesFull]
 
 			jest.spyOn(libraryRepository, 'getByUser').mockResolvedValueOnce(
 				book,

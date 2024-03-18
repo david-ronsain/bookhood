@@ -1,7 +1,10 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import GetUserLibraryStats from '../../../../../src/app/application/usecases/library/getUserLibraryStats.usecase'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
-import { userLibraryStats } from '../../../../../../shared-api/test'
+import {
+	userLibraryStats,
+	libraryRepository as libRepo,
+} from '../../../../../../shared-api/test'
 
 describe('GetUserLibraryStatsUseCase', () => {
 	let getUserLibraryStats: GetUserLibraryStats
@@ -9,7 +12,7 @@ describe('GetUserLibraryStatsUseCase', () => {
 
 	beforeEach(() => {
 		libraryRepository = {
-			getStats: jest.fn(),
+			...libRepo,
 		} as unknown as LibraryRepository
 
 		getUserLibraryStats = new GetUserLibraryStats(libraryRepository)

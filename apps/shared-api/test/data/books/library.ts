@@ -56,21 +56,6 @@ export const libraryEntity = {
 	place: 'Some place',
 }
 
-export const booksList: IBooksList = {
-	total: 1,
-	results: [
-		{
-			_id: 'aaaaaaaaaaaa',
-			authors: ['author'],
-			description: 'description',
-			place: 'place',
-			status: LibraryStatus.TO_LEND,
-			title: 'title',
-			categories: ['category'],
-		},
-	],
-}
-
 export const librariesFull: ILibraryFull[] = [
 	{
 		_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
@@ -115,8 +100,32 @@ export const librariesFull: ILibraryFull[] = [
 ]
 
 export const libraryModel = {
-	_id: new mongoose.Types.ObjectId(),
+	_id: new mongoose.Types.ObjectId().toString(),
 	userId: new mongoose.Types.ObjectId(),
 	bookId: new mongoose.Types.ObjectId(),
 	location: { type: 'Point', coordinates: [0, 0] },
+	status: LibraryStatus.TO_LEND,
+	place: 'Some place',
+}
+
+export const libraryRepositoryMock = {
+	getByUserIdAndBookId: jest.fn(),
+	create: jest.fn(),
+	getByUser: jest.fn(),
+	getById: jest.fn(),
+	getFullById: jest.fn(),
+	list: jest.fn(),
+	update: jest.fn(),
+	getStats: jest.fn(),
+}
+
+export const libraryRepository = {
+	getFullById: jest.fn(),
+	getByUser: jest.fn(),
+	getStats: jest.fn(),
+	list: jest.fn(),
+	getByUserIdAndBookId: jest.fn(),
+	create: jest.fn(),
+	getById: jest.fn(),
+	update: jest.fn(),
 }

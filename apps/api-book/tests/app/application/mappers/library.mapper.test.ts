@@ -1,17 +1,16 @@
-import mongoose from 'mongoose'
+/* eslint-disable @nx/enforce-module-boundaries */
 import LibraryMapper from '../../../../src/app/application/mappers/library.mapper'
 import LibraryModel from '../../../../src/app/domain/models/library.model'
 import { LibraryEntity } from '../../../../src/app/infrastructure/adapters/repository/entities/library.entity'
-import { LibraryStatus } from '../../../../../shared/src'
+import {
+	libraryEntity as lib,
+	libraryModel,
+} from '../../../../../shared-api/test'
 
 describe('LibraryMapper', () => {
 	it('should map LibraryEntity to LibraryModel', () => {
 		// Mock data for testing
-		const libraryEntity = {
-			_id: '123',
-			userId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			bookId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-		} as unknown as LibraryEntity
+		const libraryEntity = lib as unknown as LibraryEntity
 
 		const libraryModel = LibraryMapper.fromEntitytoModel(libraryEntity)
 
@@ -21,20 +20,12 @@ describe('LibraryMapper', () => {
 	})
 
 	it('should convert LibraryModel object IDs to strings', () => {
-		const libraryModel: LibraryModel = {
-			_id: '123',
-			userId: new mongoose.Types.ObjectId('aaaaaaaaaaaaaaaaaaaaaaaa'),
-			bookId: new mongoose.Types.ObjectId('bbbbbbbbbbbbbbbbbbbbbbbb'),
-			location: { type: 'Point', coordinates: [0, 0] },
-			status: LibraryStatus.TO_LEND,
-			place: 'Some place',
-		}
+		const libraryWithStringIds = LibraryMapper.modelObjectIdToString(
+			libraryModel as unknown as LibraryModel,
+		)
 
-		const libraryWithStringIds =
-			LibraryMapper.modelObjectIdToString(libraryModel)
-
-		expect(libraryWithStringIds._id).toBe('123')
-		expect(libraryWithStringIds.userId).toBe('aaaaaaaaaaaaaaaaaaaaaaaa')
-		expect(libraryWithStringIds.bookId).toBe('bbbbbbbbbbbbbbbbbbbbbbbb')
+		expect(libraryWithStringIds._id).toBe(libraryModel._id.toString())
+		expect(libraryWithStringIds.userId).toBe(libraryModel.userId.toString())
+		expect(libraryWithStringIds.bookId).toBe(libraryModel.bookId.toString())
 	})
 })

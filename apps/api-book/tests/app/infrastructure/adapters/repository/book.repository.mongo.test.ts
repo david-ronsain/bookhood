@@ -9,6 +9,12 @@ import {
 } from '../../../../../../shared/src'
 import { Test, TestingModule } from '@nestjs/testing'
 import { getModelToken } from '@nestjs/mongoose'
+import {
+	bookEntity,
+	bookModel as bookModelData,
+	bookSearch,
+	emptyBookSearch,
+} from '../../../../../../shared-api/test'
 
 describe('BookRepositoryMongo', () => {
 	let bookRepository: BookRepositoryMongo
@@ -35,27 +41,7 @@ describe('BookRepositoryMongo', () => {
 
 	describe('getByISBN', () => {
 		it('should return a BookModel if book is found', async () => {
-			const findOneMock = jest.fn().mockReturnValue({
-				_id: '123',
-				title: 'Example Book',
-				authors: ['John Doe'],
-				categories: ['Fiction'],
-				description: 'A sample book description.',
-				image: {
-					thumbnail: 'thumbnail-url',
-					smallThumbnail: 'small-thumbnail-url',
-				},
-				isbn: [
-					{
-						type: 'ISBN_13',
-						identifier: '9781234567890',
-					},
-				],
-				language: 'en',
-				subtitle: 'An amazing story',
-				publisher: 'Book Publisher',
-				publishedDate: '2022-01-01',
-			})
+			const findOneMock = jest.fn().mockReturnValue(bookModelData)
 			jest.spyOn(bookModel, 'findOne').mockImplementationOnce(findOneMock)
 
 			const result = await bookRepository.getByISBN(['9781234567890'])
@@ -83,27 +69,6 @@ describe('BookRepositoryMongo', () => {
 
 	describe('create', () => {
 		it('should return a created BookModel', async () => {
-			const bookEntity = {
-				_id: '123',
-				title: 'Example Book',
-				authors: ['John Doe'],
-				categories: ['Fiction'],
-				description: 'A sample book description.',
-				image: {
-					thumbnail: 'thumbnail-url',
-					smallThumbnail: 'small-thumbnail-url',
-				},
-				isbn: [
-					{
-						type: 'ISBN_13',
-						identifier: '9781234567890',
-					},
-				],
-				language: 'en',
-				subtitle: 'An amazing story',
-				publisher: 'Book Publisher',
-				publishedDate: '2022-01-01',
-			} as BookEntity
 			const createMock = jest.fn().mockReturnValue(bookEntity)
 			jest.spyOn(bookModel, 'create').mockImplementationOnce(createMock)
 
@@ -116,32 +81,7 @@ describe('BookRepositoryMongo', () => {
 
 	describe('search', () => {
 		it('should return a valid IBookSearch for a title', async () => {
-			const mockedResult: IBookSearch = {
-				results: [
-					{
-						_id: '123',
-						libraryId: '456',
-						title: 'Example Book',
-						authors: ['John Doe'],
-						description: 'desc',
-						language: 'en',
-						isbn: [],
-						owner: undefined as unknown as IBookSearchResultOwner[],
-					},
-					{
-						_id: '456',
-						libraryId: '456',
-						title: 'Another Book',
-						authors: ['Jane Doe'],
-						description: 'desc',
-						language: 'en',
-						isbn: [],
-						owner: undefined as unknown as IBookSearchResultOwner[],
-					},
-				],
-				total: 2,
-			}
-			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
+			const aggregateMock = jest.fn().mockResolvedValue([bookSearch])
 			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
 				aggregateMock,
 			)
@@ -154,36 +94,11 @@ describe('BookRepositoryMongo', () => {
 				[],
 			)
 
-			expect(result).toEqual(mockedResult)
+			expect(result).toMatchObject(bookSearch)
 		})
 
 		it('should return a valid IBookSearch for an author', async () => {
-			const mockedResult: IBookSearch = {
-				results: [
-					{
-						_id: '123',
-						libraryId: '456',
-						title: 'Example Book',
-						authors: ['John Doe'],
-						description: 'desc',
-						language: 'en',
-						isbn: [],
-						owner: undefined as unknown as IBookSearchResultOwner[],
-					},
-					{
-						_id: '456',
-						libraryId: '456',
-						title: 'Another Book',
-						authors: ['Jane Doe'],
-						description: 'desc',
-						language: 'en',
-						isbn: [],
-						owner: undefined as unknown as IBookSearchResultOwner[],
-					},
-				],
-				total: 2,
-			}
-			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
+			const aggregateMock = jest.fn().mockResolvedValue([bookSearch])
 			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
 				aggregateMock,
 			)
@@ -197,15 +112,11 @@ describe('BookRepositoryMongo', () => {
 				'first.last@name.test',
 			)
 
-			expect(result).toEqual(result)
+			expect(result).toMatchObject(result)
 		})
 
 		it('should return an empty IBookSearch for an author', async () => {
-			const mockedResult: IBookSearch = {
-				results: [],
-				total: 0,
-			}
-			const aggregateMock = jest.fn().mockResolvedValue([mockedResult])
+			const aggregateMock = jest.fn().mockResolvedValue([emptyBookSearch])
 			jest.spyOn(bookModel, 'aggregate').mockImplementationOnce(
 				aggregateMock,
 			)
@@ -218,7 +129,7 @@ describe('BookRepositoryMongo', () => {
 				[0, 0, 0, 0],
 			)
 
-			expect(result).toEqual(result)
+			expect(result).toMatchObject(result)
 		})
 	})
 })

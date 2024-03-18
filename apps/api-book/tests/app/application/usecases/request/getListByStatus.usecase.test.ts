@@ -1,16 +1,19 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import GetListByStatusUseCase from '../../../../../src/app/application/usecases/request/getListByStatus.usecase'
 import { RequestRepository } from '../../../../../src/app/domain/ports/request.repository'
-import { IRequestList, RequestStatus } from '../../../../../../shared/src/'
+import { RequestStatus } from '../../../../../../shared/src/'
+import {
+	emptyRequestList,
+	requestRepository as reqRepo,
+} from '../../../../../../shared-api/test'
 
 describe('GetListByStatusUseCase', () => {
 	let getListByStatusUseCase: GetListByStatusUseCase
 	let requestRepository: RequestRepository
 
 	beforeEach(() => {
-		requestRepository = {
-			getListByStatus: jest.fn(),
-		} as unknown as RequestRepository
+		jest.clearAllMocks()
+		requestRepository = { ...reqRepo } as unknown as RequestRepository
 
 		getListByStatusUseCase = new GetListByStatusUseCase(requestRepository)
 	})
@@ -21,14 +24,11 @@ describe('GetListByStatusUseCase', () => {
 			const ownerId = 'ownerId'
 			const status = RequestStatus.ACCEPTED_PENDING_DELIVERY
 			const startAt = 0
-			const requestList: IRequestList = {
-				results: [],
-				total: 0,
-			}
+
 			jest.spyOn(
 				requestRepository,
 				'getListByStatus',
-			).mockResolvedValueOnce(requestList)
+			).mockResolvedValueOnce(emptyRequestList)
 
 			const result = await getListByStatusUseCase.handler(
 				userId,
@@ -37,7 +37,7 @@ describe('GetListByStatusUseCase', () => {
 				startAt,
 			)
 
-			expect(result).toEqual(requestList)
+			expect(result).toMatchObject(emptyRequestList)
 			expect(requestRepository.getListByStatus).toHaveBeenCalledWith(
 				userId,
 				ownerId,

@@ -2,15 +2,14 @@
 import GetUserRequestStatsUseCase from '../../../../../src/app/application/usecases/request/getUserRequestStats.usecase'
 import { RequestRepository } from '../../../../../src/app/domain/ports/request.repository'
 import { userRequestStats } from '../../../../../../shared-api/test/data/books/request'
+import { requestRepository as reqRepo } from '../../../../../../shared-api/test'
 
 describe('GetUserRequestStatsUseCase', () => {
 	let getUserRequestStatsUseCase: GetUserRequestStatsUseCase
 	let requestRepository: RequestRepository
 
 	beforeEach(() => {
-		requestRepository = {
-			getStats: jest.fn(),
-		} as unknown as RequestRepository
+		requestRepository = { ...reqRepo } as unknown as RequestRepository
 
 		getUserRequestStatsUseCase = new GetUserRequestStatsUseCase(
 			requestRepository,

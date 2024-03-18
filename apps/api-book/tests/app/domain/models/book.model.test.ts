@@ -1,31 +1,10 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IBook, LibraryStatus } from '../../../../../shared/src'
+import { book } from '../../../../../shared-api/test'
 import BookModel from '../../../../src/app/domain/models/book.model'
 
 describe('BookModel', () => {
 	it('should create an instance of BookModel with provided data', () => {
-		const bookData: IBook = {
-			_id: '123',
-			title: 'Example Book',
-			authors: ['John Doe'],
-			categories: ['Fiction'],
-			description: 'A sample book description.',
-			image: {
-				thumbnail: 'thumbnail-url',
-				smallThumbnail: 'small-thumbnail-url',
-			},
-			isbn: [
-				{
-					type: 'ISBN_13',
-					identifier: '9781234567890',
-				},
-			],
-			language: 'en',
-			subtitle: 'An amazing story',
-			publisher: 'Book Publisher',
-			publishedDate: '2022-01-01',
-			status: LibraryStatus.TO_LEND,
-		}
+		const bookData = book
 
 		let bookModel = new BookModel(bookData)
 

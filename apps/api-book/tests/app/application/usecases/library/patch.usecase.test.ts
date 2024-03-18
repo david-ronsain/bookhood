@@ -1,44 +1,24 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import {
-	ConflictException,
-	ForbiddenException,
-	NotFoundException,
-} from '@nestjs/common'
-import AddBookUseCase from '../../../../../src/app/application/usecases/book/addBook.usecase'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
 import LibraryModel from '../../../../../src/app/domain/models/library.model'
-import LibraryMapper from '../../../../../src/app/application/mappers/library.mapper'
 import mongoose from 'mongoose'
 import { ILibrary, LibraryStatus } from '../../../../../../shared/src'
 import PatchUseCase from '../../../../../src/app/application/usecases/library/patch.usecase'
+import {
+	libraryModel,
+	libraryRepository,
+} from '../../../../../../shared-api/test'
 
 describe('PatchUseCase', () => {
 	let patchUseCase: PatchUseCase
 	let libraryRepositoryMock: LibraryRepository
 
-	const mockedLib: LibraryModel = {
-		_id: new mongoose.Types.ObjectId().toString(),
-		bookId: new mongoose.Types.ObjectId(),
-		place: 'somePlace',
-		userId: new mongoose.Types.ObjectId(),
-		location: {
-			type: 'Point',
-			coordinates: [0, 0],
-		},
-		status: LibraryStatus.TO_LEND,
-	}
+	const mockedLib = libraryModel
 
 	beforeEach(() => {
-		libraryRepositoryMock = {
-			getByUserIdAndBookId: jest.fn(),
-			create: jest.fn(),
-			getByUser: jest.fn(),
-			getById: jest.fn(),
-			getFullById: jest.fn(),
-			list: jest.fn(),
-			update: jest.fn(),
-			getStats: jest.fn(),
-		}
+		jest.clearAllMocks()
+		libraryRepositoryMock = { ...libraryRepository }
 
 		patchUseCase = new PatchUseCase(libraryRepositoryMock)
 	})

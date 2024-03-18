@@ -8,7 +8,7 @@ import { RequestStatus } from '../../../../../../shared/src'
 import RequestMapper from '../../../../../src/app/application/mappers/request.mapper'
 import {
 	requestEntity,
-	requestInfos,
+	requestsInfos,
 	requestsList,
 	userRequestStats,
 } from '../../../../../../shared-api/test/data/books/request'
@@ -159,15 +159,13 @@ describe('RequestRepositoryMongo', () => {
 		const requestId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
 
 		it('should return request infos', async () => {
-			const mockedResults = requestInfos
-
 			jest.spyOn(requestModel, 'aggregate').mockResolvedValue(
-				mockedResults,
+				requestsInfos,
 			)
 
 			const result = await repository.getRequestInfos(requestId)
 
-			expect(result).toEqual(mockedResults[0])
+			expect(result).toEqual(requestsInfos[0])
 		})
 
 		it('should return null if no request is found', async () => {

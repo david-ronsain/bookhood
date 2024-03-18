@@ -3,48 +3,24 @@ import CreateBookIfNewUseCase from '../../../../../src/app/application/usecases/
 import { BookRepository } from '../../../../../src/app/domain/ports/book.repository'
 import { IAddBookDTO, IBook, LibraryStatus } from '../../../../../../shared/src'
 import BookModel from '../../../../../src/app/domain/models/book.model'
+import { bookRepository, addBookDTO } from '../../../../../../shared-api/test'
 
 describe('CreateBookIfNewUseCase', () => {
 	let createBookIfNewUseCase: CreateBookIfNewUseCase
 	let bookRepositoryMock: BookRepository
 
 	beforeEach(() => {
-		bookRepositoryMock = {
-			getByISBN: jest.fn(),
-			search: jest.fn(),
-			create: jest.fn(),
-		}
-
+		jest.clearAllMocks()
+		bookRepositoryMock = { ...bookRepository }
 		createBookIfNewUseCase = new CreateBookIfNewUseCase(bookRepositoryMock)
 	})
 
 	it('should create a new book if it does not exist', async () => {
-		const addBookDTO: IAddBookDTO = {
-			authors: ['author'],
-			description: 'desc',
-			isbn: [
-				{
-					type: 'ISBN_13',
-					identifier: '01234567890123',
-				},
-			],
-			language: 'fr',
-			title: 'title',
-			categories: ['category'],
-			image: { smallThumbnail: '', thumbnail: '' },
-			publishedDate: '2024',
-			publisher: 'publisher',
-			subtitle: 'subtitle',
-			location: { lat: 0, lng: 0 },
-			status: LibraryStatus.TO_LEND,
-			place: 'Some place',
-		}
-
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(null)
 
 		const createdBookModel: BookModel = {
-			_id: '123',
 			...addBookDTO,
+			_id: '123',
 		}
 
 		jest.spyOn(bookRepositoryMock, 'create').mockResolvedValue(
@@ -66,30 +42,9 @@ describe('CreateBookIfNewUseCase', () => {
 	})
 
 	it('should return existing book if it already exists', async () => {
-		const addBookDTO: IAddBookDTO = {
-			authors: ['author'],
-			description: 'desc',
-			isbn: [
-				{
-					type: 'ISBN_13',
-					identifier: '01234567890123',
-				},
-			],
-			language: 'fr',
-			title: 'title',
-			categories: ['category'],
-			image: { smallThumbnail: '', thumbnail: '' },
-			publishedDate: '2024',
-			publisher: 'publisher',
-			subtitle: 'subtitle',
-			location: { lat: 0, lng: 0 },
-			status: LibraryStatus.TO_LEND,
-			place: 'Some place',
-		}
-
 		const existingBookModel: BookModel = {
-			_id: '456',
 			...addBookDTO,
+			_id: '456',
 		}
 		jest.spyOn(bookRepositoryMock, 'getByISBN').mockResolvedValue(
 			existingBookModel,

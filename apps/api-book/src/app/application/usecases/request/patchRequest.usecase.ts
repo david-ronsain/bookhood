@@ -63,7 +63,7 @@ export default class PatchRequestUseCase {
 		const updated = await this.requestRepository.patch(
 			body.requestId,
 			body.status,
-			[event, ...request.events],
+			[event, ...(request.events ?? [])],
 			body.dates ? body.dates[0] : undefined,
 			body.dates ? body.dates[1] : undefined,
 		)

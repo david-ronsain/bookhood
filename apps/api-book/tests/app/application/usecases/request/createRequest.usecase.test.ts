@@ -2,13 +2,15 @@
 import CreateRequestUseCase from '../../../../../src/app/application/usecases/request/createRequest.usecase'
 import { RequestRepository } from '../../../../../src/app/domain/ports/request.repository'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
-import { IRequest } from '../../../../../../shared/src/interfaces/request.interface'
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import RequestModel from '../../../../../src/app/domain/models/request.model'
 import RequestMapper from '../../../../../src/app/application/mappers/request.mapper'
-import { LibraryStatus, RequestStatus } from '../../../../../../shared/src'
-import LibraryModel from '../../../../../src/app/domain/models/library.model'
-import mongoose from 'mongoose'
+import {
+	requestRepository as reqRepo,
+	libraryRepository as libRepo,
+	request as req,
+	libraryModel,
+} from '../../../../../../shared-api/test'
 
 describe('CreateRequestUseCase', () => {
 	let createRequestUseCase: CreateRequestUseCase
@@ -16,14 +18,10 @@ describe('CreateRequestUseCase', () => {
 	let libraryRepository: LibraryRepository
 
 	beforeEach(() => {
-		requestRepository = {
-			create: jest.fn(),
-			countActiveRequestsForUser: jest.fn(),
-		} as unknown as RequestRepository
+		jest.clearAllMocks()
+		requestRepository = { ...reqRepo } as unknown as RequestRepository
 
-		libraryRepository = {
-			getById: jest.fn(),
-		} as unknown as LibraryRepository
+		libraryRepository = { ...libRepo } as unknown as LibraryRepository
 
 		createRequestUseCase = new CreateRequestUseCase(
 			requestRepository,
@@ -34,23 +32,8 @@ describe('CreateRequestUseCase', () => {
 	describe('handler', () => {
 		it('should create a request when conditions are met', async () => {
 			const dates = ['0000-00-00', '0000-00-00']
-			const request: IRequest = {
-				_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-				libraryId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-				ownerId: 'cccccccccccccccccccccccc',
-				userId: 'dddddddddddddddddddddddd',
-				status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
-			}
-			const library: LibraryModel = {
-				userId: new mongoose.Types.ObjectId(),
-				bookId: new mongoose.Types.ObjectId(),
-				status: LibraryStatus.TO_LEND,
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				place: 'Some place',
-			}
+			const request = req
+			const library = libraryModel
 
 			jest.spyOn(libraryRepository, 'getById').mockResolvedValueOnce(
 				library,
@@ -105,16 +88,7 @@ describe('CreateRequestUseCase', () => {
 
 		it('should throw ForbiddenException when user has active requests', async () => {
 			const dates = ['0000-00-00', '0000-00-00']
-			const library: LibraryModel = {
-				userId: new mongoose.Types.ObjectId(),
-				bookId: new mongoose.Types.ObjectId(),
-				status: LibraryStatus.TO_LEND,
-				location: {
-					type: 'Point',
-					coordinates: [0, 0],
-				},
-				place: 'Some place',
-			}
+			const library = libraryModel
 			jest.spyOn(libraryRepository, 'getById').mockResolvedValueOnce(
 				library,
 			)

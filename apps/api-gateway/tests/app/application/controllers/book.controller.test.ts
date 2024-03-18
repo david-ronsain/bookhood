@@ -4,12 +4,16 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 import { BookController } from '../../../../src/app/application/controllers/book.controller'
 import { AddBookDTO } from '../../../../src/app/application/dto/book.dto'
 import {
-	CurrentUser,
 	MQBookMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
-import { LibraryStatus, Role } from '../../../../../shared/src'
+import { LibraryStatus } from '../../../../../shared/src'
+import {
+	addBookDTO,
+	currentUser,
+	librariesFull,
+} from '../../../../../shared-api/test'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -29,14 +33,6 @@ jest.mock('googleapis', () => ({
 
 describe('BookController', () => {
 	let controller: BookController
-
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -66,21 +62,6 @@ describe('BookController', () => {
 
 	describe('addBook', () => {
 		it('should add a new book to the library', async () => {
-			const addBookDTO: AddBookDTO = {
-				authors: ['author'],
-				title: 'title',
-				categories: ['category'],
-				description: 'description',
-				isbn: [{ type: 'ISBN_13', identifier: '1234567890123' }],
-				language: 'fr',
-				subtitle: 'subtitle',
-				publisher: 'publisher',
-				publishedDate: '2023',
-				location: { lat: 0, lng: 0 },
-				status: LibraryStatus.TO_LEND,
-				place: 'Some place',
-			}
-
 			const response = new MicroserviceResponseFormatter(
 				true,
 				HttpStatus.CREATED,
@@ -92,7 +73,10 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.addBook(currentUser, addBookDTO)
+			const result = await controller.addBook(
+				currentUser,
+				addBookDTO as unknown as AddBookDTO,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQBookMessageType.CREATE,
@@ -105,21 +89,6 @@ describe('BookController', () => {
 		})
 
 		it('should handle generic HTTP exception', async () => {
-			const addBookDTO: AddBookDTO = {
-				title: '',
-				authors: [],
-				categories: [],
-				description: '',
-				isbn: [],
-				language: '',
-				subtitle: '',
-				publisher: '',
-				publishedDate: '',
-				location: { lat: 0, lng: 0 },
-				status: LibraryStatus.TO_LEND,
-				place: 'Some place',
-			}
-
 			const response = new MicroserviceResponseFormatter(false)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(
@@ -127,7 +96,10 @@ describe('BookController', () => {
 			)
 
 			await expect(
-				controller.addBook(currentUser, addBookDTO),
+				controller.addBook(
+					currentUser,
+					addBookDTO as unknown as AddBookDTO,
+				),
 			).rejects.toThrow(HttpException)
 		})
 	})
@@ -214,32 +186,7 @@ describe('BookController', () => {
 				true,
 				HttpStatus.OK,
 				{},
-				[
-					{
-						_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-						book: {
-							title: 'title',
-							authors: ['author'],
-							isbn: [
-								{
-									type: 'ISBN_13',
-									identifier: '1234567890123',
-								},
-							],
-							language: 'fr',
-						},
-						location: {
-							type: 'Point',
-							coordinates: [0, 0],
-						},
-						user: {
-							_id: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-							firstName: 'first',
-							lastName: 'last',
-							email: 'first.last@name.test',
-						},
-					},
-				],
+				librariesFull,
 			)
 
 			jest.spyOn(controller['bookQueue'], 'send').mockReturnValueOnce(

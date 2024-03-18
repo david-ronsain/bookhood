@@ -1,45 +1,26 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import GetListByStatusUseCase from '../../../../../src/app/application/usecases/request/getListByStatus.usecase'
 import { RequestRepository } from '../../../../../src/app/domain/ports/request.repository'
-import {
-	IRequestInfos,
-	IRequestList,
-	RequestStatus,
-} from '../../../../../../shared/src'
 import GetByIdUseCase from '../../../../../src/app/application/usecases/request/getById.usecase'
 import { NotFoundException } from '@nestjs/common'
+import {
+	requestRepository as reqRepo,
+	requestInfos,
+} from '../../../../../../shared-api/test'
 
 describe('GetByIdUseCase', () => {
 	let getById: GetByIdUseCase
 	let requestRepository: RequestRepository
 
 	beforeEach(() => {
-		requestRepository = {
-			getRequestInfos: jest.fn(),
-		} as unknown as RequestRepository
+		jest.clearAllMocks()
+		requestRepository = { ...reqRepo } as unknown as RequestRepository
 
 		getById = new GetByIdUseCase(requestRepository)
 	})
 
 	describe('handler', () => {
 		it('should return request by its id', async () => {
-			const request: IRequestInfos = {
-				_id: 'request_id',
-				book: {
-					title: 'title',
-				},
-				createdAt: '',
-				emitter: {
-					firstName: 'first',
-					lastName: 'last',
-					email: 'first.last@name.test',
-				},
-				owner: {
-					firstName: 'first1',
-					lastName: 'last1',
-					email: 'first1.last1@name.test',
-				},
-			}
+			const request = requestInfos
 			jest.spyOn(
 				requestRepository,
 				'getRequestInfos',

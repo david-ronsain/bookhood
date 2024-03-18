@@ -2,32 +2,26 @@
 import GetUserBookUseCase from '../../../../../src/app/application/usecases/book/getUserBook.usecase'
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
 import { NotFoundException } from '@nestjs/common'
-import { ILibraryFull } from '../../../../../../shared/src/interfaces/library.interface'
+import {
+	libraryFull,
+	libraryRepository as libRepo,
+} from '../../../../../../shared-api/test'
+import { ILibraryFull } from '../../../../../../shared/src'
 
 describe('GetUserBookUseCase', () => {
 	let getUserBookUseCase: GetUserBookUseCase
 	let libraryRepository: LibraryRepository
 
 	beforeEach(() => {
-		libraryRepository = {
-			getFullById: jest.fn(),
-		} as unknown as LibraryRepository
+		jest.clearAllMocks()
+		libraryRepository = libRepo as unknown as LibraryRepository
+
 		getUserBookUseCase = new GetUserBookUseCase(libraryRepository)
 	})
 
 	describe('handler', () => {
 		it('should return the book when it exists', async () => {
-			const book: ILibraryFull = {
-				_id: '123',
-				book: {
-					title: 'Title',
-					authors: ['author'],
-					description: 'desc',
-					isbn: [{ type: 'ISBN_13', identifier: '0123456789123' }],
-					language: 'fr',
-				},
-				location: { type: 'Point', coordinates: [0, 0] },
-			}
+			const book: ILibraryFull = { ...libraryFull }
 
 			jest.spyOn(libraryRepository, 'getFullById').mockResolvedValueOnce(
 				book,

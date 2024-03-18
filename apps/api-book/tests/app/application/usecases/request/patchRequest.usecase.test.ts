@@ -15,6 +15,11 @@ import {
 	PatchRequestMQDTO,
 } from '../../../../../../shared-api/src'
 import RequestModel from '../../../../../src/app/domain/models/request.model'
+import {
+	requestRepository as reqRepo,
+	request as req,
+	requestInfos,
+} from '../../../../../../shared-api/test'
 
 describe('PatchRequestUseCase', () => {
 	let patchRequestUseCase: PatchRequestUseCase
@@ -22,12 +27,8 @@ describe('PatchRequestUseCase', () => {
 	let mailClient: ClientProxy
 
 	beforeEach(() => {
-		requestRepository = {
-			getById: jest.fn(),
-			countActiveRequestsForUser: jest.fn(),
-			patch: jest.fn(),
-			getRequestInfos: jest.fn(),
-		} as unknown as RequestRepository
+		jest.clearAllMocks()
+		requestRepository = { ...reqRepo } as unknown as RequestRepository
 
 		mailClient = {
 			send: jest.fn(() => of({})),
@@ -41,12 +42,8 @@ describe('PatchRequestUseCase', () => {
 
 	describe('handler', () => {
 		const request: IRequest = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			userId: 'bbbbbbbbbbbbbbbbbbbbbbbb',
-			libraryId: 'cccccccccccccccccccccccc',
-			ownerId: 'dddddddddddddddddddddddd',
+			...req,
 			status: RequestStatus.RETURN_PENDING,
-			events: [] as IRequestEvent[],
 		}
 
 		const body: PatchRequestMQDTO = {
@@ -59,23 +56,7 @@ describe('PatchRequestUseCase', () => {
 		}
 
 		let foundRequest = new RequestModel(request)
-		const infos: IRequestInfos = {
-			_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
-			createdAt: new Date().toString(),
-			emitter: {
-				firstName: 'first1',
-				lastName: 'last1',
-				email: 'first1.last1@name.test',
-			},
-			owner: {
-				firstName: 'first2',
-				lastName: 'last2',
-				email: 'first2.last2@name.test',
-			},
-			book: {
-				title: 'Title',
-			},
-		}
+		const infos = requestInfos
 
 		it('should patch the request status and return the updated request', async () => {
 			foundRequest = {

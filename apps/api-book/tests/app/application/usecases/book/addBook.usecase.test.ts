@@ -4,53 +4,36 @@ import AddBookUseCase from '../../../../../src/app/application/usecases/book/add
 import { LibraryRepository } from '../../../../../src/app/domain/ports/library.repository'
 import LibraryModel from '../../../../../src/app/domain/models/library.model'
 import LibraryMapper from '../../../../../src/app/application/mappers/library.mapper'
-import mongoose from 'mongoose'
 import { LibraryStatus } from '../../../../../../shared/src'
+import {
+	libraryModel,
+	libraryRepositoryMock as mockRepo,
+} from '../../../../../../shared-api/test'
 
 describe('AddBookUseCase', () => {
 	let addBookUseCase: AddBookUseCase
 	let libraryRepositoryMock: LibraryRepository
 
 	beforeEach(() => {
-		libraryRepositoryMock = {
-			getByUserIdAndBookId: jest.fn(),
-			create: jest.fn(),
-			getByUser: jest.fn(),
-			getById: jest.fn(),
-			getFullById: jest.fn(),
-			list: jest.fn(),
-			update: jest.fn(),
-			getStats: jest.fn(),
-		}
+		jest.clearAllMocks()
+		libraryRepositoryMock = { ...mockRepo }
 
 		addBookUseCase = new AddBookUseCase(libraryRepositoryMock)
 	})
 
 	it('should add a book to the library successfully', async () => {
-		const bookId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-		const userId = 'bbbbbbbbbbbbbbbbbbbbbbbb'
-
 		jest.spyOn(
 			libraryRepositoryMock,
 			'getByUserIdAndBookId',
 		).mockResolvedValue(null)
 
-		const createdLibraryModel: LibraryModel = {
-			_id: '789',
-			bookId: new mongoose.Types.ObjectId(bookId),
-			userId: new mongoose.Types.ObjectId(userId),
-			location: { type: 'Point', coordinates: [0, 0] },
-			status: LibraryStatus.TO_LEND,
-			place: 'Some place',
-		}
-
 		jest.spyOn(libraryRepositoryMock, 'create').mockResolvedValue(
-			createdLibraryModel,
+			libraryModel,
 		)
 
 		const result = await addBookUseCase.handler(
-			bookId,
-			userId,
+			libraryModel.bookId.toString(),
+			libraryModel.userId.toString(),
 			{
 				lat: 0,
 				lng: 0,
@@ -59,41 +42,28 @@ describe('AddBookUseCase', () => {
 			'Some place',
 		)
 
-		expect(libraryRepositoryMock.create).toHaveBeenCalledWith(
-			new LibraryModel({
-				bookId,
-				userId,
-				location: { type: 'Point', coordinates: [0, 0] },
-				status: LibraryStatus.TO_LEND,
-				place: 'Some place',
-			}),
-		)
+		expect(libraryRepositoryMock.create).toHaveBeenCalledWith({
+			...libraryModel,
+			_id: undefined,
+		})
 
-		const expectedOutput =
-			LibraryMapper.modelObjectIdToString(createdLibraryModel)
+		const expectedOutput = LibraryMapper.modelObjectIdToString(
+			libraryModel as unknown as LibraryModel,
+		)
 		expect(result).toEqual(expectedOutput)
 	})
 
 	it('should throw a ConflictException when the book already exists in the library', async () => {
-		const bookId = 'aaaaaaaaaaaaaaaaaaaaaaaa'
-		const userId = 'bbbbbbbbbbbbbbbbbbbbbbbb'
-
 		jest.spyOn(
 			libraryRepositoryMock,
 			'getByUserIdAndBookId',
-		).mockResolvedValue({
-			_id: '789',
-			bookId: new mongoose.Types.ObjectId(bookId),
-			userId: new mongoose.Types.ObjectId(userId),
-			location: { type: 'Point', coordinates: [0, 0] },
-			status: LibraryStatus.TO_LEND,
-			place: 'Some place',
-		})
+		).mockResolvedValue(libraryModel)
+		jest.spyOn(libraryRepositoryMock, 'create')
 
 		await expect(
 			addBookUseCase.handler(
-				bookId,
-				userId,
+				libraryModel.bookId.toString(),
+				libraryModel.userId.toString(),
 				{ lat: 0, lng: 0 },
 				LibraryStatus.TO_LEND,
 				'Some place',
@@ -101,8 +71,8 @@ describe('AddBookUseCase', () => {
 		).rejects.toThrow(ConflictException)
 
 		expect(libraryRepositoryMock.getByUserIdAndBookId).toHaveBeenCalledWith(
-			userId,
-			bookId,
+			libraryModel.userId.toString(),
+			libraryModel.bookId.toString(),
 		)
 
 		expect(libraryRepositoryMock.create).not.toHaveBeenCalled()
