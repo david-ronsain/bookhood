@@ -1,12 +1,9 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { NotFoundException } from '@nestjs/common'
-import {
-	AddMessageDTO,
-	FlagAsSeenMessageDTO,
-	IConversationMessage,
-} from '../../../../../shared/src'
-import AddMessageUseCase from '../../../../src/app/application/usecases/addMessage.usecase'
+import { FlagAsSeenMessageDTO } from '../../../../../shared/src'
 import { ConversationRepository } from '../../../../src/app/domain/ports/conversation.repository'
 import FlagAsSeenUseCase from '../../../../src/app/application/usecases/flagAsSeen.usecase'
+import { conversationRepository as convRepo } from '../../../../../shared-api/test'
 
 describe('FlagAsSeenUseCase', () => {
 	let flagAsSeenUseCase: FlagAsSeenUseCase
@@ -14,8 +11,7 @@ describe('FlagAsSeenUseCase', () => {
 
 	beforeEach(() => {
 		conversationRepository = {
-			getMessageById: jest.fn(),
-			flagAsSeen: jest.fn(),
+			...convRepo,
 		} as unknown as ConversationRepository
 
 		flagAsSeenUseCase = new FlagAsSeenUseCase(conversationRepository)

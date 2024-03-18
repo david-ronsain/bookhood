@@ -1,7 +1,14 @@
-import { NotFoundException } from '@nestjs/common'
-import { AddMessageDTO, IConversationMessage } from '../../../../../shared/src'
+/* eslint-disable @nx/enforce-module-boundaries */
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
+import { IConversationMessage } from '../../../../../shared/src'
 import AddMessageUseCase from '../../../../src/app/application/usecases/addMessage.usecase'
 import { ConversationRepository } from '../../../../src/app/domain/ports/conversation.repository'
+import {
+	addMessageDTO,
+	conversationRepository as convRepo,
+	conversationFull,
+	message as msg,
+} from '../../../../../shared-api/test'
 
 describe('AddMessageUseCase', () => {
 	let addMessageUseCase: AddMessageUseCase
@@ -9,79 +16,63 @@ describe('AddMessageUseCase', () => {
 
 	beforeEach(() => {
 		conversationRepository = {
-			getByRequestId: jest.fn(),
-			addMessage: jest.fn(),
+			...convRepo,
 		} as unknown as ConversationRepository
 
 		addMessageUseCase = new AddMessageUseCase(conversationRepository)
 	})
 
+	afterEach(() => {
+		jest.clearAllMocks()
+	})
+
 	describe('Testing the handler method', () => {
-		const dto: AddMessageDTO = {
-			_id: 'convId',
-			message: 'message',
-			roomId: 'roomId',
-			token: 'token',
-			userId: 'id#1',
-			requestId: 'reqId',
-		}
-
-		const request = {
-			_id: 'reqId',
-			book: {
-				title: 'title',
-			},
-			createdAt: '',
-			emitter: {
-				_id: 'id#1',
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@email.test',
-			},
-			owner: {
-				_id: 'id#2',
-				firstName: 'first1',
-				lastName: 'last1',
-				email: 'first1.last1@email.test',
-			},
-		}
-		const conversation = {
-			_id: 'convId',
-			messages: [],
-			request,
-			roomId: 'roomId',
-		}
-
 		it('should throw an error because the conversation does not exist', () => {
 			jest.spyOn(
 				conversationRepository,
 				'getByRequestId',
 			).mockReturnValueOnce(Promise.resolve(null))
 
-			expect(addMessageUseCase.handler(dto)).rejects.toThrow(
+			expect(addMessageUseCase.handler(addMessageDTO)).rejects.toThrow(
 				NotFoundException,
 			)
 		})
 
-		it('should add the message to the conversation', async () => {
+		it('should not add the message to the conversation because the user is not in the conv', async () => {
 			jest.spyOn(
 				conversationRepository,
 				'getByRequestId',
-			).mockReturnValueOnce(Promise.resolve(conversation))
-			const message: IConversationMessage = {
-				from: dto.userId,
-				message: dto.message,
-				_id: 'msgId',
-				seenBy: [],
+			).mockReturnValueOnce(Promise.resolve(conversationFull))
+			jest.spyOn(conversationRepository, 'addMessage')
+
+			expect(addMessageUseCase.handler(addMessageDTO)).rejects.toThrow(
+				ForbiddenException,
+			)
+			expect(conversationRepository.addMessage).not.toHaveBeenCalled()
+		})
+
+		it('should add the message to the conversation', async () => {
+			const dto = {
+				...addMessageDTO,
+				userId: conversationFull.request.emitter._id,
 			}
+			const message: IConversationMessage = {
+				...msg,
+				from: dto.userId ?? '',
+				message: dto.message,
+			}
+
 			jest.spyOn(
 				conversationRepository,
 				'addMessage',
 			).mockReturnValueOnce(Promise.resolve(message))
+			jest.spyOn(
+				conversationRepository,
+				'getByRequestId',
+			).mockReturnValueOnce(Promise.resolve(conversationFull))
 
-			expect(addMessageUseCase.handler(dto)).resolves.toMatchObject(
-				message,
-			)
+			const res = await addMessageUseCase.handler(dto)
+			expect(res).toMatchObject(message)
 		})
 	})
 })

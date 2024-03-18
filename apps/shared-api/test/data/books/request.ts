@@ -19,11 +19,13 @@ export const requestInfos: IRequestInfos = {
 	_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
 	createdAt: new Date().toString(),
 	emitter: {
+		_id: 'id#1',
 		firstName: 'John',
 		lastName: 'Doe',
 		email: 'john@example.com',
 	},
 	owner: {
+		_id: 'id#2',
 		firstName: 'Jane',
 		lastName: 'Doe',
 		email: 'jane@example.com',

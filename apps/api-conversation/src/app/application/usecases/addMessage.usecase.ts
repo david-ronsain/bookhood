@@ -14,6 +14,7 @@ export default class AddMessageUseCase {
 			dto._id,
 			dto.requestId,
 		)
+
 		if (!conversation) {
 			throw new NotFoundException('This conversation does not exist')
 		} else if (

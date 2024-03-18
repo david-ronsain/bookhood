@@ -6,6 +6,11 @@ import { of } from 'rxjs'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src'
 import { IRequestInfos } from '../../../../../shared/src'
 import { HttpStatus } from '@nestjs/common'
+import {
+	conversationRepository as convRepo,
+	conversationFull,
+	requestInfos,
+} from '../../../../../shared-api/test'
 
 describe('AddMessageUseCase', () => {
 	let getOrCreateUseCase: GetOrCreateUseCase
@@ -14,9 +19,7 @@ describe('AddMessageUseCase', () => {
 
 	beforeEach(() => {
 		conversationRepository = {
-			getByRequestId: jest.fn(),
-			create: jest.fn(),
-			roomIdExists: jest.fn(),
+			...convRepo,
 		} as unknown as ConversationRepository
 
 		bookClient = {
@@ -30,41 +33,18 @@ describe('AddMessageUseCase', () => {
 	})
 
 	describe('Testing the handler method', () => {
-		const request = {
-			_id: 'reqId',
-			book: {
-				title: 'title',
-			},
-			createdAt: '',
-			emitter: {
-				_id: 'id#1',
-				firstName: 'first',
-				lastName: 'last',
-				email: 'first.last@email.test',
-			},
-			owner: {
-				_id: 'id#2',
-				firstName: 'first1',
-				lastName: 'last1',
-				email: 'first1.last1@email.test',
-			},
-		}
-		const conversation = {
-			_id: 'convId',
-			messages: [],
-			request,
-			roomId: 'roomId',
-		}
-
 		it('should return the existing conversation', () => {
 			jest.spyOn(
 				conversationRepository,
 				'getByRequestId',
-			).mockImplementationOnce(() => Promise.resolve(conversation))
+			).mockImplementationOnce(() => Promise.resolve(conversationFull))
 
 			expect(
-				getOrCreateUseCase.handler(request._id, request.emitter._id),
-			).resolves.toMatchObject(conversation)
+				getOrCreateUseCase.handler(
+					requestInfos._id,
+					requestInfos.emitter._id || '',
+				),
+			).resolves.toMatchObject(conversationFull)
 		})
 
 		it('should create a new conversation', () => {
@@ -82,18 +62,21 @@ describe('AddMessageUseCase', () => {
 				true,
 				HttpStatus.OK,
 				{},
-				request,
+				requestInfos,
 			)
 			jest.spyOn(bookClient, 'send').mockImplementationOnce(() => of(req))
 
 			jest.spyOn(
 				conversationRepository,
 				'getByRequestId',
-			).mockImplementationOnce(() => Promise.resolve(conversation))
+			).mockImplementationOnce(() => Promise.resolve(conversationFull))
 
 			expect(
-				getOrCreateUseCase.handler(request._id, request.emitter._id),
-			).resolves.toMatchObject(conversation)
+				getOrCreateUseCase.handler(
+					requestInfos._id,
+					requestInfos.emitter._id || '',
+				),
+			).resolves.toMatchObject(conversationFull)
 		})
 	})
 })
