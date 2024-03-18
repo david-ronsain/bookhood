@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import Account from '../../src/views/Account.vue'
 import vuetify from '../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
-import YourBooks from '../../src/components/account/books/yourBooks/yourBooks.vue'
+import MyBooks from '../../src/components/account/books/myBooks/myBooks.vue'
 import CreateBookDialog from '../../src/components/dialogs/book/createBookDialog.vue'
 import { myProfile as profileData } from '../data/profileData'
 import MyProfile from '../../src/components/profile/myProfile.vue'
@@ -43,9 +43,9 @@ describe('Testing the view Account', () => {
 							open: () => vi.fn(),
 						},
 					},
-					YourBooks: {
-						name: 'YourBooks',
-						template: '<div class="your-books"></div>',
+					MyBooks: {
+						name: 'MyBooks',
+						template: '<div class="my-books"></div>',
 						emits: ['bookCreated'],
 						methods: {
 							open: () => vi.fn(),
@@ -65,7 +65,7 @@ describe('Testing the view Account', () => {
 
 	it('should mount the component', () => {
 		expect(wrapper.findComponent(Account)).toBeTruthy()
-		expect(wrapper.findComponent(YourBooks)).toBeTruthy()
+		expect(wrapper.findComponent(MyBooks)).toBeTruthy()
 		expect(wrapper.findComponent(MyProfile)).toBeTruthy()
 		expect(wrapper.findComponent(CreateBookDialog).exists()).toBe(true)
 	})

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { mdiPlusCircleOutline } from '@mdi/js'
 	import CreateBookDialog from '../components/dialogs/book/createBookDialog.vue'
-	import YourBooks from '../components/account/books/yourBooks/yourBooks.vue'
+	import MyBooks from '../components/account/books/myBooks/myBooks.vue'
 	import { computed, ref } from 'vue'
 	import { BhPrimaryButton } from '@bookhood/ui'
 	import { useMainStore } from '../store'
@@ -40,7 +40,7 @@
 			<v-col
 				cols="12"
 				md="8">
-				<your-books />
+				<my-books />
 			</v-col>
 		</v-row>
 

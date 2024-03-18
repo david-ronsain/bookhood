@@ -149,7 +149,7 @@
 		:title="$t('account.books.myProfile.list.title')">
 		<template v-slot:text>
 			<bh-datatable
-				class="your-books-list"
+				class="my-books-list"
 				:headers="headers"
 				:items="books"
 				:loading="loading"
