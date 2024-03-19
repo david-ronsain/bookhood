@@ -4,7 +4,6 @@ import { RequestController } from '../../../../src/app/application/controllers/r
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { of } from 'rxjs'
 import {
-	CurrentUser,
 	MQRequestMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
@@ -13,9 +12,10 @@ import {
 	IRequest,
 	IRequestList,
 	IPatchRequestDTO,
-	Role,
+	Locale,
 } from '../../../../../shared/src'
 import { GetRequestsDTO } from '../../../../src/app/application/dto/request.dto'
+import { currentUser } from '../../../../../shared-api/test'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: jest.fn(() => ({
@@ -25,14 +25,6 @@ jest.mock('@nestjs/microservices', () => ({
 
 describe('RequestController', () => {
 	let controller: RequestController
-
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -82,9 +74,14 @@ describe('RequestController', () => {
 				of(response),
 			)
 
-			const result = await controller.create(currentUser, libraryId, {
-				dates,
-			})
+			const result = await controller.create(
+				currentUser,
+				libraryId,
+				{
+					dates,
+				},
+				Locale.FR,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQRequestMessageType.CREATE,
@@ -92,6 +89,7 @@ describe('RequestController', () => {
 					libraryId,
 					user: currentUser,
 					dates,
+					locale: Locale.FR,
 				},
 			)
 
@@ -112,9 +110,14 @@ describe('RequestController', () => {
 			)
 
 			await expect(
-				controller.create(currentUser, libraryId, {
-					dates: dates,
-				}),
+				controller.create(
+					currentUser,
+					libraryId,
+					{
+						dates: dates,
+					},
+					Locale.FR,
+				),
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -123,6 +126,7 @@ describe('RequestController', () => {
 					libraryId,
 					user: currentUser,
 					dates,
+					locale: Locale.FR,
 				},
 			)
 		})
@@ -162,13 +166,18 @@ describe('RequestController', () => {
 				of(response),
 			)
 
-			const result = await controller.getListByStatus(currentUser, data)
+			const result = await controller.getListByStatus(
+				currentUser,
+				data,
+				Locale.FR,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQRequestMessageType.LIST,
 				{
 					...data,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 
@@ -189,7 +198,7 @@ describe('RequestController', () => {
 			)
 
 			await expect(
-				controller.getListByStatus(currentUser, data),
+				controller.getListByStatus(currentUser, data, Locale.FR),
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -197,6 +206,7 @@ describe('RequestController', () => {
 				{
 					...data,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 		})
@@ -226,7 +236,12 @@ describe('RequestController', () => {
 				of(response),
 			)
 
-			const result = await controller.patch(currentUser, data, requestId)
+			const result = await controller.patch(
+				currentUser,
+				data,
+				requestId,
+				Locale.FR,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQRequestMessageType.PATCH,
@@ -234,6 +249,7 @@ describe('RequestController', () => {
 					...data,
 					requestId,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 
@@ -253,7 +269,7 @@ describe('RequestController', () => {
 			)
 
 			await expect(
-				controller.patch(currentUser, data, requestId),
+				controller.patch(currentUser, data, requestId, Locale.FR),
 			).rejects.toThrow(HttpException)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -262,6 +278,7 @@ describe('RequestController', () => {
 					...data,
 					requestId,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 		})

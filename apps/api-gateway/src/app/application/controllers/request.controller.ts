@@ -14,6 +14,7 @@ import {
 	ForbiddenException,
 	HttpCode,
 	UseGuards,
+	Headers,
 } from '@nestjs/common'
 
 import { ClientProxy } from '@nestjs/microservices'
@@ -30,6 +31,7 @@ import {
 	IRequest,
 	IRequestList,
 	type IPatchRequestDTO,
+	Locale,
 } from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import {
@@ -44,6 +46,7 @@ import {
 import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
 import { AuthUserGuard } from '../guards/authUser.guard'
 import { User } from '../decorators/user.decorator'
+import envConfig from '../../../config/env.config'
 
 @Controller('request')
 export class RequestController {
@@ -62,6 +65,7 @@ export class RequestController {
 		@User() user: CurrentUser,
 		@Param('libraryId') libraryId: string,
 		@Body() body: CreateRequestDTO,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IRequest> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
@@ -70,6 +74,7 @@ export class RequestController {
 				libraryId,
 				user,
 				...body,
+				locale,
 			} as CreateRequestMQDTO),
 		)
 		if (!response.success) {
@@ -88,6 +93,7 @@ export class RequestController {
 	async getListByStatus(
 		@User() user: CurrentUser,
 		@Query() body: GetRequestsDTO,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IRequestList> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequestList>
@@ -95,6 +101,7 @@ export class RequestController {
 			this.bookQueue.send(MQRequestMessageType.LIST, {
 				...body,
 				user,
+				locale,
 			} as GetRequestsMQDTO),
 		)
 		if (!response.success) {
@@ -117,6 +124,7 @@ export class RequestController {
 		@User() user: CurrentUser,
 		@Body() body: IPatchRequestDTO,
 		@Param('id') id: string,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IRequest> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<IRequest>
@@ -125,6 +133,7 @@ export class RequestController {
 				...body,
 				requestId: id,
 				user,
+				locale,
 			} as PatchRequestMQDTO),
 		)
 		if (!response.success) {

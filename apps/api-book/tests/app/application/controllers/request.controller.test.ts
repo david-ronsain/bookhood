@@ -15,6 +15,7 @@ import {
 	IRequest,
 	IRequestInfos,
 	IRequestList,
+	Locale,
 	RequestStatus,
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
@@ -117,6 +118,7 @@ describe('RequestController', () => {
 			user: currentUser,
 			libraryId: '123',
 			dates: ['0000-00-00', '0000-00-00'],
+			locale: Locale.FR,
 		}
 
 		it('should create a request successfully', async () => {
@@ -190,6 +192,7 @@ describe('RequestController', () => {
 			user: currentUser,
 			status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
 			startAt: 0,
+			locale: Locale.FR,
 		}
 
 		it('should return a list of requests', async () => {
@@ -231,6 +234,7 @@ describe('RequestController', () => {
 			user: currentUser,
 			requestId: 'request_id',
 			status: RequestStatus.ACCEPTED_PENDING_DELIVERY,
+			locale: Locale.FR,
 		}
 
 		it('should update request status', async () => {
