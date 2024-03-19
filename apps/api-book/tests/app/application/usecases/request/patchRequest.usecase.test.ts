@@ -60,7 +60,9 @@ describe('PatchRequestUseCase', () => {
 				_id: request.userId,
 			} as unknown as CurrentUser,
 			dates: ['2024-03-07', '2024-03-07'],
-			locale: Locale.FR,
+			session: {
+				locale: Locale.FR,
+			},
 		}
 
 		let foundRequest = new RequestModel(request)

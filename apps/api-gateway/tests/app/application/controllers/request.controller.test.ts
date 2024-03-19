@@ -89,7 +89,9 @@ describe('RequestController', () => {
 					libraryId,
 					user: currentUser,
 					dates,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 
@@ -126,7 +128,9 @@ describe('RequestController', () => {
 					libraryId,
 					user: currentUser,
 					dates,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 		})
@@ -177,7 +181,9 @@ describe('RequestController', () => {
 				{
 					...data,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 
@@ -206,7 +212,9 @@ describe('RequestController', () => {
 				{
 					...data,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 		})
@@ -249,7 +257,9 @@ describe('RequestController', () => {
 					...data,
 					requestId,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 
@@ -278,7 +288,9 @@ describe('RequestController', () => {
 					...data,
 					requestId,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 		})

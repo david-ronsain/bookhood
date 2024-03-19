@@ -1,4 +1,4 @@
-import { IUser, Role } from '@bookhood/shared'
+import { IUser, Locale, Role } from '@bookhood/shared'
 import { Document } from 'mongoose'
 
 export interface UserEntity extends Document, IUser {
@@ -19,4 +19,6 @@ export interface UserEntity extends Document, IUser {
 	readonly token?: string
 
 	readonly tokenExpiration: Date
+
+	readonly locale?: Locale
 }

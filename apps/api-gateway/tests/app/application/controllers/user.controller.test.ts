@@ -12,7 +12,12 @@ import {
 	UserStats,
 } from '../../../../src/app/application/dto/user.dto'
 import { HttpException, HttpStatus } from '@nestjs/common'
-import { IExternalProfile, IUser, Role } from '../../../../../shared/src'
+import {
+	IExternalProfile,
+	IUser,
+	Locale,
+	Role,
+} from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 import {
 	currentUser,
@@ -75,11 +80,16 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.createUser(userToCreate)
+			const result = await controller.createUser(userToCreate, Locale.FR)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.CREATE,
-				userToCreate,
+				{
+					...userToCreate,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 
 			expect(result).toMatchObject(userToCreate)
@@ -95,13 +105,18 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			await expect(controller.createUser(userToCreate)).rejects.toThrow(
-				HttpException,
-			)
+			await expect(
+				controller.createUser(userToCreate, Locale.FR),
+			).rejects.toThrow(HttpException)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.CREATE,
-				userToCreate,
+				{
+					...userToCreate,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 		})
 	})
@@ -119,11 +134,16 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.me(currentUser)
+			const result = await controller.me(currentUser, Locale.FR)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.GET_ME,
-				currentUser.token,
+				{
+					token: currentUser.token,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 
 			expect(result).toMatchObject(userLight)
@@ -131,7 +151,7 @@ describe('Testing UserController', () => {
 
 		it('should throw an error if no token is provided', async () => {
 			await expect(
-				controller.me({} as unknown as CurrentUser),
+				controller.me({} as unknown as CurrentUser, Locale.FR),
 			).rejects.toThrow(UserNotFoundException)
 		})
 
@@ -145,13 +165,18 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			await expect(controller.me(currentUser)).rejects.toThrow(
+			await expect(controller.me(currentUser, Locale.FR)).rejects.toThrow(
 				UserNotFoundException,
 			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.GET_ME,
-				currentUser.token,
+				{
+					token: currentUser.token,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 		})
 	})
@@ -176,11 +201,21 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.getProfile(currentUser, userId)
+			const result = await controller.getProfile(
+				currentUser,
+				userId,
+				Locale.FR,
+			)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.GET_PROFILE,
-				{ user: currentUser, userId },
+				{
+					user: currentUser,
+					userId,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 
 			expect(result).toMatchObject(response.data)
@@ -200,12 +235,18 @@ describe('Testing UserController', () => {
 			)
 
 			await expect(
-				controller.getProfile(currentUser, userId),
+				controller.getProfile(currentUser, userId, Locale.FR),
 			).rejects.toThrow(UserNotFoundException)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.GET_PROFILE,
-				{ user: currentUser, userId },
+				{
+					user: currentUser,
+					userId,
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 		})
 	})
@@ -226,11 +267,16 @@ describe('Testing UserController', () => {
 				of(response),
 			)
 
-			const result = await controller.getStats(currentUser)
+			const result = await controller.getStats(currentUser, Locale.FR)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQUserMessageType.GET_STATS,
-				'userId',
+				{
+					userId: 'userId',
+					session: {
+						locale: Locale.FR,
+					},
+				},
 			)
 
 			expect(result).toMatchObject(response.data)

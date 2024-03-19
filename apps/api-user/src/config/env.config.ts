@@ -31,4 +31,10 @@ export default (): INestEnvConfig => ({
 	settings: {
 		sessionDuration: parseInt(process.env.SESSION_DURATION || ''),
 	},
+	i18n: {
+		availableLocales: (process.env.I18N_AVAILABLE_LOCALES || '').split(','),
+		defaultLocale: process.env.I18N_DEFAULT_LOCALE || '',
+		fallbackLocale: process.env.I18N_FALLBACK_LOCALE || '',
+		localeToken: process.env.I18N_LOCALE_TOKEN || '',
+	},
 })

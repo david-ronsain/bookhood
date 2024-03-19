@@ -13,6 +13,7 @@ import {
 	MQAuthMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
+import { Locale } from '../../../../../shared/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -55,11 +56,11 @@ describe('AuthController', () => {
 				of(response),
 			)
 
-			const result = await controller.sendLink(sendLinkDTO)
+			const result = await controller.sendLink(sendLinkDTO, Locale.FR)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQAuthMessageType.SEND_LINK,
-				sendLinkDTO,
+				{ ...sendLinkDTO, session: { locale: Locale.FR } },
 			)
 			expect(result).toBe(true)
 		})
@@ -78,9 +79,9 @@ describe('AuthController', () => {
 				of(response),
 			)
 
-			await expect(controller.sendLink(sendLinkDTO)).rejects.toThrow(
-				UserNotFoundException,
-			)
+			await expect(
+				controller.sendLink(sendLinkDTO, Locale.FR),
+			).rejects.toThrow(UserNotFoundException)
 		})
 	})
 
@@ -96,11 +97,11 @@ describe('AuthController', () => {
 				of(response),
 			)
 
-			const result = await controller.signin(signinDTO)
+			const result = await controller.signin(signinDTO, Locale.FR)
 
 			expect(controller['userQueue'].send).toHaveBeenCalledWith(
 				MQAuthMessageType.SIGNIN,
-				signinDTO,
+				{ ...signinDTO, session: { locale: Locale.FR } },
 			)
 			expect(result).toBe(true)
 		})
@@ -119,9 +120,9 @@ describe('AuthController', () => {
 				of(response),
 			)
 
-			await expect(controller.signin(signinDTO)).rejects.toThrow(
-				ForbiddenException,
-			)
+			await expect(
+				controller.signin(signinDTO, Locale.FR),
+			).rejects.toThrow(ForbiddenException)
 		})
 	})
 })

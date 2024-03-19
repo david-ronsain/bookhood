@@ -35,6 +35,7 @@ import {
 	userModel,
 	userRequestStats,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -87,6 +88,12 @@ describe('UserController', () => {
 				},
 				{ provide: CreateUserUseCase, useValue: mockedUseCase },
 				{ provide: GetUserByIdUseCase, useValue: mockedUseCase },
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
+					},
+				},
 			],
 		}).compile()
 

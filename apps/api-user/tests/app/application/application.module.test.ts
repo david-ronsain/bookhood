@@ -14,6 +14,9 @@ import UserRepositoryMongo from '../../../src/app/infrastructure/adapters/reposi
 import envConfig from '../../../src/config/env.config'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { WinstonModule } from 'nest-winston'
+import { I18nModule } from 'nestjs-i18n'
+import { MQResolver } from '../../../../shared-api/src'
+import path from 'path'
 
 describe('Testing the ApplicationModule', () => {
 	let module: TestingModule
@@ -29,9 +32,9 @@ describe('Testing the ApplicationModule', () => {
 						uri: `${envConfig().mongo.protocol}://${
 							envConfig().mongo.user
 								? envConfig().mongo.user +
-								  ':' +
-								  envConfig().mongo.password +
-								  '@'
+									':' +
+									envConfig().mongo.password +
+									'@'
 								: ''
 						}${
 							envConfig().mongo.host
@@ -46,6 +49,19 @@ describe('Testing the ApplicationModule', () => {
 						schema: UserSchema,
 					},
 				]),
+				I18nModule.forRoot({
+					fallbackLanguage: envConfig().i18n.fallbackLocale,
+					resolvers: [
+						{
+							use: MQResolver,
+							options: ['locale'],
+						},
+					],
+					loaderOptions: {
+						path: path.join(__dirname, '/app/application/locales/'),
+						watch: true,
+					},
+				}),
 				ApplicationModule,
 			],
 		}).compile()

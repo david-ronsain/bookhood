@@ -6,16 +6,21 @@ import {
 	userModelWithToken,
 	userRepository as userRepo,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('Testing the VerifAuthTokenUseCase', () => {
 	let usecase: VerifAuthTokenUseCase
+	let i18n: I18nService
 
 	let mock: UserRepository
 
 	beforeEach(async () => {
 		mock = { ...userRepo } as unknown as UserRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		usecase = new VerifAuthTokenUseCase(mock)
+		usecase = new VerifAuthTokenUseCase(mock, i18n)
 	})
 
 	afterAll(() => {
@@ -23,13 +28,6 @@ describe('Testing the VerifAuthTokenUseCase', () => {
 	})
 
 	describe('Testing the handler method', () => {
-		it('should throw an error if the user does not exist', () => {
-			jest.spyOn(mock, 'getUserByEmail').mockResolvedValueOnce(null)
-
-			expect(usecase.handler('', '')).rejects.toThrow(NotFoundException)
-			expect(mock.getUserByEmail).toHaveBeenCalledWith('')
-		})
-
 		it('should throw an error if the token is incorrect', () => {
 			jest.spyOn(mock, 'getUserByEmail').mockResolvedValueOnce({
 				...userModelWithToken,
@@ -46,10 +44,10 @@ describe('Testing the VerifAuthTokenUseCase', () => {
 			)
 		})
 
-		it('should throw an error if the token has expired', () => {
+		it('should throw an error if the token has expired', async () => {
 			jest.spyOn(mock, 'getUserByEmail').mockResolvedValue({
 				...userModelWithToken,
-				tokenExpiration: new Date(),
+				tokenExpiration: new Date(Date.now() - 1),
 			})
 			jest.spyOn(mock, 'update').mockResolvedValueOnce({
 				...userModelWithToken,

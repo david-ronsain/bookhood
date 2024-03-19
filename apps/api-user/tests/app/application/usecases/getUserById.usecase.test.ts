@@ -6,15 +6,21 @@ import {
 	userModel,
 	userRepository as userRepo,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('Testing the GetUserByIdUseCase', () => {
 	let usecase: GetUserByIdUseCase
+	let i18n: I18nService
 
 	const mock = { ...userRepo } as unknown as UserRepository
 
 	beforeEach(async () => {
 		jest.clearAllMocks()
-		usecase = new GetUserByIdUseCase(mock)
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
+
+		usecase = new GetUserByIdUseCase(mock, i18n)
 	})
 
 	describe('Testing the handler method', () => {

@@ -93,7 +93,9 @@ describe('LibraryController', () => {
 					userId,
 					page,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -150,7 +152,9 @@ describe('LibraryController', () => {
 					libraryId,
 					status,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 			expect(result).toEqual(response.data)

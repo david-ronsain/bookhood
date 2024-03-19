@@ -1,4 +1,5 @@
-import { Role } from '../enums'
+import { Locale, Role } from '../enums'
+import { Session } from './session.interface'
 
 export interface IUser {
 	_id?: string
@@ -14,9 +15,11 @@ export interface IUser {
 	token?: string
 
 	tokenExpiration?: Date
+
+	locale?: Locale
 }
 
-export interface ICreateUserDTO {
+export interface ICreateUserDTO extends Session {
 	firstName: string
 
 	lastName: string

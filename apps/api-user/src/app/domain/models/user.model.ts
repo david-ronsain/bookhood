@@ -1,4 +1,4 @@
-import { IUser, Role } from '@bookhood/shared'
+import { IUser, Locale, Role } from '@bookhood/shared'
 
 export default class UserModel {
 	constructor(user?: IUser) {
@@ -13,6 +13,7 @@ export default class UserModel {
 					: [Role.USER]
 			this.token = user.token
 			this.tokenExpiration = user.tokenExpiration
+			this.locale = user.locale
 		}
 	}
 
@@ -29,4 +30,6 @@ export default class UserModel {
 	token?: string
 
 	tokenExpiration?: Date
+
+	locale?: Locale
 }

@@ -1,8 +1,6 @@
-import { Locale } from '@bookhood/shared'
+import { Session } from '@bookhood/shared'
 import { CurrentUser } from '../interfaces'
 
-export class DTOWithAuth {
+export class DTOWithAuth extends Session {
 	user?: CurrentUser
-
-	locale: Locale
 }

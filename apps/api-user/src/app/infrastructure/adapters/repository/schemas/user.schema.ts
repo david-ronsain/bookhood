@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose'
-import { Role } from '@bookhood/shared'
+import { Locale, Role } from '@bookhood/shared'
 
 const UserSchema = new Schema(
 	{
@@ -33,10 +33,15 @@ const UserSchema = new Schema(
 		tokenExpiration: {
 			type: Date,
 		},
+		locale: {
+			type: String,
+			enum: Locale,
+			default: Locale.FR,
+		},
 	},
 	{
 		timestamps: true,
-	}
+	},
 )
 
 export default UserSchema

@@ -71,7 +71,9 @@ export class BookController {
 			this.bookQueue.send(MQBookMessageType.CREATE, {
 				user,
 				book,
-				locale,
+				session: {
+					locale,
+				},
 			} as AddBookMQDTO),
 		)
 		if (!created.success) {
@@ -135,7 +137,9 @@ export class BookController {
 				language: 'fr',
 				boundingBox: body.boundingBox,
 				user,
-				locale,
+				session: {
+					locale,
+				},
 			} as SearchBookMQDTO),
 		)
 		if (!created.success) {
@@ -161,7 +165,9 @@ export class BookController {
 			this.bookQueue.send(MQBookMessageType.GET, {
 				page,
 				user,
-				locale,
+				session: {
+					locale,
+				},
 			} as GetBookMQDTO),
 		)
 		if (!response.success) {

@@ -1,0 +1,25 @@
+{
+    "auth": {
+        "forbidden": "Votre lien de connexion est incorrect, demandez-en un nouveau"
+    },
+    "user": {
+        "notFound": "Cet utilisateur n'existe pas"
+    },
+    "createUser": {
+        "conflict": "Cet email est déjà utilisé"
+    },
+    "getUserByEmail": {
+        "notFound": "Cet utilisateur n'existe pas"
+    },
+    "getUserById": {
+        "notFound": "Cet utilisateur n'existe pas"
+    },
+    "refreshToken": {
+        "notFound": "Cet utilisateur n'existe pas"
+    },
+    "verifyAuthToken": {
+        "notFound": "Cet utilisateur n'existe pas",
+        "forbidden1": "Votre lien de connexion est incorrect, demandez en un nouveau",
+        "forbidden2": "Votre lien de connexion a expiré, demandez en un nouveau"
+    }
+}

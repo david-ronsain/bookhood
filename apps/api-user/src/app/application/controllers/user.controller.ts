@@ -1,12 +1,19 @@
 import {
 	Controller,
+	Headers,
 	HttpStatus,
 	Inject,
 	NotFoundException,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices'
-import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
+import {
+	ICreateUserDTO,
+	IExternalProfile,
+	IUser,
+	Locale,
+	Role,
+} from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import {
@@ -21,11 +28,13 @@ import {
 } from '@bookhood/shared-api'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
-import { firstValueFrom, of } from 'rxjs'
+import { firstValueFrom } from 'rxjs'
 import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import GetUserByTokenUseCase from '../usecases/getUserByToken.usecase'
 import RefreshTokenUseCase from '../usecases/refreshToken.usecase'
 import GetUserByIdUseCase from '../usecases/getUserById.usecase'
+import envConfig from '../../../config/env.config'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 @Controller()
 export class UserController {
@@ -38,6 +47,7 @@ export class UserController {
 		private readonly getUserByIdUseCase: GetUserByIdUseCase,
 		private readonly refreshTokenUseCase: RefreshTokenUseCase,
 		private readonly createUserUseCase: CreateUserUseCase,
+		private readonly i18n: I18nService,
 	) {}
 
 	@MessagePattern(MQUserMessageType.HEALTH)
@@ -75,7 +85,11 @@ export class UserController {
 		try {
 			const roles = await this.refreshTokenUseCase.handler(token)
 			if (!roles) {
-				throw new NotFoundException('user not found')
+				throw new NotFoundException(
+					this.i18n.t('errors.user.notFound', {
+						lang: I18nContext.current()?.lang,
+					}),
+				)
 			}
 
 			return roles
@@ -175,7 +189,6 @@ export class UserController {
 				>
 			>(this.rabbitBook.send(MQBookMessageType.GET_STATS, userId))
 		} catch (err) {
-			console.log(err)
 			return new MicroserviceResponseFormatter<
 				UserLibraryStats & UserRequestStats
 			>().buildFromException(err, { userId })

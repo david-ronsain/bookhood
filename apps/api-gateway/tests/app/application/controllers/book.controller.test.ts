@@ -84,7 +84,9 @@ describe('BookController', () => {
 				{
 					user: currentUser,
 					book: addBookDTO,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -163,7 +165,9 @@ describe('BookController', () => {
 					language: 'fr',
 					boundingBox,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -216,7 +220,9 @@ describe('BookController', () => {
 				{
 					page,
 					user: currentUser,
-					locale: Locale.FR,
+					session: {
+						locale: Locale.FR,
+					},
 				},
 			)
 			expect(result).toEqual(response.data)

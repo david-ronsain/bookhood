@@ -13,6 +13,7 @@ import VerifyAuthTokenUseCase from '../../../../src/app/application/usecases/ver
 import { HealthCheckStatus } from '../../../../../shared-api/src'
 import { userModel } from '../../../../../shared-api/test'
 import { ClientProxy } from '@nestjs/microservices'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -64,6 +65,12 @@ describe('Testing AuthController', () => {
 					provide: VerifyAuthTokenUseCase,
 					useValue: {
 						handler: jest.fn(),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

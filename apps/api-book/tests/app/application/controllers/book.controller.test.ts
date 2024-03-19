@@ -125,7 +125,9 @@ describe('BookController', () => {
 		const body = {
 			book: mockDTO,
 			user: currentUser,
-			locale: Locale.FR,
+			session: {
+				locale: Locale.FR,
+			},
 		}
 		it('should add a book and return success', async () => {
 			const mockBook = bookModel as BookModel
@@ -188,7 +190,9 @@ describe('BookController', () => {
 			const result = await controller.addBook({
 				user: currentUser,
 				book: body.book,
-				locale: Locale.FR,
+				session: {
+					locale: Locale.FR,
+				},
 			})
 
 			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()

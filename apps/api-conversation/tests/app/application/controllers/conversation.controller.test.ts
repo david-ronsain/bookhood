@@ -10,12 +10,7 @@ import {
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import { Observable, of } from 'rxjs'
-import {
-	GetOrCreateConversationDTO,
-	IConversationMessage,
-	Locale,
-	SessionDTO,
-} from '../../../../../shared/src'
+import { IConversationMessage } from '../../../../../shared/src'
 import FlagAsSeenUseCase from '../../../../src/app/application/usecases/flagAsSeen.usecase'
 import {
 	addMessageDTO,

@@ -69,7 +69,9 @@ export class LibraryController {
 				user,
 				userId,
 				page,
-				locale,
+				session: {
+					locale,
+				},
 			} as GetLibrariesListMQDTO),
 		)
 
@@ -101,7 +103,9 @@ export class LibraryController {
 				user,
 				libraryId,
 				status,
-				locale,
+				session: {
+					locale,
+				},
 			} as PatchLibraryMQDTO),
 		)
 

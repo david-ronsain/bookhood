@@ -74,7 +74,9 @@ export class RequestController {
 				libraryId,
 				user,
 				...body,
-				locale,
+				session: {
+					locale,
+				},
 			} as CreateRequestMQDTO),
 		)
 		if (!response.success) {
@@ -101,7 +103,9 @@ export class RequestController {
 			this.bookQueue.send(MQRequestMessageType.LIST, {
 				...body,
 				user,
-				locale,
+				session: {
+					locale,
+				},
 			} as GetRequestsMQDTO),
 		)
 		if (!response.success) {
@@ -133,7 +137,9 @@ export class RequestController {
 				...body,
 				requestId: id,
 				user,
-				locale,
+				session: {
+					locale,
+				},
 			} as PatchRequestMQDTO),
 		)
 		if (!response.success) {

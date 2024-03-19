@@ -1,7 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import UserEmailExistsUseCase from '../../../../src/app/application/usecases/userEmailExists.usecase'
 import { UserRepository } from '../../../../src/app/domain/ports/user.repository'
-import { NotFoundException } from '@nestjs/common'
 import { userRepository as userRepo } from '../../../../../shared-api/test'
 
 describe('Testing the UserEmailExistsUseCase', () => {
@@ -19,7 +18,7 @@ describe('Testing the UserEmailExistsUseCase', () => {
 		it('should throw an error if the user does not exist', () => {
 			jest.spyOn(mock, 'emailExists').mockResolvedValue(false)
 
-			expect(usecase.handler('')).rejects.toThrow(NotFoundException)
+			expect(usecase.handler('')).resolves.toBe(false)
 			expect(mock.emailExists).toHaveBeenCalledWith('')
 		})
 

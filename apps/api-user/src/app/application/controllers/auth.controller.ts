@@ -20,6 +20,7 @@ import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import UserModel from '../../domain/models/user.model'
 import VerifyAuthTokenUseCase from '../usecases/verifyAuthToken.usecase'
 import GetUserByEmailUseCase from '../usecases/getUserByEmail.usecase'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 @Controller()
 export class AuthController {
@@ -29,6 +30,7 @@ export class AuthController {
 		private readonly createAuthLinkUseCase: CreateAuthLinkUseCase,
 		private readonly verifyAuthTokenUseCase: VerifyAuthTokenUseCase,
 		@Inject('RabbitMail') private readonly rabbitMailClient: ClientProxy,
+		private readonly i18n: I18nService,
 	) {}
 
 	@MessagePattern(MQAuthMessageType.HEALTH)
@@ -73,7 +75,9 @@ export class AuthController {
 			const token = dto.token.split('|')
 			if (token.length !== 2) {
 				throw new ForbiddenException(
-					'Your signin link is incorrect, please signin again',
+					this.i18n.t('errors.auth.forbidden', {
+						lang: I18nContext.current()?.lang,
+					}),
 				)
 			}
 
