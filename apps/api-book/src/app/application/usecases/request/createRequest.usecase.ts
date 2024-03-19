@@ -4,6 +4,7 @@ import { LibraryRepository } from '../../../domain/ports/library.repository'
 import RequestModel from '../../../domain/models/request.model'
 import { IRequest, RequestStatus } from '@bookhood/shared'
 import RequestMapper from '../../mappers/request.mapper'
+import { I18nService } from 'nestjs-i18n'
 
 export default class CreateRequestUseCase {
 	constructor(
@@ -11,6 +12,7 @@ export default class CreateRequestUseCase {
 		private readonly requestRepository: RequestRepository,
 		@Inject('LibraryRepository')
 		private readonly libraryRepository: LibraryRepository,
+		private readonly i18n: I18nService,
 	) {}
 
 	async handler(
@@ -20,7 +22,9 @@ export default class CreateRequestUseCase {
 	): Promise<IRequest> {
 		const library = await this.libraryRepository.getById(libraryId)
 		if (!library) {
-			throw new NotFoundException('We could not find this book')
+			throw new NotFoundException(
+				this.i18n.t('errors.request.createRequest.notFound'),
+			)
 		}
 
 		const currentlyBorrowed =
@@ -30,7 +34,7 @@ export default class CreateRequestUseCase {
 			)
 		if (currentlyBorrowed > 0) {
 			throw new ForbiddenException(
-				'You can not borrow multiple books at the same time',
+				this.i18n.t('errors.request.createRequest.forbidden'),
 			)
 		}
 

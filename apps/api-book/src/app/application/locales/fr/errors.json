@@ -1,0 +1,25 @@
+{
+    "book": {
+        "addBook": {
+            "conflict": "Ce livre est déjà dans votre bibliothèque"
+        },
+        "getUserBook": {
+            "notFound": "Ce livre n'existe pas"
+        }
+    },
+    "library": {
+        "patch": {
+            "notFound": "Ce livre n'existe pas",
+            "forbidden": "Vous n'avez pas le droit de mettre à jour ce livre"
+        }
+    },
+    "request": {
+        "createRequest": {
+            "notFound": "Nous n'avons pas pu trouver ce livre",
+            "forbidden": "Vous ne pouvez pas emprunter plusieurs livres en même temps"
+        },
+        "getById": {
+            "notFound": "Cette demande n'existe pas"
+        }
+    }
+}

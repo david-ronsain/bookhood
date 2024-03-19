@@ -1,6 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import mongoose from 'mongoose'
-import RequestModel from '../../../../api-book/src/app/domain/models/request.model'
 import {
 	IRequest,
 	IRequestInfos,
@@ -87,7 +86,7 @@ export const request: IRequest = {
 	status: RequestStatus.PENDING_VALIDATION,
 }
 
-export const requestModel: RequestModel = {
+export const requestModel = {
 	_id: 'aaaaaaaaaaaaaaaaaaaaaaaa',
 	libraryId: new mongoose.Types.ObjectId('bbbbbbbbbbbbbbbbbbbbbbbb'),
 	userId: new mongoose.Types.ObjectId('cccccccccccccccccccccccc'),

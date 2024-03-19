@@ -9,18 +9,23 @@ import {
 	libraryModel,
 	libraryRepository,
 } from '../../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('PatchUseCase', () => {
 	let patchUseCase: PatchUseCase
 	let libraryRepositoryMock: LibraryRepository
+	let i18n: I18nService
 
 	const mockedLib = libraryModel
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		libraryRepositoryMock = { ...libraryRepository }
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		patchUseCase = new PatchUseCase(libraryRepositoryMock)
+		patchUseCase = new PatchUseCase(libraryRepositoryMock, i18n)
 	})
 
 	describe('Testing the handler', () => {

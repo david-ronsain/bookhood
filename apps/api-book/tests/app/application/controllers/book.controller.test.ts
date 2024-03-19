@@ -7,7 +7,12 @@ import { ConflictException, HttpStatus } from '@nestjs/common'
 import BookModel from '../../../../src/app/domain/models/book.model'
 import CreateBookIfNewUseCase from '../../../../src/app/application/usecases/book/createBookIfNew.usecase'
 import SearchBookUseCase from '../../../../src/app/application/usecases/book/searchBook.usecase'
-import { IAddBookDTO, IBook, IBookSearch } from '../../../../../shared/src'
+import {
+	IAddBookDTO,
+	IBook,
+	IBookSearch,
+	Locale,
+} from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
 import { HealthCheckStatus } from '../../../../../shared-api/src'
@@ -120,6 +125,7 @@ describe('BookController', () => {
 		const body = {
 			book: mockDTO,
 			user: currentUser,
+			locale: Locale.FR,
 		}
 		it('should add a book and return success', async () => {
 			const mockBook = bookModel as BookModel
@@ -182,6 +188,7 @@ describe('BookController', () => {
 			const result = await controller.addBook({
 				user: currentUser,
 				book: body.book,
+				locale: Locale.FR,
 			})
 
 			expect(createBookIfNewUseCase.handler).toHaveBeenCalled()
@@ -201,6 +208,7 @@ describe('BookController', () => {
 			language: 'en',
 			boundingBox: [0, 0, 0, 0],
 			user: currentUser,
+			locale: Locale.FR,
 		}
 
 		it('should search for books and return success', async () => {
@@ -247,9 +255,9 @@ describe('BookController', () => {
 	})
 
 	describe('getUserBooks', () => {
-		it('should return user books when token is valid', async () => {
-			const body = { user: currentUser, page: 1 }
+		const body = { user: currentUser, page: 1, locale: Locale.FR }
 
+		it('should return user books when token is valid', async () => {
 			const mockUserBooks = librariesFull
 			jest.spyOn(getUserBooksUseCase, 'handler').mockImplementationOnce(
 				() => Promise.resolve(mockUserBooks),
@@ -273,7 +281,6 @@ describe('BookController', () => {
 		})
 
 		it('should throw an error', async () => {
-			const body = { user: currentUser, page: 1 }
 			const error = new Error()
 
 			jest.spyOn(getUserBooksUseCase, 'handler').mockRejectedValueOnce(

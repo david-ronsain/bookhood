@@ -8,12 +8,12 @@ import {
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
 import { of } from 'rxjs'
-import { LibraryStatus } from '../../../../../shared/src'
 import {
 	addBookDTO,
 	currentUser,
 	librariesFull,
 } from '../../../../../shared-api/test'
+import { Locale } from '../../../../../shared/src'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -76,6 +76,7 @@ describe('BookController', () => {
 			const result = await controller.addBook(
 				currentUser,
 				addBookDTO as unknown as AddBookDTO,
+				Locale.FR,
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -83,6 +84,7 @@ describe('BookController', () => {
 				{
 					user: currentUser,
 					book: addBookDTO,
+					locale: Locale.FR,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -99,6 +101,7 @@ describe('BookController', () => {
 				controller.addBook(
 					currentUser,
 					addBookDTO as unknown as AddBookDTO,
+					Locale.FR,
 				),
 			).rejects.toThrow(HttpException)
 		})
@@ -142,11 +145,15 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.getBooks(currentUser, {
-				q,
-				startIndex,
-				boundingBox,
-			})
+			const result = await controller.getBooks(
+				currentUser,
+				{
+					q,
+					startIndex,
+					boundingBox,
+				},
+				Locale.FR,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQBookMessageType.SEARCH,
@@ -156,6 +163,7 @@ describe('BookController', () => {
 					language: 'fr',
 					boundingBox,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -169,11 +177,15 @@ describe('BookController', () => {
 			)
 
 			await expect(
-				controller.getBooks(currentUser, {
-					q,
-					startIndex,
-					boundingBox,
-				}),
+				controller.getBooks(
+					currentUser,
+					{
+						q,
+						startIndex,
+						boundingBox,
+					},
+					Locale.FR,
+				),
 			).rejects.toThrow(HttpException)
 		})
 	})
@@ -193,13 +205,18 @@ describe('BookController', () => {
 				of(response),
 			)
 
-			const result = await controller.getUserBooks(currentUser, page)
+			const result = await controller.getUserBooks(
+				currentUser,
+				page,
+				Locale.FR,
+			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
 				MQBookMessageType.GET,
 				{
 					page,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -215,7 +232,7 @@ describe('BookController', () => {
 			)
 
 			await expect(
-				controller.getUserBooks(currentUser, page),
+				controller.getUserBooks(currentUser, page, Locale.FR),
 			).rejects.toThrow(HttpException)
 		})
 	})

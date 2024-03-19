@@ -3,11 +3,13 @@ import { ICoords, ILibrary, LibraryStatus } from '@bookhood/shared'
 import { LibraryRepository } from '../../../domain/ports/library.repository'
 import LibraryModel from '../../../domain/models/library.model'
 import LibraryMapper from '../../mappers/library.mapper'
+import { I18nService } from 'nestjs-i18n'
 
 export default class AddBookUseCase {
 	constructor(
 		@Inject('LibraryRepository')
 		private readonly libraryRepository: LibraryRepository,
+		private readonly i18n: I18nService,
 	) {}
 
 	async handler(
@@ -23,7 +25,9 @@ export default class AddBookUseCase {
 		)
 
 		if (exists) {
-			throw new ConflictException('The book is already in your library')
+			throw new ConflictException(
+				this.i18n.t('errors.book.addBook.conflict'),
+			)
 		}
 
 		const lib = await this.libraryRepository.create(

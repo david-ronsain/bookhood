@@ -11,21 +11,26 @@ import {
 	request as req,
 	libraryModel,
 } from '../../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('CreateRequestUseCase', () => {
 	let createRequestUseCase: CreateRequestUseCase
 	let requestRepository: RequestRepository
 	let libraryRepository: LibraryRepository
+	let i18n: I18nService
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		requestRepository = { ...reqRepo } as unknown as RequestRepository
-
 		libraryRepository = { ...libRepo } as unknown as LibraryRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
 		createRequestUseCase = new CreateRequestUseCase(
 			requestRepository,
 			libraryRepository,
+			i18n,
 		)
 	})
 

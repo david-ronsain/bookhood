@@ -14,7 +14,6 @@ import {
 	Query,
 	UseGuards,
 } from '@nestjs/common'
-
 import { ClientProxy } from '@nestjs/microservices'
 import {
 	ApiBody,
@@ -25,7 +24,13 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { IBook, IBookSearch, Role, ILibraryFull } from '@bookhood/shared'
+import {
+	IBook,
+	IBookSearch,
+	Role,
+	ILibraryFull,
+	Locale,
+} from '@bookhood/shared'
 import { RoleGuard } from '../guards/role.guard'
 import {
 	MicroserviceResponseFormatter,
@@ -58,6 +63,7 @@ export class BookController {
 	async addBook(
 		@User() user: CurrentUser,
 		@Body() book: AddBookDTO,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IBook> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBook>
@@ -65,6 +71,7 @@ export class BookController {
 			this.bookQueue.send(MQBookMessageType.CREATE, {
 				user,
 				book,
+				locale,
 			} as AddBookMQDTO),
 		)
 		if (!created.success) {
@@ -117,6 +124,7 @@ export class BookController {
 	async getBooks(
 		@User() user: CurrentUser,
 		@Body() body: BookSearchDTO,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IBookSearch> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBookSearch>
@@ -127,6 +135,7 @@ export class BookController {
 				language: 'fr',
 				boundingBox: body.boundingBox,
 				user,
+				locale,
 			} as SearchBookMQDTO),
 		)
 		if (!created.success) {
@@ -144,6 +153,7 @@ export class BookController {
 	async getUserBooks(
 		@User() user: CurrentUser,
 		@Query('page') page: number,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<ILibraryFull[]> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibraryFull[]>
@@ -151,6 +161,7 @@ export class BookController {
 			this.bookQueue.send(MQBookMessageType.GET, {
 				page,
 				user,
+				locale,
 			} as GetBookMQDTO),
 		)
 		if (!response.success) {

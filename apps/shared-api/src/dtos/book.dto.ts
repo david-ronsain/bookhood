@@ -1,4 +1,4 @@
-import { IAddBookDTO } from '@bookhood/shared'
+import { IAddBookDTO, Locale } from '@bookhood/shared'
 import { DTOWithAuth } from './common.dto'
 
 export interface AddBookMQDTO extends DTOWithAuth {

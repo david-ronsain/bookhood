@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { BookEntity } from './entities/book.entity'
 import { Injectable } from '@nestjs/common'
 import BookMapper from '../../../application/mappers/book.mapper'
-import mongoose, { Model, PipelineStage } from 'mongoose'
+import { Model, PipelineStage } from 'mongoose'
 import { IBookSearch } from '@bookhood/shared'
 
 @Injectable()

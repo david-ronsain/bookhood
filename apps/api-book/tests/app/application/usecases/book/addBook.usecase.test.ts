@@ -9,16 +9,21 @@ import {
 	libraryModel,
 	libraryRepositoryMock as mockRepo,
 } from '../../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('AddBookUseCase', () => {
 	let addBookUseCase: AddBookUseCase
 	let libraryRepositoryMock: LibraryRepository
+	let i18n: I18nService
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		libraryRepositoryMock = { ...mockRepo }
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		addBookUseCase = new AddBookUseCase(libraryRepositoryMock)
+		addBookUseCase = new AddBookUseCase(libraryRepositoryMock, i18n)
 	})
 
 	it('should add a book to the library successfully', async () => {

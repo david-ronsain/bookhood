@@ -6,16 +6,21 @@ import {
 	requestRepository as reqRepo,
 	requestInfos,
 } from '../../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('GetByIdUseCase', () => {
 	let getById: GetByIdUseCase
 	let requestRepository: RequestRepository
+	let i18n: I18nService
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		requestRepository = { ...reqRepo } as unknown as RequestRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		getById = new GetByIdUseCase(requestRepository)
+		getById = new GetByIdUseCase(requestRepository, i18n)
 	})
 
 	describe('handler', () => {

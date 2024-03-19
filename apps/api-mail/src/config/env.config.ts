@@ -1,3 +1,4 @@
+import { Locale } from '@bookhood/shared'
 import { INestEnvConfig } from '@bookhood/shared-api'
 
 export default (): INestEnvConfig => ({
@@ -31,6 +32,7 @@ export default (): INestEnvConfig => ({
 		availableLocales: (process.env.I18N_AVAILABLE_LOCALES || '').split(','),
 		defaultLocale: process.env.I18N_FALLBACK_LOCALE || '',
 		fallbackLocale: process.env.I18N_DEFAULT_LOCALE || '',
+		localeToken: process.env.I18N_LOCALE_TOKEN || '',
 	},
 	front: {
 		host: process.env.APP_FRONT_HOST || '',

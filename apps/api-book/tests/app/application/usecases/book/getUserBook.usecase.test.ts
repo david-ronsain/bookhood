@@ -7,16 +7,21 @@ import {
 	libraryRepository as libRepo,
 } from '../../../../../../shared-api/test'
 import { ILibraryFull } from '../../../../../../shared/src'
+import { I18nService } from 'nestjs-i18n'
 
 describe('GetUserBookUseCase', () => {
 	let getUserBookUseCase: GetUserBookUseCase
 	let libraryRepository: LibraryRepository
+	let i18n: I18nService
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		libraryRepository = libRepo as unknown as LibraryRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		getUserBookUseCase = new GetUserBookUseCase(libraryRepository)
+		getUserBookUseCase = new GetUserBookUseCase(libraryRepository, i18n)
 	})
 
 	describe('handler', () => {

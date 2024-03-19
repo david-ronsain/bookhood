@@ -1,3 +1,5 @@
+import { Locale } from '@bookhood/shared'
+
 export interface INestEnvConfigSettings {
 	protocol?: 'http' | 'https'
 	host?: string
@@ -76,6 +78,7 @@ interface INestEnvConfigI18n {
 	availableLocales: string[]
 	defaultLocale: string
 	fallbackLocale: string
+	localeToken: string
 }
 
 interface INestEnvConfigFront {
