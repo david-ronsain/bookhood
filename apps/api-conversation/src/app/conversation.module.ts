@@ -8,6 +8,9 @@ import * as winston from 'winston'
 import { winstonConfig } from '@bookhood/shared'
 import { InfrastructureModule } from './infrastructure/infrastructure.module'
 import { DomainModule } from './domain/domain.module'
+import { I18nModule } from 'nestjs-i18n'
+import { MQResolver } from '@bookhood/shared-api'
+import path from 'path'
 
 @Module({
 	imports: [
@@ -24,6 +27,19 @@ import { DomainModule } from './domain/domain.module'
 				envConfig().gateway.conversation.serviceName,
 			),
 		),
+		I18nModule.forRoot({
+			fallbackLanguage: envConfig().i18n.fallbackLocale,
+			resolvers: [
+				{
+					use: MQResolver,
+					options: ['locale'],
+				},
+			],
+			loaderOptions: {
+				path: path.join(__dirname, '/app/application/locales/'),
+				watch: true,
+			},
+		}),
 	],
 })
 export class ConversationModule {}

@@ -9,12 +9,14 @@ import {
 } from '@bookhood/shared-api'
 import { IConversationFull, IRequestInfos } from '@bookhood/shared'
 import { v4 } from 'uuid'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class GetOrCreateUseCase {
 	constructor(
 		@Inject('ConversationRepository')
 		private readonly conversationRepository: ConversationRepository,
 		@Inject('RabbitBook') private readonly bookClient: ClientProxy,
+		private readonly i18n: I18nService,
 	) {}
 
 	async handler(
@@ -55,7 +57,9 @@ export default class GetOrCreateUseCase {
 			].includes(userId)
 		) {
 			throw new ForbiddenException(
-				"You don't have access to this conversation",
+				this.i18n.t('errors.getOrCreate.forbidden', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 

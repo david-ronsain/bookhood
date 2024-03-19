@@ -7,7 +7,7 @@ import type {
 	FlagAsSeenMessageDTO,
 	WritingDTO,
 } from '@bookhood/shared'
-import { WSConversationEventType } from '@bookhood/shared'
+import { WSConversationEventType, Locale } from '@bookhood/shared'
 
 interface ISocketState {
 	connected: boolean
@@ -15,6 +15,10 @@ interface ISocketState {
 	conversation: IConversation
 
 	writing: WritingDTO[]
+}
+
+const getLocale = (): string => {
+	return navigator?.language ? navigator?.language.substring(0, 2) : Locale.FR
 }
 
 export const state = ref<ISocketState>({
@@ -26,6 +30,7 @@ export const state = ref<ISocketState>({
 export const socket = io(EnvConfig.socket.url, {
 	extraHeaders: {
 		'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
+		'x-locale': getLocale(),
 	},
 })
 

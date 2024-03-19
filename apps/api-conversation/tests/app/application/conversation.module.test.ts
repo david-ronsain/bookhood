@@ -8,6 +8,9 @@ import { WinstonModule } from 'nest-winston'
 import ConversationSchema from '../../../src/app/infrastructure/adapters/repository/schemas/conversation.schema'
 import { ConversationController } from '../../../src/app/application/controllers/conversation.controller'
 import ConversationRepositoryMongo from '../../../src/app/infrastructure/adapters/repository/conversation.repository.mongo'
+import { I18nModule } from 'nestjs-i18n'
+import { MQResolver } from '../../../../shared-api/src'
+import path from 'path'
 
 describe('Testing the ApplicationModule', () => {
 	let module: TestingModule
@@ -40,6 +43,19 @@ describe('Testing the ApplicationModule', () => {
 						schema: ConversationSchema,
 					},
 				]),
+				I18nModule.forRoot({
+					fallbackLanguage: envConfig().i18n.fallbackLocale,
+					resolvers: [
+						{
+							use: MQResolver,
+							options: ['locale'],
+						},
+					],
+					loaderOptions: {
+						path: path.join(__dirname, '/app/application/locales/'),
+						watch: true,
+					},
+				}),
 				ApplicationModule,
 			],
 		}).compile()

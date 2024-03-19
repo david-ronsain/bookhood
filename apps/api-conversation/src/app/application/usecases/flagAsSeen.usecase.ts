@@ -1,12 +1,13 @@
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common'
+import { Inject, NotFoundException } from '@nestjs/common'
 import { ConversationRepository } from '../../domain/ports/conversation.repository'
-import { FlagAsSeenMessageDTO, IConversationMessage } from '@bookhood/shared'
-import ConversationMessageModel from '../../domain/models/message.model'
+import { FlagAsSeenMessageDTO } from '@bookhood/shared'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class FlagAsSeenUseCase {
 	constructor(
 		@Inject('ConversationRepository')
 		private readonly conversationRepository: ConversationRepository,
+		private readonly i18n: I18nService,
 	) {}
 
 	async handler(dto: FlagAsSeenMessageDTO): Promise<boolean> {
@@ -15,7 +16,11 @@ export default class FlagAsSeenUseCase {
 			dto.messageId,
 		)
 		if (!message) {
-			throw new NotFoundException('This message does not exist')
+			throw new NotFoundException(
+				this.i18n.t('errors.flagAsSeen.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		} else if (message.from !== dto.userId) {
 			await this.conversationRepository.flagAsSeen(
 				dto.conversationId,

@@ -2,9 +2,10 @@ import { Inject, UseGuards } from '@nestjs/common'
 import { Logger } from 'winston'
 import { ClientProxy } from '@nestjs/microservices'
 import {
+	ConnectedSocket,
+	MessageBody,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
-	OnGatewayInit,
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer,
@@ -23,6 +24,7 @@ import {
 	GetOrCreateConversationDTO,
 	IConversationFull,
 	IConversationMessage,
+	Locale,
 	Role,
 	WSConversationEventType,
 	WritingDTO,
@@ -30,10 +32,11 @@ import {
 import envConfig from '../../../config/env.config'
 import { AuthUserGuard } from '../guards/authUser.guard'
 import { RoleGuard } from '../guards/role.guard'
+import { SocketHeaders } from '../decorators/socket.decorator'
 
 @WebSocketGateway(envConfig().socket.port, { cors: true })
 export class ConversationGateway
-	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+	implements OnGatewayConnection, OnGatewayDisconnect
 {
 	constructor(
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
@@ -43,14 +46,10 @@ export class ConversationGateway
 
 	@WebSocketServer() io: Server
 
-	afterInit() {
-		this.logger.info('initialized')
-	}
-
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	handleConnection(client: Socket, ...args: any[]) {
 		const { sockets } = this.io.sockets
-
+		const locale = client.handshake.headers['x-locale']
 		this.logger.info(`Client id: ${client.id} connected`)
 		this.logger.debug(`Number of connected clients: ${sockets.size}`)
 	}
@@ -66,8 +65,10 @@ export class ConversationGateway
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage(WSConversationEventType.CONNECT)
 	async getOrCreateConversation(
-		client: Socket,
-		dto: GetOrCreateConversationDTO,
+		@ConnectedSocket() client: Socket,
+		@SocketHeaders(envConfig().i18n.localeToken) locale: Locale,
+		@SocketHeaders(envConfig().settings.sessionToken) token: string,
+		@MessageBody() dto: GetOrCreateConversationDTO,
 	) {
 		try {
 			const conversation = await firstValueFrom<
@@ -75,7 +76,13 @@ export class ConversationGateway
 			>(
 				this.conversationQueue.send(
 					MQConversationMessageType.CREATE_AND_GET,
-					dto,
+					{
+						...dto,
+						session: {
+							locale,
+							token,
+						},
+					},
 				),
 			)
 
@@ -89,14 +96,19 @@ export class ConversationGateway
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage(WSConversationEventType.ADD_MESSAGE)
-	async addMessage(client: Socket, dto: AddMessageDTO) {
+	async addMessage(
+		@ConnectedSocket() client: Socket,
+		@SocketHeaders(envConfig().i18n.localeToken) locale: Locale,
+		@SocketHeaders(envConfig().settings.sessionToken) token: string,
+		@MessageBody() dto: AddMessageDTO,
+	) {
 		try {
 			const message = await firstValueFrom<
 				MicroserviceResponseFormatter<IConversationMessage>
 			>(
 				this.conversationQueue.send(
 					MQConversationMessageType.ADD_MESSAGE,
-					dto,
+					{ ...dto, locale, token },
 				),
 			)
 
@@ -110,12 +122,17 @@ export class ConversationGateway
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage(WSConversationEventType.FLAG_MESSAGE_SEEN)
-	async flagAsSeen(client: Socket, dto: FlagAsSeenMessageDTO) {
+	async flagAsSeen(
+		@ConnectedSocket() client: Socket,
+		@SocketHeaders(envConfig().i18n.localeToken) locale: Locale,
+		@SocketHeaders(envConfig().settings.sessionToken) token: string,
+		@MessageBody() dto: FlagAsSeenMessageDTO,
+	) {
 		try {
 			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
 				this.conversationQueue.send(
 					MQConversationMessageType.FLAG_AS_SEEN,
-					dto,
+					{ ...dto, locale, token },
 				),
 			)
 			client.broadcast.emit(
@@ -129,14 +146,20 @@ export class ConversationGateway
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage(WSConversationEventType.IS_WRITING)
-	async isWriting(client: Socket, dto: WritingDTO) {
+	async isWriting(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() dto: WritingDTO,
+	) {
 		client.data.userId = dto.userId
 		client.broadcast.emit(WSConversationEventType.IS_WRITING_SUCCESS, dto)
 	}
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	@SubscribeMessage(WSConversationEventType.NOT_WRITING)
-	async isNotWriting(client: Socket, dto: WritingDTO) {
+	async isNotWriting(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() dto: WritingDTO,
+	) {
 		client.data.userId = undefined
 		client.broadcast.emit(WSConversationEventType.NOT_WRITING_SUCCESS, dto)
 	}

@@ -8,10 +8,13 @@ export class MQResolver implements I18nResolver {
 	resolve(context: ExecutionContext) {
 		let lang: string
 		const args = context.getArgs()?.[0]
-
+		console.log(args)
 		for (const key of this.keys) {
 			if (args[key]) {
 				lang = args[key]
+				break
+			} else if (args.session?.[key]) {
+				lang = args.session[key]
 				break
 			}
 		}

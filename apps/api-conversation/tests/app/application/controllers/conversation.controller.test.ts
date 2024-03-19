@@ -13,6 +13,8 @@ import { Observable, of } from 'rxjs'
 import {
 	GetOrCreateConversationDTO,
 	IConversationMessage,
+	Locale,
+	SessionDTO,
 } from '../../../../../shared/src'
 import FlagAsSeenUseCase from '../../../../src/app/application/usecases/flagAsSeen.usecase'
 import {
@@ -20,6 +22,7 @@ import {
 	conversationFull as conv,
 	currentUser,
 	flagAsSeenDTO,
+	getOrCreateDTO,
 } from '../../../../../shared-api/test'
 
 describe('ConversationController', () => {
@@ -88,17 +91,14 @@ describe('ConversationController', () => {
 			)
 			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
-			const dto: GetOrCreateConversationDTO = {
-				requestId: 'requestId',
-				token: 'token',
-			}
 			const conversation = { ...conv }
-			conversation.request._id = dto.requestId
+			conversation.request._id = getOrCreateDTO.requestId
 
 			jest.spyOn(getOrCreateUseCase, 'handler').mockImplementationOnce(
 				() => Promise.resolve(conversation),
 			)
-			const result = await controller.getOrCreateConversation(dto)
+			const result =
+				await controller.getOrCreateConversation(getOrCreateDTO)
 
 			expect(result.data).toMatchObject(conversation)
 		})
@@ -114,16 +114,13 @@ describe('ConversationController', () => {
 			)
 			jest.spyOn(userClient, 'send').mockReturnValue(mockObservable)
 
-			const dto: GetOrCreateConversationDTO = {
-				requestId: 'requestId',
-				token: 'token',
-			}
-			const result = await controller.getOrCreateConversation(dto)
+			const result =
+				await controller.getOrCreateConversation(getOrCreateDTO)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter().buildFromException(
 					new ForbiddenException(),
-					dto,
+					getOrCreateDTO,
 				),
 			)
 		})

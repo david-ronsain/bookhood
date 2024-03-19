@@ -2,23 +2,39 @@
 import {
 	AddMessageDTO,
 	FlagAsSeenMessageDTO,
+	GetOrCreateConversationDTO,
 	IConversationMessage,
+	Locale,
 } from '../../../../shared/src'
 
 export const addMessageDTO: AddMessageDTO = {
-	token: 'token',
 	_id: 'convId',
 	message: 'Message',
 	roomId: 'roomId',
 	userId: 'userId',
 	requestId: 'reqId',
+	session: {
+		token: 'token',
+		locale: Locale.FR,
+	},
 }
 
 export const flagAsSeenDTO: FlagAsSeenMessageDTO = {
-	token: 'token',
 	messageId: 'msgId',
 	userId: 'userId',
 	conversationId: 'convId',
+	session: {
+		token: 'token',
+		locale: Locale.FR,
+	},
+}
+
+export const getOrCreateDTO: GetOrCreateConversationDTO = {
+	requestId: 'requestId',
+	session: {
+		token: 'token',
+		locale: Locale.FR,
+	},
 }
 
 export const message: IConversationMessage = {

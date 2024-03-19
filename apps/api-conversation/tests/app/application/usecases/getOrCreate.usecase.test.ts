@@ -11,11 +11,13 @@ import {
 	conversationFull,
 	requestInfos,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('AddMessageUseCase', () => {
 	let getOrCreateUseCase: GetOrCreateUseCase
 	let conversationRepository: ConversationRepository
 	let bookClient: ClientProxy
+	let i18n: I18nService
 
 	beforeEach(() => {
 		conversationRepository = {
@@ -26,9 +28,14 @@ describe('AddMessageUseCase', () => {
 			send: jest.fn(() => of({})),
 		} as unknown as ClientProxy
 
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
+
 		getOrCreateUseCase = new GetOrCreateUseCase(
 			conversationRepository,
 			bookClient,
+			i18n,
 		)
 	})
 

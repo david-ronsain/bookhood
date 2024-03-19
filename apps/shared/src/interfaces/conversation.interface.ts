@@ -1,5 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+	IsEnum,
+	IsNotEmpty,
+	IsObject,
+	IsOptional,
+	IsString,
+} from 'class-validator'
 import { IRequestInfos } from './request.interface'
+import { Locale } from '../enums'
 
 export class TokenDTO {
 	@IsNotEmpty()
@@ -7,13 +14,27 @@ export class TokenDTO {
 	token: string
 }
 
-export class GetOrCreateConversationDTO extends TokenDTO {
+export class SessionDTO {
+	@IsNotEmpty()
+	@IsString()
+	token: string
+
+	@IsOptional()
+	@IsEnum(Locale)
+	locale: Locale.FR
+}
+
+export class GetOrCreateConversationDTO {
 	@IsNotEmpty()
 	@IsString()
 	requestId: string
+
+	@IsOptional()
+	@IsObject()
+	session?: SessionDTO
 }
 
-export class AddMessageDTO extends TokenDTO {
+export class AddMessageDTO {
 	@IsNotEmpty()
 	@IsString()
 	_id: string
@@ -33,6 +54,10 @@ export class AddMessageDTO extends TokenDTO {
 	@IsNotEmpty()
 	@IsString()
 	roomId: string
+
+	@IsOptional()
+	@IsObject()
+	session?: SessionDTO
 }
 
 export interface IConversation {
@@ -67,7 +92,7 @@ export interface IConversationFull {
 	messages: IConversationMessage[]
 }
 
-export class FlagAsSeenMessageDTO extends TokenDTO {
+export class FlagAsSeenMessageDTO {
 	@IsNotEmpty()
 	@IsString()
 	messageId: string
@@ -79,6 +104,10 @@ export class FlagAsSeenMessageDTO extends TokenDTO {
 	@IsOptional()
 	@IsString()
 	userId: string
+
+	@IsOptional()
+	@IsObject()
+	session?: SessionDTO
 }
 
 export class WritingDTO {

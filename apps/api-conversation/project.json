@@ -15,7 +15,9 @@
 				"main": "apps/api-conversation/src/main.ts",
 				"tsConfig": "apps/api-conversation/tsconfig.app.json",
 				"webpackConfig": "apps/api-conversation/webpack.config.js",
-				"assets": []
+				"assets": [
+					"apps/api-conversation/src/app/application/locales"
+				]
 			},
 			"configurations": {
 				"development": {},

@@ -9,17 +9,22 @@ import {
 	conversationFull,
 	message as msg,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('AddMessageUseCase', () => {
 	let addMessageUseCase: AddMessageUseCase
 	let conversationRepository: ConversationRepository
+	let i18n: I18nService
 
 	beforeEach(() => {
 		conversationRepository = {
 			...convRepo,
 		} as unknown as ConversationRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
-		addMessageUseCase = new AddMessageUseCase(conversationRepository)
+		addMessageUseCase = new AddMessageUseCase(conversationRepository, i18n)
 	})
 
 	afterEach(() => {

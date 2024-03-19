@@ -11,6 +11,7 @@ export interface INestEnvConfigSettings {
 	mailFrom?: string
 	mailTo?: string
 	sessionDuration?: number
+	sessionToken?: string
 }
 
 interface INestEnvConfigGatewayUserService {

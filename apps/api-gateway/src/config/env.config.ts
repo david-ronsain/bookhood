@@ -9,6 +9,7 @@ export default (): INestEnvConfig => ({
 		protocol: (process.env.APP_API_GATEWAY_PROTOCOL || '') as
 			| 'http'
 			| 'https',
+		sessionToken: process.env.SESSION_TOKEN || '',
 	},
 	gateway: {
 		user: {

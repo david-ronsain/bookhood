@@ -1,0 +1,12 @@
+{
+    "addMessage": {
+        "notFound": "Cette conversation n'existe pas",
+        "forbidden": "Vous n'avez pas accès à cette conversation"
+    },
+    "flagAsSeen": {
+        "notFound": "Ce message n'existe pas"
+    },
+    "getOrCreate": {
+        "forbidden": "Vous n'avez pas accès à cette conversation"
+    }
+}
