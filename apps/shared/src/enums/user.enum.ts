@@ -3,3 +3,7 @@ export enum Role {
 	USER = 'user',
 	ADMIN = 'admin',
 }
+
+export enum Locale {
+	FR = 'fr',
+}
