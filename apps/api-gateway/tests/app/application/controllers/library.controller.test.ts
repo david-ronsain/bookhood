@@ -3,16 +3,16 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
 import {
-	CurrentUser,
 	MQLibraryMessageType,
 	MicroserviceResponseFormatter,
 } from '../../../../../shared-api/src'
+import { currentUser } from '../../../../../shared-api/test'
 import { of } from 'rxjs'
 import {
 	IBook,
 	IBooksList,
 	LibraryStatus,
-	Role,
+	Locale,
 } from '../../../../../shared/src'
 import { BookNotFoundException } from '../../../../src/app/application/exceptions'
 
@@ -24,14 +24,6 @@ jest.mock('@nestjs/microservices', () => ({
 
 describe('LibraryController', () => {
 	let controller: LibraryController
-
-	const currentUser: CurrentUser = {
-		_id: 'userId',
-		token: 'token',
-		email: 'first.last@name.test',
-		roles: [Role.ADMIN],
-		firstName: 'first',
-	}
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -92,6 +84,7 @@ describe('LibraryController', () => {
 				currentUser,
 				userId,
 				page,
+				Locale.FR,
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -100,6 +93,7 @@ describe('LibraryController', () => {
 					userId,
 					page,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -113,7 +107,7 @@ describe('LibraryController', () => {
 			)
 
 			await expect(
-				controller.getLibraries(currentUser, userId, page),
+				controller.getLibraries(currentUser, userId, page, Locale.FR),
 			).rejects.toThrow(HttpException)
 		})
 	})
@@ -147,6 +141,7 @@ describe('LibraryController', () => {
 				currentUser,
 				libraryId,
 				status,
+				Locale.FR,
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -155,6 +150,7 @@ describe('LibraryController', () => {
 					libraryId,
 					status,
 					user: currentUser,
+					locale: Locale.FR,
 				},
 			)
 			expect(result).toEqual(response.data)
@@ -168,7 +164,7 @@ describe('LibraryController', () => {
 			)
 
 			await expect(
-				controller.patch(currentUser, libraryId, status),
+				controller.patch(currentUser, libraryId, status, Locale.FR),
 			).rejects.toThrow(BookNotFoundException)
 		})
 	})

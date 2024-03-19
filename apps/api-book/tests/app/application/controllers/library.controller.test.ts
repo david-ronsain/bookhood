@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { LibraryController } from '../../../../src/app/application/controllers/library.controller'
 import { MicroserviceResponseFormatter } from '../../../../../shared-api/src/formatters/microserviceResponse.formatter'
 import { ForbiddenException, HttpStatus } from '@nestjs/common'
-import { ILibrary, LibraryStatus } from '../../../../../shared/src'
+import { ILibrary, LibraryStatus, Locale } from '../../../../../shared/src'
 import ListUseCase from '../../../../src/app/application/usecases/library/list.usecase'
 import PatchUseCase from '../../../../src/app/application/usecases/library/patch.usecase'
 import { booksList, currentUser, library } from '../../../../../shared-api/test'
@@ -46,7 +46,12 @@ describe('LibraryController', () => {
 	})
 
 	describe('getLibrariesList', () => {
-		const body = { user: currentUser, page: 1, userId: 'aaaaaaaaaaaa' }
+		const body = {
+			user: currentUser,
+			page: 1,
+			userId: 'aaaaaaaaaaaa',
+			locale: Locale.FR,
+		}
 
 		it('should return profile books when token is valid', async () => {
 			const mockProfileBooks = booksList
@@ -90,6 +95,7 @@ describe('LibraryController', () => {
 			user: currentUser,
 			status: LibraryStatus.TO_LEND,
 			libraryId: 'aaaaaaaaaaaa',
+			locale: Locale.FR,
 		}
 
 		it('should throw an error', async () => {

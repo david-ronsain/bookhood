@@ -3,6 +3,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	Headers,
 	HttpCode,
 	HttpStatus,
 	Inject,
@@ -20,7 +21,13 @@ import {
 	ApiResponse,
 } from '@nestjs/swagger'
 import { firstValueFrom } from 'rxjs'
-import { IBooksList, ILibrary, LibraryStatus, Role } from '@bookhood/shared'
+import {
+	IBooksList,
+	ILibrary,
+	LibraryStatus,
+	Locale,
+	Role,
+} from '@bookhood/shared'
 import { BookNotFoundException, UserNotFoundException } from '../exceptions'
 import {
 	type CurrentUser,
@@ -33,6 +40,7 @@ import { RoleGuard } from '../guards/role.guard'
 import { BooksList } from '../dto/library.dto'
 import { User } from '../decorators/user.decorator'
 import { AuthUserGuard } from '../guards/authUser.guard'
+import envConfig from '../../../config/env.config'
 
 @Controller('library')
 export class LibraryController {
@@ -52,6 +60,7 @@ export class LibraryController {
 		@User() user: CurrentUser,
 		@Param('userId') userId: string,
 		@Query('page') page: number,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IBooksList> {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<IBooksList>
@@ -60,6 +69,7 @@ export class LibraryController {
 				user,
 				userId,
 				page,
+				locale,
 			} as GetLibrariesListMQDTO),
 		)
 
@@ -82,6 +92,7 @@ export class LibraryController {
 		@User() user: CurrentUser,
 		@Param('libraryId') libraryId: string,
 		@Body('status') status: LibraryStatus,
+		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<ILibrary> {
 		const books = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibrary>
@@ -90,6 +101,7 @@ export class LibraryController {
 				user,
 				libraryId,
 				status,
+				locale,
 			} as PatchLibraryMQDTO),
 		)
 
