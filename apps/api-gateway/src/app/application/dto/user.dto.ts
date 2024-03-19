@@ -41,6 +41,10 @@ export class UserStats implements IUserStats {
 
 	nbPlaces: number
 
+	nbBooksToLend: number
+
+	nbBooksToGive: number
+
 	nbIncomingRequests: number
 
 	nbOutgoingRequests: number
