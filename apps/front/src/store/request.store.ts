@@ -4,9 +4,11 @@ import {
 	type IGetRequests,
 } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
-import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useFetch } from '../composables/fetch.composable'
+
+const { POST, PATCH, GET } = useFetch()
 
 export const useRequestStore = defineStore('requestStore', () => {
 	const incomingRequestPage = ref<number>(1)
@@ -15,17 +17,7 @@ export const useRequestStore = defineStore('requestStore', () => {
 	const outgoingRequests = ref<IRequestList>({ total: 0, results: [] })
 
 	const create = (libraryId: string, dates: string[]) =>
-		axios.post(
-			EnvConfig.api.base + EnvConfig.api.url.request + libraryId,
-			{ dates },
-			{
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			},
-		)
+		POST(EnvConfig.api.url.request + libraryId, { dates })
 
 	const refuse = (requestId: string) =>
 		updateStatus(requestId, RequestStatus.REFUSED)
@@ -58,34 +50,15 @@ export const useRequestStore = defineStore('requestStore', () => {
 		requestId: string,
 		status: RequestStatus,
 		dates?: string[],
-	) =>
-		axios.patch(
-			EnvConfig.api.base + EnvConfig.api.url.request + requestId,
-			{ status, dates },
-			{
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			},
-		)
+	) => PATCH(EnvConfig.api.url.request + requestId, { status, dates })
 
 	const getIncomingRequests = (body: IGetRequests): IRequestList =>
-		axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.request, {
-				params: {
-					startAt: (incomingRequestPage.value - 1) * 10,
-					status: body.status,
-					ownerId: body.ownerId,
-					userId: body.userId,
-				},
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			})
+		GET(EnvConfig.api.url.request, {
+			startAt: (incomingRequestPage.value - 1) * 10,
+			status: body.status,
+			ownerId: body.ownerId,
+			userId: body.userId,
+		})
 			.then((results) => {
 				incomingRequests.value = results.data
 				return results.data
@@ -95,20 +68,12 @@ export const useRequestStore = defineStore('requestStore', () => {
 			})
 
 	const getOutgoingRequests = (body: IGetRequests): IRequestList =>
-		axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.request, {
-				params: {
-					startAt: (outgoingRequestPage.value - 1) * 10,
-					status: body.status,
-					ownerId: body.ownerId,
-					userId: body.userId,
-				},
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			})
+		GET(EnvConfig.api.url.request, {
+			startAt: (outgoingRequestPage.value - 1) * 10,
+			status: body.status,
+			ownerId: body.ownerId,
+			userId: body.userId,
+		})
 			.then((results) => {
 				outgoingRequests.value = results.data
 				return results.data

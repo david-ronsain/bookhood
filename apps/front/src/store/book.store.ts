@@ -1,6 +1,5 @@
 import { EnvConfig } from '../../config/env'
 import { type ISearchingEventProps } from '@bookhood/ui'
-import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { mapBook, mapBooks } from '../mappers/bookMapper'
@@ -10,6 +9,9 @@ import {
 	LibraryStatus,
 	type ILibraryFull,
 } from '@bookhood/shared'
+import { useFetch } from '../composables/fetch.composable'
+
+const { POST, GET } = useFetch()
 
 export const useBookStore = defineStore('bookStore', () => {
 	const searchMaxResults = ref<number>(0)
@@ -18,21 +20,10 @@ export const useBookStore = defineStore('bookStore', () => {
 		search: ISearchingEventProps,
 		startAt: number,
 	): Promise<IBook[]> =>
-		axios
-			.post(
-				EnvConfig.api.base + EnvConfig.api.url.book + 'google/search',
-				{
-					q: `${search.type}:${search.text.replace(/ /, '+')}`,
-					startIndex: startAt,
-				},
-				{
-					headers: {
-						'x-token': localStorage.getItem(
-							EnvConfig.localStorage.userKey,
-						),
-					},
-				},
-			)
+		POST(EnvConfig.api.url.book + 'google/search', {
+			q: `${search.type}:${search.text.replace(/ /, '+')}`,
+			startIndex: startAt,
+		})
 			.then((results) => {
 				searchMaxResults.value = parseInt(results.data.totalItems)
 				return mapBooks(
@@ -53,38 +44,16 @@ export const useBookStore = defineStore('bookStore', () => {
 		startAt: number,
 		boundingBox: number[],
 	): Promise<IBookSearch> =>
-		axios
-			.post(
-				EnvConfig.api.base + EnvConfig.api.url.book + 'search',
-				{
-					q: `${search.type}:${search.text?.replace(/ /, '+') ?? ''}`,
-					startIndex: startAt,
-					boundingBox,
-				},
-				{
-					headers: {
-						'x-token': localStorage.getItem(
-							EnvConfig.localStorage.userKey,
-						),
-					},
-				},
-			)
-			.catch(() => {
-				return []
-			})
+		POST(EnvConfig.api.url.book + 'search', {
+			q: `${search.type}:${search.text?.replace(/ /, '+') ?? ''}`,
+			startIndex: startAt,
+			boundingBox,
+		}).catch(() => {
+			return []
+		})
 
 	const searchGoogleByISBN = async (isbn: string): Promise<IBook | null> =>
-		axios
-			.get(
-				EnvConfig.api.base + EnvConfig.api.url.book + 'google/' + isbn,
-				{
-					headers: {
-						'x-token': localStorage.getItem(
-							EnvConfig.localStorage.userKey,
-						),
-					},
-				},
-			)
+		GET(EnvConfig.api.url.book + 'google/' + isbn)
 			.then((results) =>
 				results.data.totalItems > 0
 					? mapBook(results.data.items[0])
@@ -100,27 +69,10 @@ export const useBookStore = defineStore('bookStore', () => {
 		location: { lat; lng },
 		place: string,
 	): Promise<IBook | null> =>
-		axios.post(
-			EnvConfig.api.base + EnvConfig.api.url.book,
-			{ ...book, location, status, place },
-			{
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			},
-		)
+		POST(EnvConfig.api.url.book, { ...book, location, status, place })
 
 	const loadBooks = (): Promise<ILibraryFull[]> =>
-		axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.book, {
-				headers: {
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			})
+		GET(EnvConfig.api.url.book)
 			.then((response: { data: ILibraryFull[] }) => response.data)
 			.catch(() => [])
 

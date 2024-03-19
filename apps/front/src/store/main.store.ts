@@ -1,8 +1,10 @@
 import { type IUser } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
-import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useFetch } from '../composables/fetch.composable'
+
+const { GET } = useFetch()
 
 export const useMainStore = defineStore('mainStore', () => {
 	const error = ref<string>('')
@@ -11,14 +13,7 @@ export const useMainStore = defineStore('mainStore', () => {
 
 	const getProfile = async (): Promise<void> => {
 		if (localStorage.getItem(EnvConfig.localStorage.userKey)) {
-			await axios
-				.get(EnvConfig.api.base + EnvConfig.api.url.user + 'me', {
-					headers: {
-						'x-token': localStorage.getItem(
-							EnvConfig.localStorage.userKey,
-						),
-					},
-				})
+			GET(EnvConfig.api.url.user + 'me')
 				.then((response) => {
 					profile.value = response.data
 				})

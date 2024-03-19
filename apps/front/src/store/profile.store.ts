@@ -5,9 +5,12 @@ import {
 	type IUserStats,
 } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
-import axios from 'axios'
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useFetch } from '../composables/fetch.composable'
+
+const { GET } = useFetch()
 
 export const useProfileStore = defineStore('profileStore', () => {
 	const booksList = ref<IBook[]>([])
@@ -19,23 +22,9 @@ export const useProfileStore = defineStore('profileStore', () => {
 
 	const loadBooks = async (userId: string): Promise<void> => {
 		booksListLoading.value = true
-		await axios
-			.get(
-				EnvConfig.api.base +
-					EnvConfig.api.url.library +
-					'user/' +
-					userId,
-				{
-					params: {
-						page: booksListPage.value - 1,
-					},
-					headers: {
-						'x-token': localStorage.getItem(
-							EnvConfig.localStorage.userKey,
-						),
-					},
-				},
-			)
+		await GET(EnvConfig.api.url.library + 'user/' + userId, {
+			page: booksListPage.value - 1,
+		})
 			.then((response: { data: IBooksList }) => {
 				booksList.value = response.data.results
 				booksListTotal.value = response.data.total
@@ -50,15 +39,7 @@ export const useProfileStore = defineStore('profileStore', () => {
 	}
 
 	const loadProfile = async (userId: string): Promise<void> => {
-		await axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.user + userId, {
-				headers: {
-					'Content-Type': 'application/json',
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			})
+		await GET(EnvConfig.api.url.user + userId)
 			.then((res) => {
 				profile.value = res.data
 			})
@@ -68,15 +49,7 @@ export const useProfileStore = defineStore('profileStore', () => {
 	}
 
 	const loadProfileStats = async (): Promise<void> => {
-		await axios
-			.get(EnvConfig.api.base + EnvConfig.api.url.user + 'stats', {
-				headers: {
-					'Content-Type': 'application/json',
-					'x-token': localStorage.getItem(
-						EnvConfig.localStorage.userKey,
-					),
-				},
-			})
+		await GET(EnvConfig.api.url.user + 'stats')
 			.then((res) => {
 				stats.value = res.data
 			})
