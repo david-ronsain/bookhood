@@ -3,7 +3,7 @@ import { ICoords, ILibrary, LibraryStatus } from '@bookhood/shared'
 import { LibraryRepository } from '../../../domain/ports/library.repository'
 import LibraryModel from '../../../domain/models/library.model'
 import LibraryMapper from '../../mappers/library.mapper'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class AddBookUseCase {
 	constructor(
@@ -26,7 +26,9 @@ export default class AddBookUseCase {
 
 		if (exists) {
 			throw new ConflictException(
-				this.i18n.t('errors.book.addBook.conflict'),
+				this.i18n.t('errors.book.addBook.conflict', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 

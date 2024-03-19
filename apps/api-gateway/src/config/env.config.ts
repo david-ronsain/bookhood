@@ -61,8 +61,8 @@ export default (): INestEnvConfig => ({
 	},
 	i18n: {
 		availableLocales: (process.env.I18N_AVAILABLE_LOCALES || '').split(','),
-		defaultLocale: process.env.I18N_FALLBACK_LOCALE || '',
-		fallbackLocale: process.env.I18N_DEFAULT_LOCALE || '',
+		defaultLocale: process.env.I18N_DEFAULT_LOCALE || '',
+		fallbackLocale: process.env.I18N_FALLBACK_LOCALE || '',
 		localeToken: process.env.I18N_LOCALE_TOKEN || '',
 	},
 })

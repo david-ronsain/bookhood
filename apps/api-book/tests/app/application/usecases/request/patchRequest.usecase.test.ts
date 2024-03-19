@@ -5,6 +5,7 @@ import {
 	IRequest,
 	IRequestEvent,
 	IRequestInfos,
+	Locale,
 	RequestStatus,
 } from '../../../../../../shared/src'
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
@@ -20,15 +21,20 @@ import {
 	request as req,
 	requestInfos,
 } from '../../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 describe('PatchRequestUseCase', () => {
 	let patchRequestUseCase: PatchRequestUseCase
 	let requestRepository: RequestRepository
 	let mailClient: ClientProxy
+	let i18n: I18nService
 
 	beforeEach(() => {
 		jest.clearAllMocks()
 		requestRepository = { ...reqRepo } as unknown as RequestRepository
+		i18n = {
+			t: jest.fn(),
+		} as unknown as I18nService
 
 		mailClient = {
 			send: jest.fn(() => of({})),
@@ -37,6 +43,7 @@ describe('PatchRequestUseCase', () => {
 		patchRequestUseCase = new PatchRequestUseCase(
 			requestRepository,
 			mailClient,
+			i18n,
 		)
 	})
 
@@ -53,6 +60,7 @@ describe('PatchRequestUseCase', () => {
 				_id: request.userId,
 			} as unknown as CurrentUser,
 			dates: ['2024-03-07', '2024-03-07'],
+			locale: Locale.FR,
 		}
 
 		let foundRequest = new RequestModel(request)

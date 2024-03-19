@@ -4,7 +4,7 @@ import { LibraryRepository } from '../../../domain/ports/library.repository'
 import RequestModel from '../../../domain/models/request.model'
 import { IRequest, RequestStatus } from '@bookhood/shared'
 import RequestMapper from '../../mappers/request.mapper'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class CreateRequestUseCase {
 	constructor(
@@ -23,7 +23,9 @@ export default class CreateRequestUseCase {
 		const library = await this.libraryRepository.getById(libraryId)
 		if (!library) {
 			throw new NotFoundException(
-				this.i18n.t('errors.request.createRequest.notFound'),
+				this.i18n.t('errors.request.createRequest.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 
@@ -34,7 +36,9 @@ export default class CreateRequestUseCase {
 			)
 		if (currentlyBorrowed > 0) {
 			throw new ForbiddenException(
-				this.i18n.t('errors.request.createRequest.forbidden'),
+				this.i18n.t('errors.request.createRequest.forbidden', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 

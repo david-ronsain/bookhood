@@ -1,7 +1,7 @@
 import { Inject, NotFoundException } from '@nestjs/common'
 import { LibraryRepository } from '../../../domain/ports/library.repository'
 import { ILibraryFull } from '@bookhood/shared'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class GetUserBookUseCase {
 	constructor(
@@ -14,7 +14,9 @@ export default class GetUserBookUseCase {
 		const book = await this.libraryRepository.getFullById(libraryId)
 		if (!book) {
 			throw new NotFoundException(
-				this.i18n.t('errors.book.getUserBook.notFound'),
+				this.i18n.t('errors.book.getUserBook.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 

@@ -1,7 +1,7 @@
 import { Inject, NotFoundException } from '@nestjs/common'
 import { RequestRepository } from '../../../domain/ports/request.repository'
 import { IRequestInfos } from '@bookhood/shared'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class GetByIdUseCase {
 	constructor(
@@ -14,7 +14,9 @@ export default class GetByIdUseCase {
 		const request = await this.requestRepository.getRequestInfos(requestId)
 		if (!request) {
 			throw new NotFoundException(
-				this.i18n.t('errors.request.getById.notFound'),
+				this.i18n.t('errors.request.getById.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 

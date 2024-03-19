@@ -14,7 +14,10 @@
 				"outputPath": "dist/apps/api-book",
 				"main": "apps/api-book/src/main.ts",
 				"tsConfig": "apps/api-book/tsconfig.app.json",
-				"webpackConfig": "apps/api-book/webpack.config.js"
+				"webpackConfig": "apps/api-book/webpack.config.js",
+				"assets": [
+					"apps/api-book/src/app/application/locales"
+				]
 			},
 			"configurations": {
 				"development": {},

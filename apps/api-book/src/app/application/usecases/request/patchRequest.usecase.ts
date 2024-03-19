@@ -5,18 +5,24 @@ import RequestMapper from '../../mappers/request.mapper'
 import { ClientProxy } from '@nestjs/microservices'
 import { format } from 'date-fns'
 import { MQMailMessageType, PatchRequestMQDTO } from '@bookhood/shared-api'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class PatchRequestUseCase {
 	constructor(
 		@Inject('RequestRepository')
 		private readonly requestRepository: RequestRepository,
 		@Inject('RabbitMail') private readonly mailClient: ClientProxy,
+		private readonly i18n: I18nService,
 	) {}
 
 	async handler(body: PatchRequestMQDTO): Promise<IRequest> {
 		const request = await this.requestRepository.getById(body.requestId)
 		if (!request) {
-			throw new NotFoundException('Request not found')
+			throw new NotFoundException(
+				this.i18n.t('errors.request.patchRequest.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		const currentlyBorrowed =
@@ -33,7 +39,9 @@ export default class PatchRequestUseCase {
 			body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY
 		) {
 			throw new ForbiddenException(
-				'This user has already a loan in progress, you can not load him your book',
+				this.i18n.t('errors.request.patchRequest.forbidden1', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 
@@ -42,7 +50,13 @@ export default class PatchRequestUseCase {
 			!this.statusAllowed(request.status, body.status)
 		) {
 			throw new ForbiddenException(
-				`The request can not go from "${request.status}" to "${body.status}`,
+				this.i18n.t('errors.request.patchRequest.forbidden2', {
+					lang: I18nContext.current()?.lang,
+					args: {
+						from: request.status,
+						to: body.status,
+					},
+				}),
 			)
 		}
 

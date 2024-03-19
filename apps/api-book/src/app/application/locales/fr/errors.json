@@ -20,6 +20,11 @@
         },
         "getById": {
             "notFound": "Cette demande n'existe pas"
+        },
+        "patchRequest": {
+            "notFound": "Cette demande n'existe pas",
+            "forbidden1": "Cet utilisateur a déjà un emprunt en cours",
+            "forbidden2": "La requête ne peut pas passer du statut \"{from}\" à \"{to}\""
         }
     }
 }

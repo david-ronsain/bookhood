@@ -1,12 +1,7 @@
-import {
-	ConflictException,
-	ForbiddenException,
-	Inject,
-	NotFoundException,
-} from '@nestjs/common'
+import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common'
 import { ILibrary, LibraryStatus } from '@bookhood/shared'
 import { LibraryRepository } from '../../../domain/ports/library.repository'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class PatchUseCase {
 	constructor(
@@ -24,13 +19,17 @@ export default class PatchUseCase {
 
 		if (!lib) {
 			throw new NotFoundException(
-				this.i18n.t('errors.library.patch.notFound'),
+				this.i18n.t('errors.library.patch.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 
 		if (lib.userId.toString() !== userId) {
 			throw new ForbiddenException(
-				this.i18n.t('errors.library.patch.forbidden'),
+				this.i18n.t('errors.library.patch.forbidden', {
+					lang: I18nContext.current()?.lang,
+				}),
 			)
 		}
 
