@@ -1,6 +1,6 @@
 import { Locale } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 
 export const useFetch = () => {
 	const getLocale = (): string => {
@@ -9,8 +9,12 @@ export const useFetch = () => {
 			: Locale.FR
 	}
 
-	const GET = (url: string, data: object = {}, headers: object = {}) =>
-		axios.get(url, {
+	const GET = (
+		url: string,
+		data: object = {},
+		headers: object = {},
+	): Promise<AxiosResponse<any, any>> =>
+		axios.get(EnvConfig.api.base + url, {
 			params: {
 				...data,
 			},
@@ -21,7 +25,35 @@ export const useFetch = () => {
 			},
 		})
 
+	const PATCH = (
+		url: string,
+		data: object = {},
+		headers: object = {},
+	): Promise<AxiosResponse<any, any>> =>
+		axios.patch(EnvConfig.api.base + url, data, {
+			headers: {
+				'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
+				'x-locale': getLocale(),
+				...headers,
+			},
+		})
+
+	const POST = (
+		url: string,
+		data: object = {},
+		headers: object = {},
+	): Promise<AxiosResponse<any, any>> =>
+		axios.post(EnvConfig.api.base + url, data, {
+			headers: {
+				'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
+				'x-locale': getLocale(),
+				...headers,
+			},
+		})
+
 	return {
 		GET,
+		PATCH,
+		POST,
 	}
 }
