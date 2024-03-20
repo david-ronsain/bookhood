@@ -14,6 +14,9 @@ import { BookRequestMailDTO, IRequestInfos } from '../../../../../shared/src'
 import { HealthCheckStatus } from '../../../../../shared-api/src'
 import { requestInfos, userLight } from '../../../../../shared-api/test'
 import { bookRequestMailDTO } from '../../../../../shared-api/test/data/mail/mail'
+import { I18nService } from 'nestjs-i18n'
+import envConfig from '../../../../../api-conversation/src/config/env.config'
+import { ConfigModule } from '@nestjs/config'
 
 describe('MailController', () => {
 	let controller: MailController
@@ -29,8 +32,15 @@ describe('MailController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [MailController],
 			providers: [
+				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
@@ -62,6 +72,12 @@ describe('MailController', () => {
 				{
 					provide: RequestReturnedWithIssueUseCase,
 					useValue: mock,
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
+					},
 				},
 			],
 		}).compile()

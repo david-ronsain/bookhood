@@ -16,8 +16,10 @@ export default (): INestEnvConfig => ({
 		vhost: process.env.RMQ_VHOST || '',
 		queues: {
 			mail: process.env.RMQ_MAIL_QUEUE || '',
+			user: process.env.RMQ_USER_QUEUE || '',
 		},
 	},
+
 	settings: {
 		env: process.env.NODE_ENV || '',
 		mailFrom: process.env.EMAIL_FROM || '',

@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common'
+import { Controller, Inject, UseGuards } from '@nestjs/common'
 
 import { MessagePattern } from '@nestjs/microservices'
 import {
@@ -18,9 +18,12 @@ import RequestNeverReceivedUseCase from '../usecases/request/requestNeverReceive
 import RequestReturnedWithIssueUseCase from '../usecases/request/requestReturnedWithIssue.usecase'
 import {
 	AuthSendLinkDTO,
+	AuthUserGuard,
+	CurrentUser,
 	HealthCheckStatus,
 	MQMailMessageType,
 	RequestInfosDTO,
+	User,
 } from '@bookhood/shared-api'
 
 @Controller()
@@ -41,36 +44,43 @@ export class MailController {
 		return HealthCheckStatus.UP
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.USER_CREATED)
 	userRegistered(user: ICreateUserDTO): void {
 		this.userRegisteredUseCase.handler(user)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.AUTH_SEND_LINK)
 	authSendLink(user: AuthSendLinkDTO): void {
 		this.authSendLinkUseCase.handler(user)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.REQUEST_CREATED)
 	requestCreated(infos: BookRequestMailDTO): void {
 		this.requestCreatedUseCase.handler(infos)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.REQUEST_ACCEPTED)
 	requestAccepted(infos: RequestInfosDTO): void {
 		this.requestAcceptedUseCase.handler(infos)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.REQUEST_REFUSED)
 	requestRefused(infos: RequestInfosDTO): void {
 		this.requestRefusedUseCase.handler(infos)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.REQUEST_NEVER_RECEIVED)
 	requestNeverReceived(infos: RequestInfosDTO): void {
 		this.requestNeverReceivedUseCase.handler(infos)
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQMailMessageType.REQUEST_RETURNED_WITH_ISSUE)
 	requestReturnedWithIssue(infos: RequestInfosDTO): void {
 		this.requestReturnedWithIssueUseCase.handler(infos)
