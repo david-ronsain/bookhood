@@ -14,7 +14,10 @@
 				"outputPath": "dist/apps/api-gateway",
 				"main": "apps/api-gateway/src/main.ts",
 				"tsConfig": "apps/api-gateway/tsconfig.app.json",
-				"webpackConfig": "apps/api-gateway/webpack.config.js"
+				"webpackConfig": "apps/api-gateway/webpack.config.js",
+				"assets": [
+					"apps/api-gateway/src/app/application/locales"
+				]
 			},
 			"configurations": {
 				"development": {},

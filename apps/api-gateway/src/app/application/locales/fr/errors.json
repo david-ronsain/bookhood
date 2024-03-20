@@ -1,0 +1,6 @@
+{
+    "authGuard.forbidden": "Utilisateur non connecté",
+    "user": {
+        "notFound": "Cet utilisateur n'existe pas"
+    }
+}

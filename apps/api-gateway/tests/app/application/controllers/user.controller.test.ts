@@ -25,6 +25,7 @@ import {
 	userLight,
 	userRequestStats,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: jest.fn(() => ({
@@ -49,6 +50,12 @@ describe('Testing UserController', () => {
 					provide: 'RabbitBook',
 					useValue: {
 						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

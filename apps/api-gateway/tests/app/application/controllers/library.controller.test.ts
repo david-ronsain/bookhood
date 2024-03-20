@@ -15,6 +15,7 @@ import {
 	Locale,
 } from '../../../../../shared/src'
 import { BookNotFoundException } from '../../../../src/app/application/exceptions'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -39,6 +40,12 @@ describe('LibraryController', () => {
 					provide: 'RabbitUser',
 					useValue: {
 						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

@@ -43,11 +43,13 @@ import {
 import { AuthUserGuard } from '../guards/authUser.guard'
 import { User } from '../decorators/user.decorator'
 import envConfig from '../../../config/env.config'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 
 @Controller('user')
 export class UserController {
 	constructor(
 		@Inject('RabbitUser') private readonly userQueue: ClientProxy,
+		private readonly i18n: I18nService,
 	) {}
 
 	@Post()
@@ -86,7 +88,11 @@ export class UserController {
 		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<IUser> {
 		if (!user.token) {
-			throw new UserNotFoundException('')
+			throw new UserNotFoundException(
+				this.i18n.t('errors.user.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		const tokenParts = user.token?.split('|')
@@ -120,7 +126,11 @@ export class UserController {
 		@Headers(envConfig().i18n.localeToken) locale: Locale,
 	): Promise<UserStats> {
 		if (!user.token) {
-			throw new UserNotFoundException('')
+			throw new UserNotFoundException(
+				this.i18n.t('errors.user.notFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		const stats = await firstValueFrom<

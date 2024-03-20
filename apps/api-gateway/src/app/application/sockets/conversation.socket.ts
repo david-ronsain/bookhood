@@ -49,7 +49,7 @@ export class ConversationGateway
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
 	handleConnection(client: Socket, ...args: any[]) {
 		const { sockets } = this.io.sockets
-		const locale = client.handshake.headers['x-locale']
+
 		this.logger.info(`Client id: ${client.id} connected`)
 		this.logger.debug(`Number of connected clients: ${sockets.size}`)
 	}

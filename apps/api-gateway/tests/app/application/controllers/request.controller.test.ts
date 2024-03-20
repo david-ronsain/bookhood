@@ -16,6 +16,7 @@ import {
 } from '../../../../../shared/src'
 import { GetRequestsDTO } from '../../../../src/app/application/dto/request.dto'
 import { currentUser } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: jest.fn(() => ({
@@ -40,6 +41,12 @@ describe('RequestController', () => {
 					provide: 'RabbitUser',
 					useValue: {
 						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

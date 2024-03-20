@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { IncomingMessage } from 'http'
+import { I18nContext, I18nService } from 'nestjs-i18n'
 import { firstValueFrom } from 'rxjs'
 import { Socket } from 'socket.io'
 
@@ -19,6 +20,7 @@ import { Socket } from 'socket.io'
 export class AuthUserGuard implements CanActivate {
 	constructor(
 		@Inject('RabbitUser') private readonly userQueue: ClientProxy,
+		private readonly i18n: I18nService,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,7 +37,11 @@ export class AuthUserGuard implements CanActivate {
 
 			if (!user.success) {
 				return Promise.reject(
-					new ForbiddenException('User not logged in'),
+					new ForbiddenException(
+						this.i18n.t('errors.authGuard.forbidden', {
+							lang: I18nContext.current()?.lang,
+						}),
+					),
 				)
 			}
 

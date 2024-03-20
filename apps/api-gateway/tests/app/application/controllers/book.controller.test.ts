@@ -14,6 +14,7 @@ import {
 	librariesFull,
 } from '../../../../../shared-api/test'
 import { Locale } from '../../../../../shared/src'
+import { I18nService } from 'nestjs-i18n'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -48,6 +49,12 @@ describe('BookController', () => {
 					provide: 'RabbitUser',
 					useValue: {
 						send: jest.fn(() => of({})),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],
