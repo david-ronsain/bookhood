@@ -4,6 +4,7 @@
 	import { useRoute } from 'vue-router'
 	import type { IConversationFull } from '@bookhood/shared'
 	import { WSConversationEventType } from '@bookhood/shared'
+	import Conversation from '../components/conversation/conversation.vue'
 
 	const route = useRoute()
 
@@ -61,4 +62,3 @@
 		max-height: 100%;
 	}
 </style>
-../composables/socket.composable
