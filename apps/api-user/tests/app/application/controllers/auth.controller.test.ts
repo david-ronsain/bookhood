@@ -2,7 +2,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Test } from '@nestjs/testing'
 import { AuthController } from '../../../../src/app/application/controllers/auth.controller'
-import { winstonConfig } from '../../../../../shared/src'
+import { Locale, winstonConfig } from '../../../../../shared/src'
 import { HttpStatus, NotFoundException } from '@nestjs/common'
 import * as winston from 'winston'
 import { WinstonModule } from 'nest-winston'
@@ -95,6 +95,13 @@ describe('Testing AuthController', () => {
 	})
 
 	describe('sendLink method', () => {
+		const dto = {
+			email: 'first.last@name.test',
+			session: {
+				locale: Locale.FR,
+				token: 'token',
+			},
+		}
 		it('should send the signin link', async () => {
 			jest.spyOn(getUserByEmailUseCase, 'handler').mockResolvedValue(
 				userModel,
@@ -104,9 +111,7 @@ describe('Testing AuthController', () => {
 				subscribe: jest.fn(() => of({})),
 			} as any)
 
-			const result = await controller.sendLink({
-				email: 'first.last@name.test',
-			})
+			const result = await controller.sendLink(dto)
 
 			expect(getUserByEmailUseCase.handler).toHaveBeenCalledWith(
 				'first.last@name.test',
@@ -125,7 +130,7 @@ describe('Testing AuthController', () => {
 					throw new NotFoundException()
 				},
 			)
-			expect(controller.sendLink({ email: '' })).resolves.toMatchObject({
+			expect(controller.sendLink(dto)).resolves.toMatchObject({
 				success: false,
 			})
 		})

@@ -37,6 +37,8 @@ import {
 	userRequestStats,
 } from '../../../../../shared-api/test'
 import { I18nService } from 'nestjs-i18n'
+import { ConfigModule } from '@nestjs/config'
+import envConfig from '../../../../src/config/env.config'
 
 jest.mock('rxjs', () => ({
 	of: jest.fn(),
@@ -70,11 +72,18 @@ describe('UserController', () => {
 		} as any
 
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [UserController],
 			providers: [
 				{ provide: WINSTON_MODULE_PROVIDER, useValue: loggerMock },
 				{ provide: 'RabbitMail', useValue: rabbitMailClientMock },
 				{ provide: 'RabbitBook', useValue: rabbitBookClientMock },
+				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: CreateAuthLinkUseCase,
 					useValue: mockedUseCase,
@@ -238,14 +247,19 @@ describe('UserController', () => {
 	})
 
 	describe('me', () => {
+		const dto = {
+			token: 'someToken',
+			session: {
+				locale: Locale.FR,
+				token: 'someToken||',
+			},
+		}
 		it('should get user by token', async () => {
-			const token = 'someToken'
-
 			jest.spyOn(mockedUseCase, 'handler').mockResolvedValue(userModel)
 
-			const result = await controller.me(token)
+			const result = await controller.me(dto)
 
-			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(dto.token)
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>(
 					true,
@@ -257,19 +271,18 @@ describe('UserController', () => {
 		})
 
 		it('should handle errors during user retrieval', async () => {
-			const token = 'someToken'
 			const error = new Error('User retrieval error')
 
 			jest.spyOn(mockedUseCase, 'handler').mockRejectedValue(error)
 
-			const result = await controller.me(token)
+			const result = await controller.me(dto)
 
-			expect(mockedUseCase.handler).toHaveBeenCalledWith(token)
+			expect(mockedUseCase.handler).toHaveBeenCalledWith(dto.token)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter<IUser | null>().buildFromException(
 					error,
-					{ token },
+					{ token: dto.token },
 				),
 			)
 		})

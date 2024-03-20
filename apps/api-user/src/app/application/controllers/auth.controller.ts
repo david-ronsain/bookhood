@@ -48,11 +48,15 @@ export class AuthController {
 				dto.email,
 			)
 			this.createAuthLinkUseCase.handler(user)
+
 			if (user) {
 				this.rabbitMailClient
 					.send(MQMailMessageType.AUTH_SEND_LINK, {
 						...user,
-						session: dto.session,
+						session: {
+							locale: dto.session.locale,
+							token: user.token,
+						},
 					} as AuthSendLinkDTO)
 					.subscribe()
 			}

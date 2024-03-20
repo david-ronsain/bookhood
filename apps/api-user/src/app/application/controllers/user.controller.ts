@@ -3,6 +3,7 @@ import {
 	HttpStatus,
 	Inject,
 	NotFoundException,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices'
@@ -10,6 +11,8 @@ import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import {
+	AuthUserGuard,
+	GetProfileByTokenMQDTO,
 	GetProfileMQDTO,
 	HealthCheckStatus,
 	MQBookMessageType,
@@ -114,13 +117,15 @@ export class UserController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQUserMessageType.GET_ME)
 	async me(
-		token: string,
+		dto: GetProfileByTokenMQDTO,
 	): Promise<MicroserviceResponseFormatter<IUser | null>> {
 		try {
-			const user: UserModel =
-				await this.getUserByTokenUseCase.handler(token)
+			const user: UserModel = await this.getUserByTokenUseCase.handler(
+				dto.token,
+			)
 
 			return new MicroserviceResponseFormatter<IUser | null>(
 				true,
@@ -137,11 +142,12 @@ export class UserController {
 		} catch (err) {
 			return new MicroserviceResponseFormatter<IUser | null>().buildFromException(
 				err,
-				{ token },
+				{ token: dto.token },
 			)
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQUserMessageType.GET_PROFILE)
 	async getProfile(
 		@Payload() body: GetProfileMQDTO,
@@ -169,6 +175,7 @@ export class UserController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQUserMessageType.GET_STATS)
 	async getStats(
 		userId: string,

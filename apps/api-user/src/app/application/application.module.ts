@@ -76,6 +76,29 @@ import { AuthController } from './controllers/auth.controller'
 				} as RmqOptions)
 			},
 		},
+		{
+			provide: 'RabbitUser',
+			useFactory: () => {
+				return ClientProxyFactory.create({
+					transport: Transport.RMQ,
+					options: {
+						urls: [
+							`${envConfig().rabbitmq.protocol || ''}://${
+								envConfig().rabbitmq.user || ''
+							}:${envConfig().rabbitmq.password || ''}@${
+								envConfig().rabbitmq.host || ''
+							}:${envConfig().rabbitmq.port || ''}/${
+								envConfig().rabbitmq.vhost || ''
+							}`,
+						],
+						queue: envConfig().rabbitmq.queues.user || '',
+						queueOptions: {
+							durable: true,
+						},
+					},
+				} as RmqOptions)
+			},
+		},
 	],
 	exports: [...USER_USECASES],
 })
