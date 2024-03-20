@@ -2,7 +2,7 @@ import axios from 'axios'
 import { createPinia, setActivePinia } from 'pinia'
 import { describe, vi } from 'vitest'
 import { useUserStore } from '../../src/store/user.store'
-import { createdUser, user } from '../data/userData'
+import { createdUser } from '../data/userData'
 
 vi.mock('axios')
 

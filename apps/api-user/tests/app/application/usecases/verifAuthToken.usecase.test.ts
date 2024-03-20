@@ -1,7 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import VerifAuthTokenUseCase from '../../../../src/app/application/usecases/verifyAuthToken.usecase'
 import { UserRepository } from '../../../../src/app/domain/ports/user.repository'
-import { ForbiddenException, NotFoundException } from '@nestjs/common'
+import { ForbiddenException } from '@nestjs/common'
 import {
 	userModelWithToken,
 	userRepository as userRepo,

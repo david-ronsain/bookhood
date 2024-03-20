@@ -1,6 +1,6 @@
 import type { Meta } from '@storybook/vue3'
 import BhCard from './bhCard.vue'
-import type { IBhCardProps } from 'apps/ui/src/interfaces/bhCard.interface'
+import type { IBhCardProps } from '../../../interfaces/bhCard.interface'
 
 const meta: Meta<typeof BhCard> = {
 	component: BhCard,

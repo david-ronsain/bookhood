@@ -9,7 +9,6 @@ import {
 	IsNumberString,
 	IsOptional,
 	IsString,
-	ValidateNested,
 } from 'class-validator'
 
 export class GetRequestsDTO implements IGetRequests {

@@ -1,10 +1,11 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 import SearchFields from '../../../src/components/search/searchFields.vue'
 import vuetify from '../../../src/plugins/vuetify'
-import { createTestingPinia } from '@pinia/testing'
 import { VBtnToggle } from 'vuetify/lib/components/index.mjs'
-import { BhAddressAutocomplete, BhTextField } from '../../../../ui/src'
+import BhAddressAutocomplete from '../../../../ui/src/lib/location/addressAutocomplete/bhAddressAutocomplete.vue'
+import BhTextField from '../../../../ui/src/lib/inputs/textField/bhTextField.vue'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({

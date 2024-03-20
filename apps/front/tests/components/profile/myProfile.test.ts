@@ -1,10 +1,9 @@
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
-import ProfileCard from '../../../src/components/profile/profileCard.vue'
 import vuetify from '../../../src/plugins/vuetify'
 import { createTestingPinia } from '@pinia/testing'
 import { useProfileStore } from '../../../src/store'
-import { externalProfile, myProfile, userStats } from '../../data/profileData'
+import { myProfile, userStats } from '../../data/profileData'
 import MyProfile from '../../../src/components/profile/myProfile.vue'
 
 vi.mock('vue-i18n', () => ({

@@ -1,11 +1,7 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Test, TestingModule } from '@nestjs/testing'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ApplicationModule } from '../../../src/app/application/application.module'
-import {
-	RmqOptions,
-	Transport,
-	ClientProxyFactory,
-} from '@nestjs/microservices'
 import UserSchema from '../../../src/app/infrastructure/adapters/repository/schemas/user.schema'
 import { USER_USECASES } from '../../../src/app/application/usecases'
 import { UserController } from '../../../src/app/application/controllers/user.controller'

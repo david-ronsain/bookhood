@@ -1,8 +1,9 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 import outgoingRequestsDatepicker from '../../../src/components/requests/outgoingRequestsDatepicker.vue'
 import vuetify from '../../../src/plugins/vuetify'
-import { BhDatePickerMenu } from '../../../../ui/src'
+import BhDatePickerMenu from '../../../../ui/src/lib/inputs/datepicker/menu/bhDatePickerMenu.vue'
 
 vi.mock('vue-i18n', () => ({
 	useI18n: () => ({

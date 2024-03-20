@@ -15,7 +15,7 @@ describe('RefreshTokenUseCase', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks()
-		userRepositoryMock = { ...userRepo } as any as UserRepository
+		userRepositoryMock = { ...userRepo } as unknown as UserRepository
 		i18n = {
 			t: jest.fn(),
 		} as unknown as I18nService

@@ -11,7 +11,7 @@ import {
 	Injectable,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import envConfig from 'apps/api-gateway/src/config/env.config'
+import envConfig from '../../../config/env.config'
 import { IncomingMessage } from 'http'
 import { I18nContext, I18nService } from 'nestjs-i18n'
 import { firstValueFrom } from 'rxjs'

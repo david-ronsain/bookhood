@@ -16,7 +16,6 @@ import { RequestController } from './application/controllers/request.controller'
 import { ConversationGateway } from './application/sockets/conversation.socket'
 import { LibraryController } from './application/controllers/library.controller'
 import { HeaderResolver, I18nModule } from 'nestjs-i18n'
-import { MQResolver } from '@bookhood/shared-api'
 import path from 'path'
 
 @Module({

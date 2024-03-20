@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { describe } from 'vitest'
 import { mapBook } from '../../src/mappers/bookMapper'

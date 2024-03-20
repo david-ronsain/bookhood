@@ -1,6 +1,5 @@
 import type { Meta } from '@storybook/vue3'
-import BhDialog from './bhDialog.vue'
-import type { IBhDialogProps } from 'apps/ui/src/interfaces/bhDialog.interface'
+import BhDialog, { type IBhDialogProps } from './bhDialog.vue'
 
 const meta: Meta<typeof BhDialog> = {
 	component: BhDialog,

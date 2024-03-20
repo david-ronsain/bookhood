@@ -1,9 +1,11 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { createTestingPinia } from '@pinia/testing'
 import { vi } from 'vitest'
 import vuetify from '../../../src/plugins/vuetify'
 import { VueWrapper, config, mount } from '@vue/test-utils'
 import SendLinkForm from '../../../src/components/signin/sendLinkForm.vue'
-import { BhPrimaryButton, BhTextField } from '../../../../ui/src'
+import BhPrimaryButton from '../../../../ui/src/lib/buttons/primaryButton/bhPrimaryButton.vue'
+import BhTextField from '../../../../ui/src/lib/inputs/textField/bhTextField.vue'
 import { useMainStore, useUserStore } from '../../../src/store'
 
 vi.mock('vue-i18n', () => ({

@@ -12,12 +12,7 @@ import {
 	UserStats,
 } from '../../../../src/app/application/dto/user.dto'
 import { HttpException, HttpStatus } from '@nestjs/common'
-import {
-	IExternalProfile,
-	IUser,
-	Locale,
-	Role,
-} from '../../../../../shared/src'
+import { IExternalProfile, IUser, Locale } from '../../../../../shared/src'
 import { UserNotFoundException } from '../../../../src/app/application/exceptions'
 import {
 	currentUser,

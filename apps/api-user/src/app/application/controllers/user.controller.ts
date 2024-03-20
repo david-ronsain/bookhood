@@ -1,19 +1,12 @@
 import {
 	Controller,
-	Headers,
 	HttpStatus,
 	Inject,
 	NotFoundException,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices'
-import {
-	ICreateUserDTO,
-	IExternalProfile,
-	IUser,
-	Locale,
-	Role,
-} from '@bookhood/shared'
+import { ICreateUserDTO, IExternalProfile, IUser, Role } from '@bookhood/shared'
 import CreateUserUseCase from '../usecases/createUser.usecase'
 import type UserModel from '../../domain/models/user.model'
 import {
@@ -33,7 +26,6 @@ import CreateAuthLinkUseCase from '../usecases/createAuthLink.usecase'
 import GetUserByTokenUseCase from '../usecases/getUserByToken.usecase'
 import RefreshTokenUseCase from '../usecases/refreshToken.usecase'
 import GetUserByIdUseCase from '../usecases/getUserById.usecase'
-import envConfig from '../../../config/env.config'
 import { I18nContext, I18nService } from 'nestjs-i18n'
 
 @Controller()

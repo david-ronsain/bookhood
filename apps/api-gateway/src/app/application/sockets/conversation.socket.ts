@@ -47,7 +47,7 @@ export class ConversationGateway
 	@WebSocketServer() io: Server
 
 	@UseGuards(AuthUserGuard, new RoleGuard([Role.USER, Role.GUEST]))
-	handleConnection(client: Socket, ...args: any[]) {
+	handleConnection(client: Socket) {
 		const { sockets } = this.io.sockets
 
 		this.logger.info(`Client id: ${client.id} connected`)

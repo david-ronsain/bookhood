@@ -12,7 +12,6 @@
 	const { t } = useI18n()
 	const formValid = ref<boolean>(false)
 	const disabled = ref<boolean>(false)
-	const form = ref(null)
 	const data = ref<CreateUserDTO>({
 		firstName: '',
 		lastName: '',

@@ -1,3 +1,4 @@
+<!-- eslint-disable @nx/enforce-module-boundaries -->
 <script setup lang="ts">
 	import {
 		mdiAccountTie,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Locale } from '@bookhood/shared'
 import { EnvConfig } from '../../config/env'
 import axios, { type AxiosResponse } from 'axios'
@@ -15,8 +16,8 @@ export const useFetch = () => {
 			[EnvConfig.settings.session.token]: localStorage.getItem(
 				EnvConfig.localStorage.userKey,
 			),
-			[EnvConfig.i18n.localeToken]: getLocale(),,
-		}
+			[EnvConfig.i18n.localeToken]: getLocale(),
+		},
 	})
 
 	const GET = (

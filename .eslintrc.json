@@ -2,6 +2,18 @@
 	"root": true,
 	"ignorePatterns": ["**/*"],
 	"plugins": ["@nx"],
+	"rules": {
+		"sort-imports": [
+			"error",
+			{
+				"ignoreCase": true,
+				"ignoreDeclarationSort": true,
+				"ignoreMemberSort": true,
+				"memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+				"allowSeparatedGroups": true
+			}
+		]
+	},
 	"overrides": [
 		{
 			"files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.vue"],

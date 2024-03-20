@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { describe, vi } from 'vitest'
 import { useAccountStore } from '../../src/store/account.store'
 import { createPinia, setActivePinia } from 'pinia'

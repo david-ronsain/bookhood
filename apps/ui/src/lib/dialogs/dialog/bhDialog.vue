@@ -1,7 +1,7 @@
 <script setup lang="ts">
 	import { ref } from 'vue'
 	import { watch } from 'vue'
-	import { BhCard } from '@bookhood/ui'
+	import BhCard from '../../cards/card/bhCard.vue'
 
 	export interface IBhDialogProps {
 		opened?: boolean

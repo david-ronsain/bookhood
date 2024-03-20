@@ -5,7 +5,6 @@ import {
 	HttpException,
 	Inject,
 	LoggerService,
-	HttpCode,
 	HttpStatus,
 } from '@nestjs/common'
 import { Request, Response } from 'express'
@@ -14,7 +13,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
 	constructor(
-		@Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: LoggerService
+		@Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: LoggerService,
 	) {}
 
 	catch(exception: HttpException, host: ArgumentsHost) {
@@ -25,10 +24,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
 		this.logger.log(
 			`${status} ${req.method} ${req.url} - ###{body: ${JSON.stringify(
-				req.body
+				req.body,
 			)}} ###{params: ${JSON.stringify(
-				req.params
-			)}} ###{query: ${JSON.stringify(req.query)}}`
+				req.params,
+			)}} ###{query: ${JSON.stringify(req.query)}}`,
 		)
 		let reasons
 		if (status === HttpStatus.BAD_REQUEST) {

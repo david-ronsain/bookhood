@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { ClientProxy } from '@nestjs/microservices'
 import { Test, TestingModule } from '@nestjs/testing'

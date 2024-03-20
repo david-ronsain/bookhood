@@ -1,6 +1,5 @@
 <script setup lang="ts">
 	import { onMounted, onUnmounted, watch, computed } from 'vue'
-	import Conversation from '../components/conversation/conversation.vue'
 	import { emitEvent, socket, state } from '../composables/socket.composable'
 	import { useRoute } from 'vue-router'
 	import type { IConversationFull } from '@bookhood/shared'
