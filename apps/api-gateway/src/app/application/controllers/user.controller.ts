@@ -39,9 +39,9 @@ import {
 	ProfileStatsMQDTO,
 	GetProfileByTokenMQDTO,
 	CreateUserMQDTO,
+	AuthUserGuard,
+	User,
 } from '@bookhood/shared-api'
-import { AuthUserGuard } from '../guards/authUser.guard'
-import { User } from '../decorators/user.decorator'
 import envConfig from '../../../config/env.config'
 import { I18nContext, I18nService } from 'nestjs-i18n'
 

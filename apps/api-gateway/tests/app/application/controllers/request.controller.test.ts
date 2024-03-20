@@ -17,6 +17,8 @@ import {
 import { GetRequestsDTO } from '../../../../src/app/application/dto/request.dto'
 import { currentUser } from '../../../../../shared-api/test'
 import { I18nService } from 'nestjs-i18n'
+import { ConfigModule } from '@nestjs/config'
+import envConfig from '../../../../src/config/env.config'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: jest.fn(() => ({
@@ -29,6 +31,12 @@ describe('RequestController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [RequestController],
 			providers: [
 				{

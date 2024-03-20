@@ -42,10 +42,10 @@ import {
 	PatchRequestDTO,
 	PatchRequestMQDTO,
 	MQRequestMessageType,
+	AuthUserGuard,
+	User,
 } from '@bookhood/shared-api'
 import { CreateRequestDTO, GetRequestsDTO } from '../dto/request.dto'
-import { AuthUserGuard } from '../guards/authUser.guard'
-import { User } from '../decorators/user.decorator'
 import envConfig from '../../../config/env.config'
 
 @Controller('request')

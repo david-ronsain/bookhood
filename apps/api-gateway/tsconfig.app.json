@@ -10,6 +10,7 @@
 	"exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
 	"include": [
 		"src/**/*.ts",
-		"src/app/tests/application/controllers/app.controller.spec.ts"
+		"src/app/tests/application/controllers/app.controller.spec.ts",
+		"../shared-api/src/decorators/user.decorator.ts"
 	]
 }

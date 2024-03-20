@@ -15,6 +15,8 @@ import {
 } from '../../../../../shared-api/test'
 import { Locale } from '../../../../../shared/src'
 import { I18nService } from 'nestjs-i18n'
+import { ConfigModule } from '@nestjs/config'
+import envConfig from '../../../../src/config/env.config'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -37,6 +39,12 @@ describe('BookController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [BookController],
 			providers: [
 				{
@@ -84,6 +92,7 @@ describe('BookController', () => {
 				currentUser,
 				addBookDTO as unknown as AddBookDTO,
 				Locale.FR,
+				'',
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -93,6 +102,7 @@ describe('BookController', () => {
 					book: addBookDTO,
 					session: {
 						locale: Locale.FR,
+						token: '',
 					},
 				},
 			)
@@ -111,6 +121,7 @@ describe('BookController', () => {
 					currentUser,
 					addBookDTO as unknown as AddBookDTO,
 					Locale.FR,
+					'',
 				),
 			).rejects.toThrow(HttpException)
 		})
@@ -162,6 +173,7 @@ describe('BookController', () => {
 					boundingBox,
 				},
 				Locale.FR,
+				'',
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -174,6 +186,7 @@ describe('BookController', () => {
 					user: currentUser,
 					session: {
 						locale: Locale.FR,
+						token: '',
 					},
 				},
 			)
@@ -196,6 +209,7 @@ describe('BookController', () => {
 						boundingBox,
 					},
 					Locale.FR,
+					'',
 				),
 			).rejects.toThrow(HttpException)
 		})
@@ -220,6 +234,7 @@ describe('BookController', () => {
 				currentUser,
 				page,
 				Locale.FR,
+				'',
 			)
 
 			expect(controller['bookQueue'].send).toHaveBeenCalledWith(
@@ -229,6 +244,7 @@ describe('BookController', () => {
 					user: currentUser,
 					session: {
 						locale: Locale.FR,
+						token: '',
 					},
 				},
 			)
@@ -245,7 +261,7 @@ describe('BookController', () => {
 			)
 
 			await expect(
-				controller.getUserBooks(currentUser, page, Locale.FR),
+				controller.getUserBooks(currentUser, page, Locale.FR, ''),
 			).rejects.toThrow(HttpException)
 		})
 	})

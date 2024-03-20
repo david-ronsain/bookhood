@@ -15,6 +15,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Server, Socket } from 'socket.io'
 import { firstValueFrom } from 'rxjs'
 import {
+	AuthUserGuard,
 	MicroserviceResponseFormatter,
 	MQConversationMessageType,
 } from '@bookhood/shared-api'
@@ -30,7 +31,6 @@ import {
 	WritingDTO,
 } from '@bookhood/shared'
 import envConfig from '../../../config/env.config'
-import { AuthUserGuard } from '../guards/authUser.guard'
 import { RoleGuard } from '../guards/role.guard'
 import { SocketHeaders } from '../decorators/socket.decorator'
 

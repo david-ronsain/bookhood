@@ -16,6 +16,8 @@ import {
 } from '../../../../../shared/src'
 import { BookNotFoundException } from '../../../../src/app/application/exceptions'
 import { I18nService } from 'nestjs-i18n'
+import { ConfigModule } from '@nestjs/config'
+import envConfig from '../../../../src/config/env.config'
 
 jest.mock('@nestjs/microservices', () => ({
 	ClientProxy: {
@@ -28,6 +30,12 @@ describe('LibraryController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [LibraryController],
 			providers: [
 				{

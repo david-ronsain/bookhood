@@ -35,11 +35,11 @@ import {
 	MicroserviceResponseFormatter,
 	PatchLibraryMQDTO,
 	MQLibraryMessageType,
+	AuthUserGuard,
+	User,
 } from '@bookhood/shared-api'
 import { RoleGuard } from '../guards/role.guard'
 import { BooksList } from '../dto/library.dto'
-import { User } from '../decorators/user.decorator'
-import { AuthUserGuard } from '../guards/authUser.guard'
 import envConfig from '../../../config/env.config'
 
 @Controller('library')

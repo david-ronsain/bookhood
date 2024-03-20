@@ -39,12 +39,12 @@ import {
 	SearchBookMQDTO,
 	GetBookMQDTO,
 	MQBookMessageType,
+	AuthUserGuard,
+	User,
 } from '@bookhood/shared-api'
 import { AddBookDTO, Book, BookSearch, BookSearchDTO } from '../dto/book.dto'
 import { google } from 'googleapis'
 import envConfig from '../../../config/env.config'
-import { AuthUserGuard } from '../guards/authUser.guard'
-import { User } from '../decorators/user.decorator'
 
 @Controller('book')
 export class BookController {
@@ -64,6 +64,7 @@ export class BookController {
 		@User() user: CurrentUser,
 		@Body() book: AddBookDTO,
 		@Headers(envConfig().i18n.localeToken) locale: Locale,
+		@Headers(envConfig().settings.sessionToken) token: string,
 	): Promise<IBook> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBook>
@@ -73,6 +74,7 @@ export class BookController {
 				book,
 				session: {
 					locale,
+					token,
 				},
 			} as AddBookMQDTO),
 		)
@@ -127,6 +129,7 @@ export class BookController {
 		@User() user: CurrentUser,
 		@Body() body: BookSearchDTO,
 		@Headers(envConfig().i18n.localeToken) locale: Locale,
+		@Headers(envConfig().settings.sessionToken) token: string,
 	): Promise<IBookSearch> {
 		const created = await firstValueFrom<
 			MicroserviceResponseFormatter<IBookSearch>
@@ -139,6 +142,7 @@ export class BookController {
 				user,
 				session: {
 					locale,
+					token,
 				},
 			} as SearchBookMQDTO),
 		)
@@ -158,6 +162,7 @@ export class BookController {
 		@User() user: CurrentUser,
 		@Query('page') page: number,
 		@Headers(envConfig().i18n.localeToken) locale: Locale,
+		@Headers(envConfig().settings.sessionToken) token: string,
 	): Promise<ILibraryFull[]> {
 		const response = await firstValueFrom<
 			MicroserviceResponseFormatter<ILibraryFull[]>
@@ -167,6 +172,7 @@ export class BookController {
 				user,
 				session: {
 					locale,
+					token,
 				},
 			} as GetBookMQDTO),
 		)
