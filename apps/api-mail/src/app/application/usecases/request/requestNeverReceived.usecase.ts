@@ -1,11 +1,11 @@
 import { Inject } from '@nestjs/common'
 import { IMailer } from '../../../domain/ports/mailer.interface'
-import { IRequestInfos } from '@bookhood/shared'
+import { RequestInfosDTO } from '@bookhood/shared-api'
 
 export default class RequestNeverReceivedUseCase {
 	constructor(@Inject('Mailer') private readonly mailer: IMailer) {}
 
-	handler(infos: IRequestInfos): void {
+	handler(infos: RequestInfosDTO): void {
 		this.mailer.requestNeverReceived(infos)
 	}
 }

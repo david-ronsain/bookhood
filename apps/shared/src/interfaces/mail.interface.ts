@@ -1,4 +1,6 @@
-export interface BookRequestMailDTO {
+import { Session } from './session.interface'
+
+export interface BookRequestMailDTO extends Session {
 	book: string
 
 	emitterFirstName: string

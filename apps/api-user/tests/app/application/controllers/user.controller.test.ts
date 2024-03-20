@@ -16,6 +16,7 @@ import {
 	ICreateUserDTO,
 	IExternalProfile,
 	IUser,
+	Locale,
 	Role,
 } from '../../../../../shared/src'
 import { of, Observable } from 'rxjs'
@@ -118,6 +119,9 @@ describe('UserController', () => {
 				firstName: 'first',
 				lastName: 'last',
 				email: 'first.last@email.test',
+				session: {
+					locale: Locale.FR,
+				},
 			}
 
 			jest.spyOn(mockedUseCase, 'handler').mockImplementationOnce(() =>

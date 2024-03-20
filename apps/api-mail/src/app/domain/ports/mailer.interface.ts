@@ -1,24 +1,20 @@
-import {
-	BookRequestMailDTO,
-	ICreateUserDTO,
-	IRequestInfos,
-	IUser,
-} from '@bookhood/shared'
+import { BookRequestMailDTO, ICreateUserDTO } from '@bookhood/shared'
+import { AuthSendLinkDTO, RequestInfosDTO } from '@bookhood/shared-api'
 
 export interface IMailer {
 	requestCreated(infos: BookRequestMailDTO): void
 
-	requestAccepted(infos: IRequestInfos): void
+	requestAccepted(infos: RequestInfosDTO): void
 
-	requestRefused(infos: IRequestInfos): void
+	requestRefused(infos: RequestInfosDTO): void
 
-	requestReturnedWithIssue(infos: IRequestInfos): void
+	requestReturnedWithIssue(infos: RequestInfosDTO): void
 
-	requestNeverReceived(infos: IRequestInfos): void
+	requestNeverReceived(infos: RequestInfosDTO): void
 
 	userRegistered(user: ICreateUserDTO): void
 
-	authSendLink(user: IUser): void
+	authSendLink(user: AuthSendLinkDTO): void
 
 	sendEmail(
 		from: string,

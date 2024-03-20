@@ -1,10 +1,21 @@
 import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common'
 import { RequestRepository } from '../../../domain/ports/request.repository'
-import { IRequest, IRequestEvent, RequestStatus } from '@bookhood/shared'
+import {
+	IRequest,
+	IRequestEvent,
+	IRequestInfos,
+	RequestStatus,
+	Session,
+	SessionInfos,
+} from '@bookhood/shared'
 import RequestMapper from '../../mappers/request.mapper'
 import { ClientProxy } from '@nestjs/microservices'
 import { format } from 'date-fns'
-import { MQMailMessageType, PatchRequestMQDTO } from '@bookhood/shared-api'
+import {
+	MQMailMessageType,
+	PatchRequestMQDTO,
+	RequestInfosDTO,
+} from '@bookhood/shared-api'
 import { I18nContext, I18nService } from 'nestjs-i18n'
 
 export default class PatchRequestUseCase {
@@ -88,27 +99,48 @@ export default class PatchRequestUseCase {
 
 		if (request.status !== body.status) {
 			if (body.status === RequestStatus.REFUSED) {
-				this.mailClient
-					.send(MQMailMessageType.REQUEST_REFUSED, infos)
-					.subscribe()
+				this.sendMail(
+					MQMailMessageType.REQUEST_REFUSED,
+					infos,
+					body.session,
+				)
 			} else if (
 				body.status === RequestStatus.ACCEPTED_PENDING_DELIVERY
 			) {
-				this.mailClient
-					.send(MQMailMessageType.REQUEST_ACCEPTED, infos)
-					.subscribe()
+				this.sendMail(
+					MQMailMessageType.REQUEST_ACCEPTED,
+					infos,
+					body.session,
+				)
 			} else if (body.status === RequestStatus.NEVER_RECEIVED) {
-				this.mailClient
-					.send(MQMailMessageType.REQUEST_NEVER_RECEIVED, infos)
-					.subscribe()
+				this.sendMail(
+					MQMailMessageType.REQUEST_NEVER_RECEIVED,
+					infos,
+					body.session,
+				)
 			} else if (body.status === RequestStatus.RETURNED_WITH_ISSUE) {
-				this.mailClient
-					.send(MQMailMessageType.REQUEST_RETURNED_WITH_ISSUE, infos)
-					.subscribe()
+				this.sendMail(
+					MQMailMessageType.REQUEST_RETURNED_WITH_ISSUE,
+					infos,
+					body.session,
+				)
 			}
 		}
 
 		return RequestMapper.modelObjectIdToString(updated)
+	}
+
+	sendMail = (
+		messageType: MQMailMessageType,
+		infos: IRequestInfos,
+		session: SessionInfos,
+	): void => {
+		this.mailClient
+			.send(messageType, {
+				...infos,
+				session,
+			} as RequestInfosDTO)
+			.subscribe()
 	}
 
 	statusAllowed = (

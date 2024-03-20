@@ -186,7 +186,7 @@ describe('PatchRequestUseCase', () => {
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-accepted',
-				infos,
+				{ ...infos, session: body.session },
 			)
 		})
 
@@ -216,7 +216,7 @@ describe('PatchRequestUseCase', () => {
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-never-received',
-				infos,
+				{ ...infos, session: body.session },
 			)
 		})
 
@@ -246,7 +246,7 @@ describe('PatchRequestUseCase', () => {
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-refused',
-				infos,
+				{ ...infos, session: body.session },
 			)
 		})
 
@@ -277,7 +277,7 @@ describe('PatchRequestUseCase', () => {
 
 			expect(mailClient.send).toHaveBeenCalledWith(
 				'mail-request-returned-with-issue',
-				infos,
+				{ ...infos, session: body.session },
 			)
 		})
 	})

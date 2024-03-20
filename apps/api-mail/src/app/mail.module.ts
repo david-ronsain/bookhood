@@ -12,12 +12,8 @@ import { AwsSdkModule } from 'nest-aws-sdk'
 import { SES } from 'aws-sdk'
 import { SESManagerModule } from './infrastructure/adapters/aws/ses/awsses.module'
 import * as path from 'path'
-import {
-	AcceptLanguageResolver,
-	HeaderResolver,
-	I18nModule,
-	QueryResolver,
-} from 'nestjs-i18n'
+import { I18nModule } from 'nestjs-i18n'
+import { MQResolver } from '@bookhood/shared-api'
 
 @Module({
 	imports: [
@@ -29,7 +25,7 @@ import {
 		DomainModule,
 		InfrastructureModule,
 		WinstonModule.forRoot(
-			winstonConfig(winston, envConfig().gateway.mail.serviceName)
+			winstonConfig(winston, envConfig().gateway.mail.serviceName),
 		),
 		SESManagerModule,
 		AwsSdkModule.forRoot({
@@ -42,14 +38,9 @@ import {
 			fallbackLanguage: envConfig().i18n.fallbackLocale,
 			resolvers: [
 				{
-					use: QueryResolver,
-					options: ['lang', 'lg', 'locale'],
+					use: MQResolver,
+					options: ['locale'],
 				},
-				{
-					use: HeaderResolver,
-					options: ['x-lang', 'x-lg', 'x-locale'],
-				},
-				AcceptLanguageResolver,
 			],
 			loaderOptions: {
 				path: path.join(__dirname, '/app/application/locales/'),

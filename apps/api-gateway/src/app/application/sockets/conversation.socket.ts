@@ -108,7 +108,13 @@ export class ConversationGateway
 			>(
 				this.conversationQueue.send(
 					MQConversationMessageType.ADD_MESSAGE,
-					{ ...dto, locale, token },
+					{
+						...dto,
+						session: {
+							locale,
+							token,
+						},
+					},
 				),
 			)
 
@@ -132,7 +138,13 @@ export class ConversationGateway
 			await firstValueFrom<MicroserviceResponseFormatter<boolean>>(
 				this.conversationQueue.send(
 					MQConversationMessageType.FLAG_AS_SEEN,
-					{ ...dto, locale, token },
+					{
+						...dto,
+						session: {
+							locale,
+							token,
+						},
+					},
 				),
 			)
 			client.broadcast.emit(

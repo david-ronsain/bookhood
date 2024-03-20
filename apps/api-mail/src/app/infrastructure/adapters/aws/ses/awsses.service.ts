@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectAwsService } from 'nest-aws-sdk'
 import { AWSError, SES } from 'aws-sdk'
-import { BookRequestMailDTO, IRequestInfos, IUser } from '@bookhood/shared'
+import { BookRequestMailDTO, ICreateUserDTO } from '@bookhood/shared'
 import { IMailer } from '../../../../domain/ports/mailer.interface'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import { Logger } from 'winston'
@@ -11,7 +11,8 @@ import { compile } from 'handlebars'
 import mjml2html from 'mjml'
 import { PromiseResult } from 'aws-sdk/lib/request'
 import envConfig from '../../../../../config/env.config'
-import { I18nService } from 'nestjs-i18n'
+import { I18nContext, I18nService } from 'nestjs-i18n'
+import { AuthSendLinkDTO, RequestInfosDTO } from '@bookhood/shared-api'
 
 @Injectable()
 export class SESManagerService implements IMailer {
@@ -29,63 +30,87 @@ export class SESManagerService implements IMailer {
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.request.created.subject'),
+			this.i18n.t('mails.request.created.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				link,
 				text: {
 					text1: this.i18n.t('mails.request.created.text1', {
 						args: { firstName: infos.recipientFirstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.request.created.text2', {
 						args: {
 							firstName: infos.emitterFirstName,
 							book: infos.book,
 						},
+						lang: I18nContext.current()?.lang,
 					}),
-					text3: this.i18n.t('mails.request.created.text3'),
-					cta: this.i18n.t('mails.request.created.cta'),
+					text3: this.i18n.t('mails.request.created.text3', {
+						lang: I18nContext.current()?.lang,
+					}),
+					cta: this.i18n.t('mails.request.created.cta', {
+						lang: I18nContext.current()?.lang,
+					}),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
 			envConfig().settings.mailFrom,
 			[this.mailTo(infos.email)],
-			this.i18n.t('mails.request.created.subject'),
+			this.i18n.t('mails.request.created.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			content,
 		)
 	}
 
-	async requestAccepted(infos: IRequestInfos): Promise<void> {
+	async requestAccepted(infos: RequestInfosDTO): Promise<void> {
 		const template = 'request/accepted.mjml'
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.request.accepted.subject'),
+			this.i18n.t('mails.request.accepted.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				text: {
 					text1: this.i18n.t('mails.request.accepted.text1', {
 						args: { firstName: infos.emitter.firstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.request.accepted.text2', {
 						args: {
 							firstName: infos.owner.firstName,
 							book: infos.book.title,
 						},
+						lang: I18nContext.current()?.lang,
 					}),
-					text3: this.i18n.t('mails.request.accepted.text3'),
+					text3: this.i18n.t('mails.request.accepted.text3', {
+						lang: I18nContext.current()?.lang,
+					}),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
@@ -96,36 +121,47 @@ export class SESManagerService implements IMailer {
 					firstName: infos.owner.firstName,
 					book: infos.book.title,
 				},
+				lang: I18nContext.current()?.lang,
 			}),
 			content,
 		)
 	}
 
-	async requestRefused(infos: IRequestInfos): Promise<void> {
+	async requestRefused(infos: RequestInfosDTO): Promise<void> {
 		const template = 'request/refused.mjml'
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.request.refused.subject'),
+			this.i18n.t('mails.request.refused.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				text: {
 					text1: this.i18n.t('mails.request.refused.text1', {
 						args: { firstName: infos.emitter.firstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.request.refused.text2', {
 						args: {
 							firstName: infos.owner.firstName,
 							book: infos.book.title,
 						},
+						lang: I18nContext.current()?.lang,
 					}),
-					text3: this.i18n.t('mails.request.refused.text3'),
+					text3: this.i18n.t('mails.request.refused.text3', {
+						lang: I18nContext.current()?.lang,
+					}),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
@@ -136,36 +172,47 @@ export class SESManagerService implements IMailer {
 					firstName: infos.owner.firstName,
 					book: infos.book.title,
 				},
+				lang: I18nContext.current()?.lang,
 			}),
 			content,
 		)
 	}
 
-	async requestNeverReceived(infos: IRequestInfos): Promise<void> {
+	async requestNeverReceived(infos: RequestInfosDTO): Promise<void> {
 		const template = 'request/neverReceived.mjml'
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.request.neverReceived.subject'),
+			this.i18n.t('mails.request.neverReceived.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				text: {
 					text1: this.i18n.t('mails.request.neverReceived.text1', {
 						args: { firstName: infos.owner.firstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.request.neverReceived.text2', {
 						args: {
 							firstName: infos.emitter.firstName,
 							book: infos.book.title,
 						},
+						lang: I18nContext.current()?.lang,
 					}),
-					text3: this.i18n.t('mails.request.neverReceived.text3'),
+					text3: this.i18n.t('mails.request.neverReceived.text3', {
+						lang: I18nContext.current()?.lang,
+					}),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
@@ -176,23 +223,27 @@ export class SESManagerService implements IMailer {
 					firstName: infos.emitter.firstName,
 					book: infos.book.title,
 				},
+				lang: I18nContext.current()?.lang,
 			}),
 			content,
 		)
 	}
 
-	async requestReturnedWithIssue(infos: IRequestInfos): Promise<void> {
+	async requestReturnedWithIssue(infos: RequestInfosDTO): Promise<void> {
 		const template = 'request/returnedWithIssue.mjml'
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.request.returnedWithIssue.subject'),
+			this.i18n.t('mails.request.returnedWithIssue.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				text: {
 					text1: this.i18n.t(
 						'mails.request.returnedWithIssue.text1',
 						{
 							args: { firstName: infos.emitter.firstName },
+							lang: I18nContext.current()?.lang,
 						},
 					),
 					text2: this.i18n.t(
@@ -202,16 +253,24 @@ export class SESManagerService implements IMailer {
 								firstName: infos.owner.firstName,
 								book: infos.book.title,
 							},
+							lang: I18nContext.current()?.lang,
 						},
 					),
-					text3: this.i18n.t('mails.request.returnedWithIssue.text3'),
+					text3: this.i18n.t(
+						'mails.request.returnedWithIssue.text3',
+						{ lang: I18nContext.current()?.lang },
+					),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
@@ -221,63 +280,80 @@ export class SESManagerService implements IMailer {
 				args: {
 					book: infos.book.title,
 				},
+				lang: I18nContext.current()?.lang,
 			}),
 			content,
 		)
 	}
 
-	async userRegistered(user: IUser): Promise<void> {
+	async userRegistered(user: ICreateUserDTO): Promise<void> {
 		const template = 'user/registered.mjml'
 		const link = `${envConfig().front.protocol}://${
 			envConfig().front.host
-		}:${envConfig().front.port}/signin/${user.token}`
+		}:${envConfig().front.port}/signin/${user.session.token}`
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.user.registered.subject'),
+			this.i18n.t('mails.user.registered.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				firstName: user.firstName,
 				text: {
 					text1: this.i18n.t('mails.user.registered.text1', {
 						args: { firstName: user.firstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.auth.signin.text2', {
 						args: { link },
+						lang: I18nContext.current()?.lang,
 					}),
-					text3: this.i18n.t('mails.user.registered.text2'),
+					text3: this.i18n.t('mails.user.registered.text2', {
+						lang: I18nContext.current()?.lang,
+					}),
 				},
 			},
 		)
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
 			envConfig().settings.mailFrom,
 			[this.mailTo(user.email)],
-			this.i18n.t('mails.user.registered.subject'),
+			this.i18n.t('mails.user.registered.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			content,
 		)
 	}
 
-	async authSendLink(user: IUser): Promise<void> {
+	async authSendLink(user: AuthSendLinkDTO): Promise<void> {
 		const template = 'auth/send-link.mjml'
 		const link = `${envConfig().front.protocol}://${
 			envConfig().front.host
-		}:${envConfig().front.port}/signin/${user.token}`
+		}:${envConfig().front.port}/signin/${user.session.token}`
 
 		const content = await this.parseTemplate(
 			template,
-			this.i18n.t('mails.auth.signin.subject'),
+			this.i18n.t('mails.auth.signin.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			{
 				text: {
 					text1: this.i18n.t('mails.auth.signin.text1', {
 						args: { firstName: user.firstName },
+						lang: I18nContext.current()?.lang,
 					}),
 					text2: this.i18n.t('mails.auth.signin.text2', {
 						args: { link },
+						lang: I18nContext.current()?.lang,
 					}),
 				},
 			},
@@ -285,13 +361,19 @@ export class SESManagerService implements IMailer {
 
 		if (!content.length) {
 			this.logger.error(`template not found - ${template}`)
-			throw new Error('template not found')
+			throw new Error(
+				this.i18n.t('mails.templateNotFound', {
+					lang: I18nContext.current()?.lang,
+				}),
+			)
 		}
 
 		this.sendEmail(
 			envConfig().settings.mailFrom,
 			[this.mailTo(user.email)],
-			this.i18n.t('mails.auth.signin.subject'),
+			this.i18n.t('mails.auth.signin.subject', {
+				lang: I18nContext.current()?.lang,
+			}),
 			content,
 		)
 	}
@@ -371,10 +453,15 @@ export class SESManagerService implements IMailer {
 					...data,
 					title,
 					trads: {
-						websiteName: 'Bookhood',
-						websitePhrase:
-							'Les livres ont aussi droit a une seconde chance',
-						copyright: '@bookhood 2024',
+						websiteName: this.i18n.t('mails.websiteName', {
+							lang: I18nContext.current()?.lang,
+						}),
+						websitePhrase: this.i18n.t('mails.websitePhrase', {
+							lang: I18nContext.current()?.lang,
+						}),
+						copyright: this.i18n.t('mails.copyright', {
+							lang: I18nContext.current()?.lang,
+						}),
 					},
 				})
 				html = mjml2html(mjml).html

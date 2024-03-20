@@ -15,6 +15,9 @@ import { BookController } from './application/controllers/book.controller'
 import { RequestController } from './application/controllers/request.controller'
 import { ConversationGateway } from './application/sockets/conversation.socket'
 import { LibraryController } from './application/controllers/library.controller'
+import { HeaderResolver, I18nModule } from 'nestjs-i18n'
+import { MQResolver } from '@bookhood/shared-api'
+import path from 'path'
 
 @Module({
 	imports: [
@@ -37,6 +40,19 @@ import { LibraryController } from './application/controllers/library.controller'
 		WinstonModule.forRoot(
 			winstonConfig(winston, envConfig().gateway.gateway.serviceName),
 		),
+		I18nModule.forRoot({
+			fallbackLanguage: envConfig().i18n.fallbackLocale,
+			resolvers: [
+				{
+					use: HeaderResolver,
+					options: [envConfig().i18n.localeToken],
+				},
+			],
+			loaderOptions: {
+				path: path.join(__dirname, '/app/application/locales/'),
+				watch: true,
+			},
+		}),
 	],
 	controllers: [
 		UserController,

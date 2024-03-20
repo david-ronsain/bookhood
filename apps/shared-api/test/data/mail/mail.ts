@@ -1,5 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { BookRequestMailDTO } from '../../../../shared/src'
+import { BookRequestMailDTO, Locale } from '../../../../shared/src'
 
 export const bookRequestMailDTO: BookRequestMailDTO = {
 	book: 'title',
@@ -7,4 +7,8 @@ export const bookRequestMailDTO: BookRequestMailDTO = {
 	recipientFirstName: 'recipient',
 	email: 'first.last@name.test',
 	requestId: 'aaaaaaaaaaaaaaaaaaaaaaaa',
+	session: {
+		locale: Locale.FR,
+		token: 'token',
+	},
 }

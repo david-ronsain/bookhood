@@ -8,10 +8,10 @@ import { Logger } from 'winston'
 import { createAwsServiceMock } from 'nest-aws-sdk/dist/testing'
 import { I18nService } from 'nestjs-i18n'
 import {
-	BookRequestMailDTO,
-	IRequestInfos,
-} from '../../../../../../../shared/src'
-import { requestInfos, userLight } from '../../../../../../../shared-api/test'
+	requestInfos,
+	userLight,
+	userLightWithSession,
+} from '../../../../../../../shared-api/test'
 import { bookRequestMailDTO } from '../../../../../../../shared-api/test/data/mail/mail'
 
 const mockI18nService = {
@@ -70,7 +70,9 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			expect(service.userRegistered(userLight)).rejects.toThrow()
+			expect(
+				service.userRegistered(userLightWithSession),
+			).rejects.toThrow()
 		})
 
 		it('should send a user registration email', async () => {
@@ -80,7 +82,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			await service.userRegistered(userLight)
+			await service.userRegistered(userLightWithSession)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()
@@ -95,7 +97,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => '')
 
-			expect(service.authSendLink(userLight)).rejects.toThrow()
+			expect(service.authSendLink(userLightWithSession)).rejects.toThrow()
 		})
 
 		it('should send a signin email', async () => {
@@ -105,7 +107,7 @@ describe('SESManagerService', () => {
 			)
 			spy.mockImplementation(() => 'template')
 
-			await service.authSendLink(userLight)
+			await service.authSendLink(userLightWithSession)
 
 			expect(sesInstance.sendEmail).toHaveBeenCalled()
 			expect(loggerInstance.info).toHaveBeenCalled()

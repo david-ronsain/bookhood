@@ -57,6 +57,7 @@ export class RequestController {
 					recipientFirstName: library.user.firstName,
 					email: library.user.email,
 					requestId: request._id.toString(),
+					session: body.session,
 				} as BookRequestMailDTO)
 				.subscribe()
 

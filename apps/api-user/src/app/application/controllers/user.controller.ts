@@ -63,8 +63,9 @@ export class UserController {
 			const createdUser: UserModel =
 				await this.createUserUseCase.handler(user)
 			this.createAuthLinkUseCase.handler(createdUser)
+			user.session.token = createdUser.token
 			this.rabbitMailClient
-				.send(MQMailMessageType.USER_CREATED, createdUser)
+				.send(MQMailMessageType.USER_CREATED, user)
 				.subscribe()
 			return new MicroserviceResponseFormatter<UserModel>(
 				true,

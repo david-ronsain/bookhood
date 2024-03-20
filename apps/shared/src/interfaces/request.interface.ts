@@ -74,7 +74,7 @@ export interface IPatchRequestDTO {
 	dates?: string[]
 }
 
-interface IRequestInfosUser {
+export interface IRequestInfosUser {
 	_id?: string
 
 	firstName: string
@@ -84,7 +84,7 @@ interface IRequestInfosUser {
 	email: string
 }
 
-interface IRequestInfosBook {
+export interface IRequestInfosBook {
 	title: string
 }
 

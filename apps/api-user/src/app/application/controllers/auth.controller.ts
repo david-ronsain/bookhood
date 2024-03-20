@@ -9,6 +9,7 @@ import {
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import { ISendLinkDTO, ISigninDTO } from '@bookhood/shared'
 import {
+	AuthSendLinkDTO,
 	HealthCheckStatus,
 	MQAuthMessageType,
 	MQMailMessageType,
@@ -49,7 +50,10 @@ export class AuthController {
 			this.createAuthLinkUseCase.handler(user)
 			if (user) {
 				this.rabbitMailClient
-					.send(MQMailMessageType.AUTH_SEND_LINK, user)
+					.send(MQMailMessageType.AUTH_SEND_LINK, {
+						...user,
+						session: dto.session,
+					} as AuthSendLinkDTO)
 					.subscribe()
 			}
 

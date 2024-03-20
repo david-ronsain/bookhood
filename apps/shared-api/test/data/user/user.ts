@@ -1,5 +1,11 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { IExternalProfile, IUser, Role } from '../../../../shared/src'
+import {
+	ICreateUserDTO,
+	IExternalProfile,
+	IUser,
+	Locale,
+	Role,
+} from '../../../../shared/src'
 import { CurrentUser } from '../../../src'
 
 export const currentUser: CurrentUser = {
@@ -15,6 +21,16 @@ export const userLight: IUser = {
 	lastName: 'last',
 	email: 'first.last@name.test',
 	token: 'token',
+}
+
+export const userLightWithSession: ICreateUserDTO = {
+	firstName: 'first',
+	lastName: 'last',
+	email: 'first.last@name.test',
+	session: {
+		locale: Locale.FR,
+		token: 'token',
+	},
 }
 
 export const userModel = {

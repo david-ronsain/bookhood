@@ -1,4 +1,8 @@
 {
+	"websiteName": "Bookhood",
+	"websitePhrase": "Les livres ont aussi droit a une seconde chance",
+	"copyright": "@bookhood 2024",
+	"templateNotFound": "Le template de mail n'existe pas",
 	"user": {
 		"registered": {
 			"subject": "Bienvenue !",
