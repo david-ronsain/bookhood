@@ -20,6 +20,9 @@ import {
 	flagAsSeenDTO,
 	getOrCreateDTO,
 } from '../../../../../shared-api/test'
+import { I18nService } from 'nestjs-i18n'
+import envConfig from '../../../../src/config/env.config'
+import { ConfigModule } from '@nestjs/config'
 
 describe('ConversationController', () => {
 	let userClient: ClientProxy
@@ -30,6 +33,12 @@ describe('ConversationController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [ConversationController],
 			providers: [
 				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
@@ -49,6 +58,12 @@ describe('ConversationController', () => {
 					provide: FlagAsSeenUseCase,
 					useValue: {
 						handler: jest.fn(),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

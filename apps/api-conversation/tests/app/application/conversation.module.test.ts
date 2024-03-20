@@ -19,6 +19,10 @@ describe('Testing the ApplicationModule', () => {
 	beforeAll(async () => {
 		module = await Test.createTestingModule({
 			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
 				WinstonModule.forRoot({}),
 				MongooseModule.forRootAsync({
 					imports: [ConfigModule],

@@ -3,6 +3,7 @@ import {
 	ForbiddenException,
 	HttpStatus,
 	Inject,
+	UseGuards,
 } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
@@ -17,6 +18,7 @@ import {
 import { firstValueFrom } from 'rxjs'
 import GetOrCreateUseCase from '../usecases/getOrCreate.usecase'
 import {
+	AuthUserGuard,
 	HealthCheckStatus,
 	MQConversationMessageType,
 	MQUserMessageType,
@@ -39,6 +41,7 @@ export class ConversationController {
 		return HealthCheckStatus.UP
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQConversationMessageType.CREATE_AND_GET)
 	async getOrCreateConversation(
 		dto: GetOrCreateConversationDTO,
@@ -65,6 +68,7 @@ export class ConversationController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQConversationMessageType.ADD_MESSAGE)
 	async addMessage(
 		dto: AddMessageDTO,
@@ -89,6 +93,7 @@ export class ConversationController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQConversationMessageType.FLAG_AS_SEEN)
 	async flagAsSeen(
 		dto: FlagAsSeenMessageDTO,
