@@ -11,6 +11,7 @@ import {
 	Injectable,
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
+import envConfig from 'apps/api-gateway/src/config/env.config'
 import { IncomingMessage } from 'http'
 import { I18nContext, I18nService } from 'nestjs-i18n'
 import { firstValueFrom } from 'rxjs'
@@ -61,12 +62,15 @@ export class AuthUserGuard implements CanActivate {
 		let token: string[] = []
 		if (request instanceof IncomingMessage) {
 			token = request?.headers
-				? request.headers['x-token']?.toString().split('|') || []
+				? request.headers[envConfig().settings.sessionToken]
+						?.toString()
+						.split('|') || []
 				: []
 		} else if (request instanceof Socket) {
 			token = request.handshake
-				? request.handshake?.headers['x-token'].toString().split('|') ||
-					[]
+				? request.handshake?.headers[envConfig().settings.sessionToken]
+						.toString()
+						.split('|') || []
 				: []
 		}
 

@@ -2,6 +2,7 @@ interface II18nConfig {
 	availableLocales: I18nLocales[]
 	fallbackLocale: I18nLocales
 	defaultLocale: I18nLocales
+	localeToken: string
 }
 
 interface IEnvConfig {
@@ -27,6 +28,7 @@ interface ISettingsConfig {
 
 interface ISessionConfig {
 	duration: number
+	token: string
 }
 
 enum I18nLocales {
@@ -66,6 +68,8 @@ export const EnvConfig: IEnvConfig = {
 		defaultLocale:
 			import.meta.env.VITE_APP_FRONT_I18N_DEFAULT_LOCALE ||
 			I18nLocales.FR,
+		localeToken:
+			import.meta.env.VITE_APP_FRONT_I18N_TOKEN || I18nLocales.FR,
 	},
 	api: {
 		base: `${import.meta.env.VITE_APP_FRONT_API_GATEWAY_PROTOCOL}://${
@@ -94,6 +98,7 @@ export const EnvConfig: IEnvConfig = {
 			duration: parseInt(
 				import.meta.env.VITE_APP_FRONT_SESSION_DURATION || '',
 			),
+			token: import.meta.env.VITE_APP_FRONT_SESSION_TOKEN || '',
 		},
 	},
 	socket: {

@@ -29,14 +29,15 @@ export const state = ref<ISocketState>({
 
 export const socket = io(EnvConfig.socket.url, {
 	extraHeaders: {
-		'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
-		'x-locale': getLocale(),
+		[EnvConfig.settings.session.token]: localStorage.getItem(
+			EnvConfig.localStorage.userKey,
+		),
+		[EnvConfig.i18n.localeToken]: getLocale(),
 	},
 })
 
 export const emitEvent = (event: string, args: any) => {
 	socket.emit(event, {
-		token: localStorage.getItem(EnvConfig.localStorage.userKey),
 		...args,
 	})
 }

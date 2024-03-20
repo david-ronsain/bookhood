@@ -9,6 +9,16 @@ export const useFetch = () => {
 			: Locale.FR
 	}
 
+	const getHeaders = (headers: object): object => ({
+		headers: {
+			...headers,
+			[EnvConfig.settings.session.token]: localStorage.getItem(
+				EnvConfig.localStorage.userKey,
+			),
+			[EnvConfig.i18n.localeToken]: getLocale(),,
+		}
+	})
+
 	const GET = (
 		url: string,
 		data: object = {},
@@ -18,11 +28,7 @@ export const useFetch = () => {
 			params: {
 				...data,
 			},
-			headers: {
-				'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
-				'x-locale': getLocale(),
-				...headers,
-			},
+			...getHeaders(headers),
 		})
 
 	const PATCH = (
@@ -31,11 +37,7 @@ export const useFetch = () => {
 		headers: object = {},
 	): Promise<AxiosResponse<any, any>> =>
 		axios.patch(EnvConfig.api.base + url, data, {
-			headers: {
-				'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
-				'x-locale': getLocale(),
-				...headers,
-			},
+			...getHeaders(headers),
 		})
 
 	const POST = (
@@ -44,11 +46,7 @@ export const useFetch = () => {
 		headers: object = {},
 	): Promise<AxiosResponse<any, any>> =>
 		axios.post(EnvConfig.api.base + url, data, {
-			headers: {
-				'x-token': localStorage.getItem(EnvConfig.localStorage.userKey),
-				'x-locale': getLocale(),
-				...headers,
-			},
+			...getHeaders(headers),
 		})
 
 	return {
