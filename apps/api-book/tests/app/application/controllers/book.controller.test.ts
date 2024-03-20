@@ -27,6 +27,9 @@ import {
 	userLibraryStats,
 } from '../../../../../shared-api/test'
 import { userRequestStats } from '../../../../../shared-api/test/data/books/request'
+import { I18nService } from 'nestjs-i18n'
+import envConfig from '../../../../../api-conversation/src/config/env.config'
+import { ConfigModule } from '@nestjs/config'
 
 describe('BookController', () => {
 	let controller: BookController
@@ -44,8 +47,15 @@ describe('BookController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [BookController],
 			providers: [
+				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: CreateBookIfNewUseCase,
 					useValue: {
@@ -85,6 +95,12 @@ describe('BookController', () => {
 				{
 					provide: WINSTON_MODULE_PROVIDER,
 					useValue: mockLogger,
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
+					},
 				},
 			],
 		}).compile()

@@ -1,8 +1,9 @@
-import { Controller, HttpStatus } from '@nestjs/common'
+import { Controller, HttpStatus, UseGuards } from '@nestjs/common'
 
 import { MessagePattern } from '@nestjs/microservices'
 import { IBooksList, ILibrary } from '@bookhood/shared'
 import {
+	AuthUserGuard,
 	GetLibrariesListMQDTO,
 	MQLibraryMessageType,
 	MicroserviceResponseFormatter,
@@ -18,6 +19,7 @@ export class LibraryController {
 		private readonly patchUseCase: PatchUseCase,
 	) {}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQLibraryMessageType.LIST)
 	async getLibrariesList(
 		body: GetLibrariesListMQDTO,
@@ -42,6 +44,7 @@ export class LibraryController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQLibraryMessageType.PATCH)
 	async patch(
 		body: PatchLibraryMQDTO,

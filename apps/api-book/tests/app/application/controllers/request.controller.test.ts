@@ -31,10 +31,12 @@ import {
 	libraryFull,
 	currentUser,
 	request,
-	requestsList,
 	requestInfos,
 	requestList,
 } from '../../../../../shared-api/test/'
+import { ConfigModule } from '@nestjs/config'
+import envConfig from '../../../../../api-conversation/src/config/env.config'
+import { I18nService } from 'nestjs-i18n'
 
 describe('RequestController', () => {
 	let controller: RequestController
@@ -52,6 +54,12 @@ describe('RequestController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [RequestController],
 			providers: [
 				{
@@ -59,6 +67,7 @@ describe('RequestController', () => {
 					useValue: mockLogger,
 				},
 				{ provide: 'RabbitMail', useValue: { send: jest.fn() } },
+				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: CreateRequestUseCase,
 					useValue: {
@@ -87,6 +96,12 @@ describe('RequestController', () => {
 					provide: GetByIdUseCase,
 					useValue: {
 						handler: jest.fn(),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],

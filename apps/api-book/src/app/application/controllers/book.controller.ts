@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Inject } from '@nestjs/common'
+import { Controller, HttpStatus, Inject, UseGuards } from '@nestjs/common'
 
 import { MessagePattern } from '@nestjs/microservices'
 import {
@@ -9,6 +9,7 @@ import {
 } from '@bookhood/shared'
 import {
 	AddBookMQDTO,
+	AuthUserGuard,
 	GetBookMQDTO,
 	HealthCheckStatus,
 	MQBookMessageType,
@@ -26,7 +27,6 @@ import SearchBookUseCase from '../usecases/book/searchBook.usecase'
 import GetUserBooksUseCase from '../usecases/book/getUserBooks.usecase'
 import GetUserLibraryStatsUseCase from '../usecases/library/getUserLibraryStats.usecase'
 import GetUserRequestStatsUseCase from '../usecases/request/getUserRequestStats.usecase'
-import { I18n, I18nContext } from 'nestjs-i18n'
 
 @Controller()
 export class BookController {
@@ -45,6 +45,7 @@ export class BookController {
 		return HealthCheckStatus.UP
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQBookMessageType.CREATE)
 	async addBook(
 		body: AddBookMQDTO,
@@ -103,6 +104,7 @@ export class BookController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQBookMessageType.GET)
 	async getUserBooks(
 		body: GetBookMQDTO,

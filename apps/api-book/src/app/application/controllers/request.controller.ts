@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Inject } from '@nestjs/common'
+import { Controller, HttpStatus, Inject, UseGuards } from '@nestjs/common'
 
 import { ClientProxy, MessagePattern } from '@nestjs/microservices'
 import {
@@ -8,6 +8,7 @@ import {
 	IRequestInfos,
 } from '@bookhood/shared'
 import {
+	AuthUserGuard,
 	CreateRequestMQDTO,
 	GetRequestsMQDTO,
 	MQMailMessageType,
@@ -35,6 +36,7 @@ export class RequestController {
 		private readonly getByIdUseCase: GetByIdUseCase,
 	) {}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQRequestMessageType.CREATE)
 	async create(
 		body: CreateRequestMQDTO,
@@ -75,6 +77,7 @@ export class RequestController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQRequestMessageType.LIST)
 	async getByListStatus(
 		body: GetRequestsMQDTO,
@@ -105,6 +108,7 @@ export class RequestController {
 		}
 	}
 
+	@UseGuards(AuthUserGuard)
 	@MessagePattern(MQRequestMessageType.PATCH)
 	async update(
 		body: PatchRequestMQDTO,

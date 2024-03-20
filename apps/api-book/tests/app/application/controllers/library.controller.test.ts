@@ -7,6 +7,9 @@ import { ILibrary, LibraryStatus, Locale } from '../../../../../shared/src'
 import ListUseCase from '../../../../src/app/application/usecases/library/list.usecase'
 import PatchUseCase from '../../../../src/app/application/usecases/library/patch.usecase'
 import { booksList, currentUser, library } from '../../../../../shared-api/test'
+import envConfig from '../../../../../api-conversation/src/config/env.config'
+import { ConfigModule } from '@nestjs/config'
+import { I18nService } from 'nestjs-i18n'
 
 describe('LibraryController', () => {
 	let controller: LibraryController
@@ -15,8 +18,15 @@ describe('LibraryController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [
+				ConfigModule.forRoot({
+					isGlobal: true,
+					load: [envConfig],
+				}),
+			],
 			controllers: [LibraryController],
 			providers: [
+				{ provide: 'RabbitUser', useValue: { send: jest.fn() } },
 				{
 					provide: ListUseCase,
 					useValue: {
@@ -27,6 +37,12 @@ describe('LibraryController', () => {
 					provide: PatchUseCase,
 					useValue: {
 						handler: jest.fn(),
+					},
+				},
+				{
+					provide: I18nService,
+					useValue: {
+						t: jest.fn(),
 					},
 				},
 			],
