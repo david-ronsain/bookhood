@@ -1,5 +1,3 @@
-import { Locale } from '@bookhood/shared'
-
 export interface INestEnvConfigSettings {
 	protocol?: 'http' | 'https'
 	host?: string
@@ -12,6 +10,7 @@ export interface INestEnvConfigSettings {
 	mailTo?: string
 	sessionDuration?: number
 	sessionToken?: string
+	allowedOrigins?: string[]
 }
 
 interface INestEnvConfigGatewayUserService {

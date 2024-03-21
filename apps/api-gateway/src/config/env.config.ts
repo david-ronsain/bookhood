@@ -10,6 +10,7 @@ export default (): INestEnvConfig => ({
 			| 'http'
 			| 'https',
 		sessionToken: process.env.SESSION_TOKEN || '',
+		allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(','),
 	},
 	gateway: {
 		user: {

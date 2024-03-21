@@ -1,25 +1,41 @@
-import { Logger, ValidationPipe } from '@nestjs/common'
+import { HttpStatus, Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-
-import { AppModule } from './app/app.module'
 import { ConfigService } from '@nestjs/config'
 import { INestEnvConfigSettings } from '@bookhood/shared-api'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+
+import { AppModule } from './app/app.module'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
 import { LoggerInterceptor } from './app/application/interceptors'
 import { HttpExceptionFilter } from './app/application/filters'
+import envConfig from './config/env.config'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
-		cors: true,
+		cors: {
+			methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+			optionsSuccessStatus: HttpStatus.OK,
+			origin: envConfig().settings.allowedOrigins,
+		},
 	})
+
+	app.use(helmet())
+
+	app.use(
+		rateLimit({
+			windowMs: 60 * 1000,
+			limit: 10,
+		}),
+	)
 
 	app.useGlobalPipes(
 		new ValidationPipe({
 			transform: true,
 			forbidUnknownValues: true,
 			stopAtFirstError: true,
-		})
+		}),
 	)
 
 	app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
@@ -35,19 +51,19 @@ async function bootstrap() {
 	SwaggerModule.setup(
 		config.get<INestEnvConfigSettings>('settings').docPrefix,
 		app,
-		document
+		document,
 	)
 
 	app.useGlobalInterceptors(
-		new LoggerInterceptor(app.get(WINSTON_MODULE_NEST_PROVIDER))
+		new LoggerInterceptor(app.get(WINSTON_MODULE_NEST_PROVIDER)),
 	)
 
 	app.useGlobalFilters(
-		new HttpExceptionFilter(app.get(WINSTON_MODULE_NEST_PROVIDER))
+		new HttpExceptionFilter(app.get(WINSTON_MODULE_NEST_PROVIDER)),
 	)
 
 	app.setGlobalPrefix(
-		config.get<INestEnvConfigSettings>('settings').apiPrefix
+		config.get<INestEnvConfigSettings>('settings').apiPrefix,
 	)
 	await app.listen(process.env.APP_API_GATEWAY_PORT)
 
@@ -56,7 +72,7 @@ async function bootstrap() {
 			config.get<INestEnvConfigSettings>('settings').protocol
 		}://${config.get<INestEnvConfigSettings>('settings').host}:${
 			config.get<INestEnvConfigSettings>('settings').port
-		}/${config.get<INestEnvConfigSettings>('settings').apiPrefix}`
+		}/${config.get<INestEnvConfigSettings>('settings').apiPrefix}`,
 	)
 }
 

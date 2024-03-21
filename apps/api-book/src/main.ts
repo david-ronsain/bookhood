@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core'
-
-import { BookModule } from './app/book.module'
 import { Transport, RmqOptions } from '@nestjs/microservices'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
+
+import { BookModule } from './app/book.module'
 import envConfig from './config/env.config'
+import { ValidationPipe } from '@nestjs/common'
 
 async function bootstrap() {
 	const app = await NestFactory.createMicroservice(BookModule, {
@@ -25,6 +26,14 @@ async function bootstrap() {
 			noAck: true,
 		},
 	} as RmqOptions)
+
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			forbidUnknownValues: true,
+			stopAtFirstError: true,
+		}),
+	)
 
 	app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
 
