@@ -4,7 +4,7 @@ import { UserLibraryStats } from '@bookhood/shared-api'
 
 export default class GetUserLibraryStatsUseCase {
 	constructor(
-		@Inject('RequestRepository')
+		@Inject('LibraryRepository')
 		private readonly libraryRepository: LibraryRepository,
 	) {}
 

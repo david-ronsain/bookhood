@@ -15,7 +15,7 @@ import {
 } from '../../../../../shared/src'
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
 import GetUserBooksUseCase from '../../../../src/app/application/usecases/book/getUserBooks.usecase'
-import { HealthCheckStatus } from '../../../../../shared-api/src'
+import { GetStatsMQDTO, HealthCheckStatus } from '../../../../../shared-api/src'
 import GetUserLibraryStatsUseCase from '../../../../src/app/application/usecases/library/getUserLibraryStats.usecase'
 import GetUserRequestStatsUseCase from '../../../../src/app/application/usecases/request/getUserRequestStats.usecase'
 import {
@@ -319,7 +319,13 @@ describe('BookController', () => {
 	})
 
 	describe('getUserBooksStats', () => {
-		const userId = 'userId'
+		const dto: GetStatsMQDTO = {
+			userId: 'userId',
+			session: {
+				token: 'token',
+				locale: Locale.FR,
+			},
+		}
 		const libStats = userLibraryStats
 		const reqStats = userRequestStats
 
@@ -331,7 +337,7 @@ describe('BookController', () => {
 				reqStats,
 			)
 
-			const result = await controller.getUserBooksStats(userId)
+			const result = await controller.getUserBooksStats(dto)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter(
@@ -346,10 +352,10 @@ describe('BookController', () => {
 			)
 
 			expect(getUserLibraryStatsUseCase.handler).toHaveBeenCalledWith(
-				userId,
+				dto.userId,
 			)
 			expect(getUserRequestStatsUseCase.handler).toHaveBeenCalledWith(
-				userId,
+				dto.userId,
 			)
 		})
 
@@ -365,11 +371,11 @@ describe('BookController', () => {
 				'handler',
 			).mockResolvedValueOnce(reqStats)
 
-			const result = await controller.getUserBooksStats(userId)
+			const result = await controller.getUserBooksStats(dto)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter().buildFromException(error, {
-					userId,
+					userId: dto.userId,
 				}),
 			)
 		})
@@ -386,11 +392,11 @@ describe('BookController', () => {
 				'handler',
 			).mockRejectedValueOnce(error)
 
-			const result = await controller.getUserBooksStats(userId)
+			const result = await controller.getUserBooksStats(dto)
 
 			expect(result).toEqual(
 				new MicroserviceResponseFormatter().buildFromException(error, {
-					userId,
+					userId: dto.userId,
 				}),
 			)
 		})

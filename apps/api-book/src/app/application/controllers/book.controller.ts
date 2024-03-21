@@ -11,6 +11,7 @@ import {
 	AddBookMQDTO,
 	AuthUserGuard,
 	GetBookMQDTO,
+	GetStatsMQDTO,
 	HealthCheckStatus,
 	MQBookMessageType,
 	MicroserviceResponseFormatter,
@@ -130,15 +131,15 @@ export class BookController {
 
 	@MessagePattern(MQBookMessageType.GET_STATS)
 	async getUserBooksStats(
-		userId: string,
+		dto: GetStatsMQDTO,
 	): Promise<
 		MicroserviceResponseFormatter<UserLibraryStats & UserRequestStats>
 	> {
 		try {
 			const libStats: UserLibraryStats =
-				await this.getUserLibraryStatsUseCase.handler(userId)
+				await this.getUserLibraryStatsUseCase.handler(dto.userId)
 			const reqStats: UserRequestStats =
-				await this.getUserRequestStatsUseCase.handler(userId)
+				await this.getUserRequestStatsUseCase.handler(dto.userId)
 
 			const stats = {
 				...libStats,
@@ -151,7 +152,7 @@ export class BookController {
 		} catch (err) {
 			return new MicroserviceResponseFormatter<
 				UserLibraryStats & UserRequestStats
-			>().buildFromException(err, { userId })
+			>().buildFromException(err, { userId: dto.userId })
 		}
 	}
 }

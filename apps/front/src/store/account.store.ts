@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EnvConfig } from '../../config/env'
 import { defineStore } from 'pinia'
@@ -38,15 +39,17 @@ export const useAccountStore = defineStore('accountStore', () => {
 	): Promise<any> =>
 		PATCH(EnvConfig.api.url.library + libraryId, {
 			status,
-		}).then(() => {
-			const index = books.value.findIndex(
-				(lib: IBooksListResult) => lib._id === libraryId,
-			)
-
-			if (index >= 0) {
-				books.value[index].status = status
-			}
 		})
+			.then(() => {
+				const index = books.value.findIndex(
+					(lib: IBooksListResult) => lib._id === libraryId,
+				)
+
+				if (index >= 0) {
+					books.value[index].status = status
+				}
+			})
+			.catch(() => {})
 
 	return {
 		booksPage,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { BhCard } from '@bookhood/ui'
-	import { IUser } from '@bookhood/shared'
+	import { type IUser } from '@bookhood/shared'
 	import { computed, onMounted, onUnmounted } from 'vue'
 	import { useProfileStore } from '../../store'
 	import {
@@ -37,82 +37,120 @@
 		class="profile-stats"
 		v-if="stats"
 		:hover="false"
+		border
+		flat
 		:title="profile.firstName + ' ' + profile.lastName">
-		<v-row>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiBookOutline }}</v-icon
-				>{{ $t('account.myProfile.nbBooks', { nb: stats.nbBooks }) }}
-			</v-col>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiMapMarkerOutline }}</v-icon
-				>{{ $t('account.myProfile.nbPlaces', { nb: stats.nbPlaces }) }}
-			</v-col>
-		</v-row>
-		<v-row>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiGiftOutline }}</v-icon
-				>{{
-					$t('account.myProfile.nbBooksToGive', {
-						nb: stats.nbBooksToGive,
-					})
-				}}
-			</v-col>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiTimerSand }}</v-icon
-				>{{
-					$t('account.myProfile.nbBooksToLend', {
-						nb: stats.nbBooksToLend,
-					})
-				}}
-			</v-col>
-		</v-row>
-		<v-row>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiBookArrowLeftOutline }}</v-icon
-				>{{
-					$t('account.myProfile.nbIncomingRequests', {
-						nb: stats.nbIncomingRequests,
-					})
-				}}
-			</v-col>
-			<v-col
-				cols="12"
-				md="6">
-				<v-icon
-					size="20"
-					color="primary"
-					>{{ mdiBookArrowRightOutline }}</v-icon
-				>{{
-					$t('account.myProfile.nbOutgoingRequests', {
-						nb: stats.nbOutgoingRequests,
-					})
-				}}
-			</v-col>
-		</v-row>
+		<template v-slot:text>
+			<v-container>
+				<v-row>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiBookOutline }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbBooks',
+								{
+									nb: stats.nbBooks,
+								},
+								stats.nbBooks,
+							)
+						}}
+					</v-col>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiMapMarkerOutline }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbPlaces',
+								{
+									nb: stats.nbPlaces,
+								},
+								stats.nbPlaces,
+							)
+						}}
+					</v-col>
+				</v-row>
+				<v-row>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiGiftOutline }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbBooksToGive',
+								{
+									nb: stats.nbBooksToGive,
+								},
+								stats.nbBooksToGive,
+							)
+						}}
+					</v-col>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiTimerSand }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbBooksToLend',
+								{
+									nb: stats.nbBooksToLend,
+								},
+								stats.nbBooksToLend,
+							)
+						}}
+					</v-col>
+				</v-row>
+				<v-row>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiBookArrowLeftOutline }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbIncomingRequests',
+								{
+									nb: stats.nbIncomingRequests,
+								},
+								stats.nbIncomingRequests,
+							)
+						}}
+					</v-col>
+					<v-col
+						cols="12"
+						md="6">
+						<v-icon
+							size="20"
+							color="primary"
+							>{{ mdiBookArrowRightOutline }}</v-icon
+						>{{
+							$t(
+								'account.myProfile.nbOutgoingRequests',
+								{
+									nb: stats.nbOutgoingRequests,
+								},
+								stats.nbOutgoingRequests,
+							)
+						}}
+					</v-col>
+				</v-row>
+			</v-container>
+		</template>
 	</bh-card>
 </template>

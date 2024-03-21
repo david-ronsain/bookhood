@@ -331,6 +331,22 @@ export default class LibraryRepositoryMongo implements LibraryRepository {
 								0,
 							],
 						},
+						nbBooksToLend: {
+							$ifNull: [
+								{
+									$first: '$nbBooksToLend.total',
+								},
+								0,
+							],
+						},
+						nbBooksToGive: {
+							$ifNull: [
+								{
+									$first: '$nbBooksToGive.total',
+								},
+								0,
+							],
+						},
 					},
 				},
 			])

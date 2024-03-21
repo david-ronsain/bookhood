@@ -18,3 +18,7 @@ export interface SearchBookMQDTO extends DTOWithAuth {
 export interface GetBookMQDTO extends DTOWithAuth {
 	page: number
 }
+
+export interface GetStatsMQDTO extends DTOWithAuth {
+	userId: string
+}

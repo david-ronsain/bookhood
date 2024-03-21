@@ -106,6 +106,7 @@
 			"nbBooksToGive": "{nb} livre à donner | {nb} livres à donner",
 			"nbBooksToLend": "{nb} livre à prêter | {nb} livres à prêter",
 			"nbIncomingRequests": "{nb} demande reçue | {nb} demandes reçues",
+			"nbOutgoingRequests": "{nb} demande envoyée | {nb} demandes envoyées",
 			"mdiBookArrowRightOutline": "{nb} demande envoyée | {nb} demandes envoyées"
 		}
 	},

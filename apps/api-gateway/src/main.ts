@@ -26,7 +26,7 @@ async function bootstrap() {
 	app.use(
 		rateLimit({
 			windowMs: 60 * 1000,
-			limit: 10,
+			limit: 1000,
 		}),
 	)
 
